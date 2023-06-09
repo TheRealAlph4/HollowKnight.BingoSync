@@ -11,7 +11,7 @@ namespace BingoSync
     public class BingoSync : Mod, ILocalSettings<Settings>
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "v0.0.1";
+        public override string GetVersion() => "0.0.0.1";
 
         const float fadeDuration = 0.2f;
 
