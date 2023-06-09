@@ -1,0 +1,21 @@
+﻿using GlobalEnums;
+
+namespace BingoSync.CustomVariables
+{
+    internal static class Jiji
+    {
+        private static string variableName = "killedShadeJiji";
+        public static bool CheckIfKilledShadeInJijis(string name, bool orig)
+        {
+            if (name != nameof(PlayerData.instance.soulLimited) || orig)
+                return orig;
+
+            var zone = GameManager.instance.sm.mapZone;
+            if (zone != MapZone.TOWN)
+                return orig;
+
+            BingoTracker.UpdateBoolean(variableName, true);
+            return orig;
+        }
+    }
+}

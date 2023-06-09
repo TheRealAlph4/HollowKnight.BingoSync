@@ -1,0 +1,178 @@
+﻿using MagicUI.Core;
+using MagicUI.Elements;
+using MagicUI.Graphics;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using GridLayout = MagicUI.Elements.GridLayout;
+
+namespace BingoSync
+{
+    public static class BingoBoardUI
+    {
+        public static LayoutRoot layoutRoot;
+        private static GridLayout gridLayout;
+        private static Sprite sprite = null;
+
+        public static bool isBingoBoardVisible = true;
+        private static Action<string> Log;
+        private static TextureLoader Loader;
+        private static Dictionary<string, Color> Colors;
+
+        internal class SquareLayoutObjects
+        {
+            public TextObject Text;
+            public Dictionary<string, Image> BackgroundColors;
+        };
+        private static List<SquareLayoutObjects> bingoLayout = null;
+
+        public static void Setup(Action<string> log)
+        {
+            Log = log;
+            layoutRoot = new(true, "Persistent layout");
+
+            gridLayout = new GridLayout(layoutRoot, "grid")
+            {
+                MinWidth = 600,
+                MinHeight = 600,
+                RowDefinitions =
+                {
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                },
+                ColumnDefinitions =
+                {
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                    new GridDimension(1, GridUnit.Proportional),
+                },
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            layoutRoot.VisibilityCondition = () => { return isBingoBoardVisible; };
+
+            var assembly = Assembly.GetExecutingAssembly();
+            Loader = new TextureLoader(assembly, "BingoSync.Resources.Images");
+            Loader.Preload();
+            string[] resources = assembly.GetManifestResourceNames();
+            foreach (var resource in resources)
+            {
+                Log($"resource: {resource}");
+            }
+
+            Colors = new Dictionary<string, Color>
+            {
+                { "blank", Color.black },
+                { "orange", new Color(1, 0.612f, 0.071f) },
+                { "red", Color.red },
+                { "blue", Color.blue },
+                { "green", Color.green },
+                { "purple", Color.magenta },
+            };
+            
+            sprite = Loader.GetTexture("BingoSync Base Background.png").ToSprite();
+
+            CreateBaseLayout();
+            layoutRoot.ListenForHotkey(KeyCode.B, () =>
+            {
+                if (BingoSyncClient.board != null)
+                {
+                    isBingoBoardVisible = !isBingoBoardVisible;
+                }
+            });
+            BingoSyncClient.BoardUpdated.Add(UpdateGrid);
+        }
+
+        public static void UpdateGrid(Exception error)
+        {
+            if (BingoSyncClient.board == null || error != null)
+            {
+                return;
+            }
+
+            for (var position = 0; position < BingoSyncClient.board.Count; position++)
+            {
+                bingoLayout[position].Text.Text = BingoSyncClient.board[position].Name;
+                var colors = BingoSyncClient.board[position].Colors.Split(' ').ToList();
+                bingoLayout[position].BackgroundColors.Keys.ToList().ForEach(color =>
+                {
+                    bingoLayout[position].BackgroundColors[color].Height = 0;
+                });
+                colors.ForEach(color =>
+                {
+                    bingoLayout[position].BackgroundColors[color].Height = 110 / colors.Count;
+                });
+            }
+        }
+
+        public static void CreateBaseLayout() {
+            bingoLayout = new List<SquareLayoutObjects>();
+            for (int row = 0; row < 5; row++)
+            {
+                for (int column = 0; column < 5; column++)
+                {
+                    var (stack, images) = GenerateSquareBackgroundImage(row, column);
+                    gridLayout.Children.Add(stack);
+
+                    var textObject = new TextObject(layoutRoot, $"square_{row}_{column}")
+                    {
+                        FontSize = 14,
+                        Text = "",
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        MaxWidth = 100,
+                        MaxHeight = 100,
+                        Padding = new Padding(10),
+                        ContentColor = Color.white,
+                    }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
+                    gridLayout.Children.Add(textObject);
+
+                    bingoLayout.Add(new SquareLayoutObjects
+                    {
+                        Text = textObject,
+                        BackgroundColors = images,
+                    });
+                }
+            }
+        }
+
+        private static (StackLayout, Dictionary<string, Image>) GenerateSquareBackgroundImage(int row, int column)
+        {
+            var stack = new StackLayout(layoutRoot, $"background_{row}_{column}")
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Orientation = Orientation.Vertical,
+                Spacing = 0,
+            }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
+
+            var colors = Colors.Keys.ToList();
+            var images = new Dictionary<string, Image>();
+            for (int brow = 0; brow < colors.Count; brow++) {
+                Color tint;
+                if (Colors.TryGetValue(colors[brow], out tint))
+                {
+                    var backgroundImage = new Image(layoutRoot, sprite, $"image_{brow}_{row}_{column}")
+                    {
+                        Height = 0,
+                        Width = 110,
+                        Tint = tint,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                    };
+                    stack.Children.Add(backgroundImage);
+                    images.Add(colors[brow], backgroundImage);
+                }
+            }
+
+            return (stack, images);
+        }
+    }
+}
