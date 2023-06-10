@@ -13,15 +13,14 @@ namespace BingoSync
 {
     internal class BingoSyncClient
     {
-        public static Action<string> _log;
+        private static Action<string> Log;
 
         public static string room = "";
         public static string password = "";
-        public static string nickname = "BingoSyncMod";
+        public static string nickname = "";
         public static string color = "";
 
         public static bool joined = false, joining = false;
-        public static bool cookiesSet = false;
 
         public static List<BoardSquare> board = null;
 
@@ -30,10 +29,14 @@ namespace BingoSync
         private static HttpClient client = null;
         private static ClientWebSocket webSocketClient = null;
 
-        public static List<Action<Exception>> BoardUpdated;
+        public static List<Action> BoardUpdated;
 
-        public static void Setup()
+        private static int maxRetries = 10;
+
+        public static void Setup(Action<string> log)
         {
+            Log = log;
+
             cookieContainer = new CookieContainer();
             handler = new HttpClientHandler();
             handler.CookieContainer = cookieContainer;
@@ -41,64 +44,49 @@ namespace BingoSync
             {
                 BaseAddress = new Uri("https://bingosync.com"),
             };
-            RetryLoadCookie();
+            LoadCookie();
 
             webSocketClient = new ClientWebSocket();
 
-            BoardUpdated = new List<Action<Exception>>();
+            BoardUpdated = new List<Action>();
         }
 
-        private static void RetryLoadCookie(int maxAttempts = 10)
+        private static void LoadCookie()
         {
-            if (maxAttempts <= 0)
-            {
-                return;
-            }
-
-            LoadCookie((ex) =>
-            {
-                if (ex != null)
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                var task = client.GetAsync("");
+                return task.ContinueWith(responseTask =>
                 {
-                    RetryLoadCookie(maxAttempts - 1);
-                }
-            });
-        }
-
-        private static void LoadCookie(Action<Exception> errorCallback)
-        {
-            var task = client.GetAsync("");
-            _ = task.ContinueWith(responseTask =>
-            {
-                HttpResponseMessage response = null;
-                try
-                {
+                    HttpResponseMessage response = null;
                     response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
-                } catch (Exception ex)
-                {
-                    errorCallback(ex);
-                    return;
-                }
-
-                if (response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> values))
-                {
-                    foreach (string cookieHeader in values)
+                    if (response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> values))
                     {
-                        string[] cookieParts = cookieHeader.Split(';');
-                        string cookieName = cookieParts[0].Split('=')[0];
-                        string cookieValue = cookieParts[0].Split('=')[1];
+                        foreach (string cookieHeader in values)
+                        {
+                            string[] cookieParts = cookieHeader.Split(';');
+                            string cookieName = cookieParts[0].Split('=')[0];
+                            string cookieValue = cookieParts[0].Split('=')[1];
 
-                        Cookie cookie = new Cookie(cookieName.Trim(), cookieValue.Trim(), "/", response.RequestMessage.RequestUri.Host);
-                        cookieContainer.Add(response.RequestMessage.RequestUri, cookie);
+                            Cookie cookie = new Cookie(cookieName.Trim(), cookieValue.Trim(), "/", response.RequestMessage.RequestUri.Host);
+                            cookieContainer.Add(response.RequestMessage.RequestUri, cookie);
+                        }
                     }
-                }
-            });
+                });
+            }, maxRetries, nameof(LoadCookie));
         }
+
         public static void ExitRoom()
         {
             joined = false;
             joining = false;
+            UpdateBoardAndBroadcast(null);
+        }
+
+        private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard) {
+            board = newBoard;
             BingoTracker.ClearFinishedGoals();
+            BoardUpdated.ForEach(f => f());
         }
 
         public static void JoinRoom(Action<Exception> callback)
@@ -129,7 +117,6 @@ namespace BingoSync
                     readTask.ContinueWith(joinRoomResponse =>
                     {
                         var socketJoin = JsonConvert.DeserializeObject<SocketJoin>(joinRoomResponse.Result);
-                        _log($"joined room, response is {socketJoin.SocketKey}");
                         ConnectToBroadcastSocket(socketJoin);
                     });
 
@@ -154,45 +141,50 @@ namespace BingoSync
                 Color = color,
                 RemoveColor = clear,
             };
-            var payload = JsonConvert.SerializeObject(selectInput);
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
-            var task = client.PutAsync("api/select", content);
-            _ = task.ContinueWith(responseTask =>
-            {
-                var response = responseTask.Result;
-                response.EnsureSuccessStatusCode();
-            });
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                var payload = JsonConvert.SerializeObject(selectInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = client.PutAsync("api/select", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                });
+            }, maxRetries, nameof(SelectSquare));
         }
 
         private static void ConnectToBroadcastSocket(SocketJoin socketJoin)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
-            var connectTask = webSocketClient.ConnectAsync(socketUri, CancellationToken.None);
-            _ = connectTask.ContinueWith(connectResponse =>
-            {
-                if (connectResponse.Exception != null)
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                var connectTask = webSocketClient.ConnectAsync(socketUri, CancellationToken.None);
+                return connectTask.ContinueWith(connectResponse =>
                 {
-                    Console.WriteLine($"Error connecting to websocket: {connectResponse.Exception}");
-                    return;
-                }
+                    if (connectResponse.Exception != null)
+                    {
+                        Log($"error connecting to websocket: {connectResponse.Exception}");
+                        throw connectResponse.Exception;
+                    }
 
-                _log($"connected to the socket, sending socketJoin object");
-                var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
-                var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
-                var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-                sendTask.ContinueWith(_ =>
-                {
-                    _log($"will listen for updates");
-                    ListenForBoardUpdates();
+                    Log($"connected to the socket, sending socketJoin object");
+                    var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
+                    var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
+                    var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
+                    sendTask.ContinueWith(_ =>
+                    {
+                        ListenForBoardUpdates(socketJoin);
+                    });
                 });
-            });
+            }, maxRetries, nameof(ConnectToBroadcastSocket));
         }
 
-        private static void ListenForBoardUpdates()
+        private static void ListenForBoardUpdates(SocketJoin socketJoin)
         {
             if (webSocketClient.State != WebSocketState.Open)
             {
-                //ConnectToBroadcastSocket();
+                Log($"socket is closed, will try to connect again");
+                ConnectToBroadcastSocket(socketJoin);
+                return;
             }
             var buffer = new byte[1024];
             var result = webSocketClient.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
@@ -215,12 +207,9 @@ namespace BingoSync
                                     break;
                                 }
                             }
-                            BoardUpdated.ForEach(f =>
-                            {
-                                f(null);
-                            });
+                            BoardUpdated.ForEach(f => f());
                         } else if (obj.Type == "new-card") {
-                            BingoTracker.ClearFinishedGoals();
+                            UpdateBoardAndBroadcast(null);
                             UpdateBoard();
                         } else {
                             return;
@@ -228,39 +217,29 @@ namespace BingoSync
                     }
                 } finally
                 {
-                    ListenForBoardUpdates();
+                    ListenForBoardUpdates(socketJoin);
                 }
             });
         }
 
         public static void UpdateBoard()
         {
-            var task = client.GetAsync($"room/{room}/board");
-            _ = task.ContinueWith(responseTask =>
-            {
-                HttpResponseMessage response = null;
-                try
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                var task = client.GetAsync($"room/{room}/board");
+                return task.ContinueWith(responseTask =>
                 {
+                    HttpResponseMessage response = null;
                     response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     var readTask = response.Content.ReadAsStringAsync();
                     readTask.ContinueWith(boardResponse =>
                     {
-                        board = JsonConvert.DeserializeObject<List<BoardSquare>>(boardResponse.Result);
-                        _log("updated board");
-                        BoardUpdated.ForEach(f =>
-                        {
-                            f(null);
-                        });
+                        var newBoard = JsonConvert.DeserializeObject<List<BoardSquare>>(boardResponse.Result);
+                        UpdateBoardAndBroadcast(newBoard);
+                        Log("updated board");
                     });
-                } catch (Exception ex)
-                {
-                    BoardUpdated.ForEach(f =>
-                    {
-                        f(ex);
-                    });
-                }
-            });
+                });
+            }, maxRetries, nameof(UpdateBoard));
         }
     }
 

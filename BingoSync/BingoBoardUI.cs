@@ -61,11 +61,6 @@ namespace BingoSync
             var assembly = Assembly.GetExecutingAssembly();
             Loader = new TextureLoader(assembly, "BingoSync.Resources.Images");
             Loader.Preload();
-            string[] resources = assembly.GetManifestResourceNames();
-            foreach (var resource in resources)
-            {
-                Log($"resource: {resource}");
-            }
 
             Colors = new Dictionary<string, Color>
             {
@@ -90,9 +85,9 @@ namespace BingoSync
             BingoSyncClient.BoardUpdated.Add(UpdateGrid);
         }
 
-        public static void UpdateGrid(Exception error)
+        public static void UpdateGrid()
         {
-            if (BingoSyncClient.board == null || error != null)
+            if (BingoSyncClient.board == null)
             {
                 return;
             }

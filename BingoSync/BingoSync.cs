@@ -17,8 +17,6 @@ namespace BingoSync
 
         public override void Initialize()
         {
-            BingoTracker.Setup(Log);
-
             // Check bingo objectives every frame
             ModHooks.HeroUpdateHook += HeroUpdate;
 
@@ -81,7 +79,10 @@ namespace BingoSync
             );
 
             MenuUI.Setup();
+            BingoSyncClient.Setup(Log);
+            BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
+            RetryHelper.Setup(Log);
         }
 
         private IEnumerator FadeOut(On.UIManager.orig_FadeOutCanvasGroup orig, UIManager self, CanvasGroup cg)
@@ -118,7 +119,7 @@ namespace BingoSync
 
         private void ConfigureBingoSync()
         {
-            BingoTracker.UpdateBoard();
+            BingoSyncClient.UpdateBoard();
         }
 
         private void HeroUpdate()

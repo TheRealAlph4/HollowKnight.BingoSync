@@ -12,10 +12,6 @@ namespace BingoSync
         private static List<BingoSquare> _allPossibleSquares;
         private static List<string> _finishedGoals;
         private static Action<string> Log;
-
-        const int boardUpdateMaxRetries = 10;
-        private static int boardUpdateRetries = boardUpdateMaxRetries;
-
         public static Settings settings { get; set; }
 
         public static void Setup(Action<string> log)
@@ -23,9 +19,6 @@ namespace BingoSync
             _finishedGoals = new List<string>();
 
             Log = log;
-            BingoSyncClient._log = log;
-            BingoSyncClient.Setup();
-            BingoSyncClient.BoardUpdated.Add(BoardUpdatedCallback);
 
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             foreach (var resource in resources)
@@ -42,26 +35,6 @@ namespace BingoSync
                     _allPossibleSquares = ser.Deserialize<List<BingoSquare>>(jsonReader);
                 }
             }
-        }
-
-        private static void BoardUpdatedCallback(Exception error)
-        {
-            if (error == null)
-            {
-                boardUpdateRetries = boardUpdateMaxRetries;
-                return;
-            }
-            boardUpdateRetries--;
-            if (boardUpdateRetries > 0)
-            {
-                UpdateBoard();
-            }
-        }
-
-        public static void UpdateBoard()
-        {
-            Log("trying to update board");
-            BingoSyncClient.UpdateBoard();
         }
 
         public static void UpdateBoolean(string name, bool value)
