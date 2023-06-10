@@ -37,6 +37,9 @@ namespace BingoSync.Helpers
                 case MapZone.WATERWAYS:
                 case MapZone.GODSEEKER_WASTE:
                     return MapZone.WATERWAYS;
+                case MapZone.PEAK:
+                case MapZone.MINES:
+                    return MapZone.PEAK;
                 default:
                     return zone;
             }

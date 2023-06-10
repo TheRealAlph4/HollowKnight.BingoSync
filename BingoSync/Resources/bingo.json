@@ -68,9 +68,10 @@
     "name": "Crystal Guardian 2",
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "defeatedMegaBeamMiner2",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killsMegaBeamMiner",
+        "expectedQuantity": 2,
+        "state": "Removed"
       }
     ]
   },
@@ -286,7 +287,7 @@
         "type": "Int",
         "variableName": "grimmChildLevel",
         "expectedQuantity": 1,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -317,7 +318,7 @@
         "type": "Int",
         "variableName": "fireballLevel",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -328,7 +329,7 @@
         "type": "Int",
         "variableName": "screamLevel",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -339,7 +340,7 @@
         "type": "Int",
         "variableName": "screamLevel",
         "expectedQuantity": 1,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -350,7 +351,7 @@
         "type": "Int",
         "variableName": "quakeLevel",
         "expectedQuantity": 1,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -361,7 +362,7 @@
         "type": "Int",
         "variableName": "nailSmithUpgrades",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -372,7 +373,7 @@
         "type": "Int",
         "variableName": "nailSmithUpgrades",
         "expectedQuantity": 3,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -403,7 +404,7 @@
         "type": "Int",
         "variableName": "ore",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -524,13 +525,13 @@
         "type": "Int",
         "variableName": "grubsSaved_CROSSROADS",
         "expectedQuantity": 5,
-        "state": "Current"
+        "state": "AtLeast"
       },
       {
         "type": "Int",
         "variableName": "grubsSaved_FOG_CANYON",
         "expectedQuantity": 1,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -541,7 +542,7 @@
         "type": "Int",
         "variableName": "grubsSaved_CITY",
         "expectedQuantity": 5,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -552,13 +553,13 @@
         "type": "Int",
         "variableName": "grubsSaved_GREEN_PATH",
         "expectedQuantity": 4,
-        "state": "Current"
+        "state": "AtLeast"
       },
       {
         "type": "Int",
         "variableName": "grubsSaved_WASTES",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -569,7 +570,7 @@
         "type": "Int",
         "variableName": "grubsSaved_PEAK",
         "expectedQuantity": 7,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -580,7 +581,7 @@
         "type": "Int",
         "variableName": "grubsSaved_WATERWAYS",
         "expectedQuantity": 3,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -591,7 +592,7 @@
         "type": "Int",
         "variableName": "grubsSaved_ROYAL_GARDENS",
         "expectedQuantity": 3,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -602,7 +603,7 @@
         "type": "Int",
         "variableName": "grubsSaved_DEEPNEST",
         "expectedQuantity": 5,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -613,7 +614,7 @@
         "type": "Int",
         "variableName": "grubsCollected",
         "expectedQuantity": 15,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -624,7 +625,7 @@
         "type": "Int",
         "variableName": "grubsCollected",
         "expectedQuantity": 20,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -656,7 +657,7 @@
         "type": "Int",
         "variableName": "MPReserveMax",
         "expectedQuantity": 33,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -667,7 +668,7 @@
         "type": "Int",
         "variableName": "maxHealthBase",
         "expectedQuantity": 6,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -678,7 +679,7 @@
         "type": "Int",
         "variableName": "maxHealthBase",
         "expectedQuantity": 7,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -689,7 +690,7 @@
         "type": "Int",
         "variableName": "trinket1",
         "expectedQuantity": 5,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -700,7 +701,7 @@
         "type": "Int",
         "variableName": "trinket2",
         "expectedQuantity": 5,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -802,12 +803,12 @@
       },
       {
         "type": "Bool",
-        "variableName": "cityLift1",
+        "variableName": "usedLift1",
         "expectedValue": true
       },
       {
         "type": "Bool",
-        "variableName": "cityLift2",
+        "variableName": "usedLift2",
         "expectedValue": true
       }
     ]
@@ -829,7 +830,7 @@
         "type": "Int",
         "variableName": "bankerBalance",
         "expectedQuantity": 1500,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1064,7 +1065,7 @@
         "type": "Int",
         "variableName": "geoSpent",
         "expectedQuantity": 3000,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1075,7 +1076,7 @@
         "type": "Int",
         "variableName": "geoSpent",
         "expectedQuantity": 4000,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1086,7 +1087,7 @@
         "type": "Int",
         "variableName": "geoSpent",
         "expectedQuantity": 5000,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1097,7 +1098,7 @@
         "type": "Int",
         "variableName": "paidTolls",
         "expectedQuantity": 6,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1323,7 +1324,7 @@
         "type": "Int",
         "variableName": "rancidEggs",
         "expectedQuantity": 4,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1457,7 +1458,7 @@
         "type": "Int",
         "variableName": "dreamTreesCompleted",
         "expectedQuantity": 4,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1561,7 +1562,7 @@
         "type": "Int",
         "variableName": "quakeLevel",
         "expectedQuantity": 2,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },
@@ -1642,7 +1643,7 @@
         "type": "Int",
         "variableName": "parryRevekConsecutive",
         "expectedQuantity": 3,
-        "state": "Current"
+        "state": "AtLeast"
       }
     ]
   },

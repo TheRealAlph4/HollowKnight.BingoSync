@@ -11,7 +11,7 @@ namespace BingoSync
     public class BingoSync : Mod, ILocalSettings<Settings>
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.1";
+        public override string GetVersion() => "0.0.0.2";
 
         const float fadeDuration = 0.2f;
 
@@ -42,6 +42,9 @@ namespace BingoSync
             // Revek
             On.HeroController.NailParry += Revek.CheckParry;
             On.HeroController.EnterScene += Revek.EnterRoom;
+            
+            // Lifts
+            ModHooks.SetPlayerBoolHook += Lifts.CheckIfLiftWasUsed;
             
             // Jiji
             ModHooks.SetPlayerBoolHook += Jiji.CheckIfKilledShadeInJijis;

@@ -183,7 +183,7 @@ namespace BingoSync
                 }
                 switch (requirement.State)
                 {
-                    case BingoRequirementState.Current:
+                    case BingoRequirementState.AtLeast:
                         quantity = current;
                         break;
                     case BingoRequirementState.Added:
@@ -259,7 +259,7 @@ namespace BingoSync
 
     enum BingoRequirementState
     {
-        Current,
+        AtLeast,
         Added,
         Removed,
     }
@@ -268,7 +268,7 @@ namespace BingoSync
     {
         public BingoRequirementType Type = BingoRequirementType.Bool;
         public string VariableName = string.Empty;
-        public BingoRequirementState State = BingoRequirementState.Current;
+        public BingoRequirementState State = BingoRequirementState.AtLeast;
         public int ExpectedQuantity = 0;
         public bool ExpectedValue = false;
         public bool IsMet = false;
