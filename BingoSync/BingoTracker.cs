@@ -17,13 +17,14 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             _finishedGoals = new List<string>();
+            _allPossibleSquares = new List<BingoSquare>();
 
             Log = log;
 
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             foreach (var resource in resources)
             {
-                if (!resource.StartsWith("BingoSync.Resources.bingo"))
+                if (!resource.StartsWith("BingoSync.Resources.Squares"))
                 {
                     continue;
                 }
@@ -32,7 +33,7 @@ namespace BingoSync
                 using (JsonTextReader jsonReader = new JsonTextReader(reader))
                 {
                     JsonSerializer ser = new JsonSerializer();
-                    _allPossibleSquares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                    _allPossibleSquares.AddRange(ser.Deserialize<List<BingoSquare>>(jsonReader));
                 }
             }
         }

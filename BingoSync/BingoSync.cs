@@ -4,7 +4,9 @@ using MonoMod.Utils;
 using System.Collections;
 using System.Reflection;
 using BingoSync.CustomVariables;
+using BingoSync.CustomVariables.Rando;
 using UnityEngine;
+using ItemChanger;
 
 namespace BingoSync
 {
@@ -65,6 +67,9 @@ namespace BingoSync
             // Giant Geo Egg
             ModHooks.HeroUpdateHook += GiantGeoEgg.CheckIfGiantGeoEggWasDestroyed;
             ModHooks.ColliderCreateHook += GiantGeoEgg.FindGiantGeoEggGameObject;
+
+            // Rando
+            AbstractItem.AfterGiveGlobal += Checks.Checked;
 
             // Menu
             On.UIManager.ContinueGame += ContinueGame;

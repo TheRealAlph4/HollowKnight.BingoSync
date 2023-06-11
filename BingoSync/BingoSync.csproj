@@ -325,16 +325,25 @@
     <Reference Include="MagicUI">
 	  <HintPath>$(HollowKnightRefs)/Mods/MagicUI/MagicUI.dll</HintPath>
     </Reference>
+    <Reference Include="RandomizerMod">
+      <HintPath>$(HollowKnightRefs)/Mods/Randomizer 4/RandomizerMod.dll</HintPath>
+    </Reference>
+    <Reference Include="RandomizerCore">
+      <HintPath>$(HollowKnightRefs)/Mods/RandomizerCore/RandomizerCore.dll</HintPath>
+    </Reference>
+    <Reference Include="ItemChanger">
+      <HintPath>$(HollowKnightRefs)/Mods/ItemChanger/ItemChanger.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="ReadMe.md" />
     <None Include="Resources\.gitignore" />
-    <None Include="Resources\bingo.json" />
+    <None Include="Resources\Squares\Normal.json" />
     <None Include="Resources\Images\*.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\bingo.json" />
+    <EmbeddedResource Include="Resources\Squares\Normal.json" />
     <EmbeddedResource Include="Resources\Images\*.png" />
   </ItemGroup>
 </Project>
