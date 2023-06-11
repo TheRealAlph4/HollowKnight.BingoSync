@@ -139,7 +139,8 @@ namespace BingoSync
             requirement.IsMet = false;
             if (requirement.Type == BingoRequirementType.Bool)
             {
-                if (settings.Booleans.TryGetValue(requirement.VariableName, out var value) && value == requirement.ExpectedValue)
+                settings.Booleans.TryGetValue(requirement.VariableName, out var value);
+                if (value == requirement.ExpectedValue)
                 {
                     requirement.IsMet = true;
                 }
@@ -174,6 +175,10 @@ namespace BingoSync
         }
 
         public static void ClearFinishedGoals() {
+            _allPossibleSquares.ForEach(square => {
+                square.Requirements.ForEach(requirement => requirement.IsMet = false);
+                square.Solved = false;
+            });
             _finishedGoals = new List<string>();
         }
 
