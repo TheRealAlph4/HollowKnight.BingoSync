@@ -1,4 +1,4 @@
-using Modding;
+﻿using Modding;
 using MonoMod.RuntimeDetour;
 using MonoMod.Utils;
 using System.Collections;
@@ -12,7 +12,7 @@ namespace BingoSync
     public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.2";
+        public override string GetVersion() => "0.0.0.3";
 
         const float fadeDuration = 0.2f;
 
