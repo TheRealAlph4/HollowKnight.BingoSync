@@ -9,3 +9,7 @@ For now only works for the "Normal" variant of the game, but implementing other 
 ## Configuration
 
 Go to `Options > Mods > BingoSync Options` to change the mod settings like some behaviours and keybinds.
+
+## Dependencies
+
+Requires version `1.8+` of `MagicUI`
