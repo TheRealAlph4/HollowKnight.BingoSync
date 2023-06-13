@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Settings;
 
 namespace BingoSync
 {
@@ -12,7 +13,7 @@ namespace BingoSync
         private static List<BingoSquare> _allPossibleSquares;
         private static List<string> _finishedGoals;
         private static Action<string> Log;
-        public static Settings settings { get; set; }
+        public static SaveSettings settings { get; set; }
 
         public static void Setup(Action<string> log)
         {
@@ -184,7 +185,7 @@ namespace BingoSync
 
         public static void FinishGoal(string goal)
         {
-            if (BingoSyncClient.board == null)
+            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
             {
                 return;
             }

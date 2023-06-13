@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BingoSync
+namespace Settings
 {
-    public class Settings
+    public class SaveSettings
     {
         public Dictionary<string, bool> Booleans = new Dictionary<string, bool>();
         public Dictionary<Tuple<string, string>, bool> BooleansByArea = new Dictionary<Tuple<string, string>, bool>();

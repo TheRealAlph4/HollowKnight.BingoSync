@@ -15,6 +15,8 @@ namespace BingoSync
         public static LayoutRoot layoutRoot;
         private static GridLayout gridLayout;
         private static Sprite sprite = null;
+        private static Button revealCardButton = null;
+        private static TextObject loadingText = null;
 
         public static bool isBingoBoardVisible = true;
         private static Action<string> Log;
@@ -55,8 +57,35 @@ namespace BingoSync
                 },
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Right,
+                Visibility = Visibility.Hidden,
             };
-            layoutRoot.VisibilityCondition = () => { return isBingoBoardVisible; };
+
+            revealCardButton = new Button(layoutRoot, "revealCard") {
+                Content = "Reveal Card",
+                FontSize = 15,
+                Margin = 20,
+                BorderColor = Color.white,
+                ContentColor = Color.white,
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Padding = new Padding(20),
+                MinWidth = 200,
+                Visibility = Visibility.Hidden,
+            };
+            revealCardButton.Click += (sender) => {
+                BingoSyncClient.RevealCard();
+            };
+
+            loadingText = new TextObject(layoutRoot) {
+                Text = "Loading...",
+                FontSize = 15,
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                MaxWidth = 200,
+                Padding = new Padding(20),
+                ContentColor = Color.white,
+                Visibility = Visibility.Hidden,
+            };
 
             var assembly = Assembly.GetExecutingAssembly();
             Loader = new TextureLoader(assembly, "BingoSync.Resources.Images");
@@ -75,18 +104,27 @@ namespace BingoSync
             sprite = Loader.GetTexture("BingoSync Base Background.png").ToSprite();
 
             CreateBaseLayout();
-            layoutRoot.ListenForHotkey(KeyCode.B, () =>
+
+            layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.ToggleBoard, () =>
             {
                 if (BingoSyncClient.board != null)
                 {
                     isBingoBoardVisible = !isBingoBoardVisible;
                 }
             });
+            layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, () => {
+                BingoSyncClient.RevealCard();
+            });
+            layoutRoot.VisibilityCondition = () => (BingoSyncClient.joined && isBingoBoardVisible);
             BingoSyncClient.BoardUpdated.Add(UpdateGrid);
         }
 
         public static void UpdateGrid()
         {
+            loadingText.Visibility = (BingoSyncClient.board == null) ? Visibility.Visible : Visibility.Hidden;
+            revealCardButton.Visibility = (BingoSyncClient.board != null && BingoSyncClient.isHidden) ? Visibility.Visible : Visibility.Hidden;
+            gridLayout.Visibility = (BingoSyncClient.board == null || BingoSyncClient.isHidden) ? Visibility.Hidden : Visibility.Visible;
+
             if (BingoSyncClient.board == null)
             {
                 return;
