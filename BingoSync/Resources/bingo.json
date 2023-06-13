@@ -1134,21 +1134,6 @@
         "type": "Bool",
         "variableName": "gotCharm_25",
         "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_23",
-        "expectedValue": false
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_24",
-        "expectedValue": false
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_25",
-        "expectedValue": false
       }
     ]
   },
