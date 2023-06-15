@@ -227,7 +227,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "killedGrimm",
         "expectedValue": true
       }
     ]
@@ -404,9 +404,10 @@
     "name": "Kill three different Great Husk Sentries",
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "---",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killedUnique_GreatShieldZombie",
+        "expectedQuantity": 3,
+        "state": "AtLeast"
       }
     ]
   },
@@ -424,9 +425,10 @@
     "name": "Kill two different Alubas",
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "---",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killedUnique_LazyFlyer",
+        "expectedQuantity": 2,
+        "state": "AtLeast"
       }
     ]
   },
@@ -462,63 +464,12 @@
   },
   {
     "name": "Kill 6 different Stalking Devouts",
-    "criteria": "Some",
-    "amount": 6,
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (1)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (2)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (3)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (4)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (2)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (3)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (4)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_34",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_41",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killedUnique_SlashSpider",
+        "expectedQuantity": 6,
+        "state": "AtLeast"
       }
     ]
   },
@@ -586,9 +537,10 @@
     "name": "Kill two different Maggots",
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "---",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killedUnique_PrayerSlug",
+        "expectedQuantity": 2,
+        "state": "AtLeast"
       }
     ]
   },
@@ -781,7 +733,17 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "gotCharm_23",
+        "expectedValue": true
+      },
+      {
+        "type": "Bool",
+        "variableName": "gotCharm_24",
+        "expectedValue": true
+      },
+      {
+        "type": "Bool",
+        "variableName": "gotCharm_25",
         "expectedValue": true
       }
     ]
@@ -1254,7 +1216,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "hasPinGrub",
         "expectedValue": true
       }
     ]
@@ -1275,7 +1237,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "hasGodfinder",
         "expectedValue": true
       }
     ]
@@ -1372,7 +1334,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "hasTramPass",
         "expectedValue": true
       }
     ]
@@ -1382,7 +1344,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "unlockedCompletionRate",
         "expectedValue": true
       }
     ]
@@ -1935,7 +1897,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "metCloth",
         "expectedValue": true
       }
     ]
@@ -2055,7 +2017,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "enteredGGAtrium",
         "expectedValue": true
       }
     ]
@@ -2114,9 +2076,10 @@
     "name": "10 Lifeblood masks at the same time",
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "---",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "healthBlue",
+        "expectedQuantity": 10,
+        "state": "AtLeast"
       }
     ]
   },
@@ -2327,7 +2290,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "killedBindingSeal",
         "expectedValue": true
       }
     ]
@@ -2587,7 +2550,7 @@
     "requirements": [
       {
         "type": "Bool",
-        "variableName": "---",
+        "variableName": "tukMet",
         "expectedValue": true
       }
     ]

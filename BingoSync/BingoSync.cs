@@ -5,17 +5,20 @@ using System.Collections;
 using System.Reflection;
 using BingoSync.CustomVariables;
 using BingoSync.CustomVariables.Rando;
+using Settings;
 using UnityEngine;
 using ItemChanger;
 
 namespace BingoSync
 {
-    public class BingoSync : Mod, ILocalSettings<Settings>
+    public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.2";
+        public override string GetVersion() => "0.0.0.3";
 
         const float fadeDuration = 0.2f;
+
+        public static ModSettings modSettings { get; set; } = new ModSettings();
 
         public override void Initialize()
         {
@@ -61,8 +64,8 @@ namespace BingoSync
             // Tram
             ModHooks.SetPlayerIntHook += Tram.CheckIfStationWasVisited;
 
-            // Stalking Devouts
-            ModHooks.OnReceiveDeathEventHook += StalkingDevouts.CheckIfStalkingDevoutWasKilled;
+            // Unique Enemies
+            ModHooks.OnReceiveDeathEventHook += UniqueEnemies.CheckIfUniqueEnemyWasKilled;
 
             // Giant Geo Egg
             ModHooks.HeroUpdateHook += GiantGeoEgg.CheckIfGiantGeoEggWasDestroyed;
@@ -83,11 +86,11 @@ namespace BingoSync
                 DreamTrees.TrackDreamTrees
             );
 
+            RetryHelper.Setup(Log);
             MenuUI.Setup();
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
-            RetryHelper.Setup(Log);
         }
 
         private IEnumerator FadeOut(On.UIManager.orig_FadeOutCanvasGroup orig, UIManager self, CanvasGroup cg)
@@ -111,20 +114,21 @@ namespace BingoSync
         private void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
         {
             MenuUI.layoutRoot.BeginFade(0, fadeDuration);
-            ConfigureBingoSync();
+            ConfigureBingoSyncOnGameStart();
             orig(self);
         }
 
         private void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
         {
             MenuUI.layoutRoot.BeginFade(0, fadeDuration);
-            ConfigureBingoSync();
+            ConfigureBingoSyncOnGameStart();
             orig(self, permaDeath, bossRush);
         }
 
-        private void ConfigureBingoSync()
+        private void ConfigureBingoSyncOnGameStart()
         {
-            BingoSyncClient.UpdateBoard();
+            if (!modSettings.RevealCardOnGameStart) return;
+            BingoSyncClient.RevealCard();
         }
 
         private void HeroUpdate()
@@ -136,6 +140,7 @@ namespace BingoSync
         {
             PlayerData.instance.SetBoolInternal(name, orig);
             BingoTracker.UpdateBoolean(name, orig);
+            Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
             return orig;
         }
 
@@ -144,17 +149,38 @@ namespace BingoSync
             var previous = PlayerData.instance.GetIntInternal(name);
             PlayerData.instance.SetIntInternal(name, current);
             BingoTracker.UpdateInteger(name, previous, current);
+            Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
             return current;
         }
 
-        public void OnLoadLocal(Settings s)
+        public void OnLoadLocal(Settings.SaveSettings s)
         {
             BingoTracker.settings = s;
         }
 
-        public Settings OnSaveLocal()
+        public Settings.SaveSettings OnSaveLocal()
         {
             return BingoTracker.settings;
         }
+
+        public void OnLoadGlobal(ModSettings s)
+        {
+            modSettings = s;
+            MenuUI.LoadDefaults();
+            ModMenu.RefreshMenu();
+        }
+
+        public ModSettings OnSaveGlobal()
+        {
+            return modSettings;
+        }
+
+        public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) {
+            var menu = ModMenu.CreateMenuScreen(modListMenu).Build();
+            ModMenu.RefreshMenu();
+            return menu;
+        }
+
+        public bool ToggleButtonInsideMenu => false;
     }
 }

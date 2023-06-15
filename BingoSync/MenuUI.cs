@@ -8,7 +8,7 @@ namespace BingoSync
 {
     public static class MenuUI
     {
-        public static string selectedColor = "red";
+        public static string selectedColor = "";
         public static TextInput roomCode, nickname, password;
         private static List<MagicUI.Elements.Button> colorButtons;
         private static MagicUI.Elements.Button roomButton;
@@ -17,6 +17,19 @@ namespace BingoSync
         private static int inputSize = buttonSize * 5 + 40;
 
         public static LayoutRoot layoutRoot;
+        private static bool isBingoMenuUIVisible = true;
+
+        public static void LoadDefaults() {
+            if (nickname != null)
+                nickname.Text = BingoSync.modSettings.DefaultNickname;
+            if (password != null)
+                password.Text = BingoSync.modSettings.DefaultPassword;
+            selectedColor = BingoSync.modSettings.DefaultColor;
+            MagicUI.Elements.Button selectedColorButton = layoutRoot.GetElement<MagicUI.Elements.Button>(selectedColor);
+            if (selectedColorButton != null) {
+                selectedColorButton.BorderColor = Color.white;
+            }
+        }
 
         public static void Setup()
         {
@@ -62,6 +75,13 @@ namespace BingoSync
             layout.Children.Add(password);
             layout.Children.Add(CreateButtons());
             layout.Children.Add(roomButton);
+
+            LoadDefaults();
+
+            layoutRoot.VisibilityCondition = () => { return isBingoMenuUIVisible; };
+            layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.HideMenu, () => {
+                isBingoMenuUIVisible = !isBingoMenuUIVisible;
+            });
         }
 
         private static void Update()
@@ -71,7 +91,7 @@ namespace BingoSync
                 roomButton.Content = "Exit Room";
                 roomButton.Enabled = true;
                 SetEnabled(false);
-            } else if (BingoSyncClient.joining)
+            } else if (BingoSyncClient.loading)
             {
                 roomButton.Content = "Joining...";
                 roomButton.Enabled = false;
@@ -104,7 +124,10 @@ namespace BingoSync
                 Update();
             } else
             {
-                BingoSyncClient.ExitRoom();
+                BingoSyncClient.ExitRoom(() =>
+                {
+                    Update();
+                });
                 Update();
             }
         }
@@ -144,7 +167,7 @@ namespace BingoSync
                 Content = "Red",
                 FontSize = 15,
                 Margin = 20,
-                BorderColor = Color.white,
+                BorderColor = Color.red,
                 ContentColor = Color.red,
                 MinWidth = buttonSize,
             };

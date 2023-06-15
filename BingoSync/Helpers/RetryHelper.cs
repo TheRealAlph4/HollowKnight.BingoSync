@@ -11,10 +11,14 @@ public static class RetryHelper
         Log = log;
     }
 
-    public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, int retries = 0)
+    public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, Action failCallback = null, int retries = 0)
     {
         if (retries == maxRetries) {
             Log($"All retries used but could not complete request {requestName}");
+            if (failCallback != null) {
+                failCallback();
+            }
+            return;
         }
 
         Timer timer = null;
@@ -29,7 +33,7 @@ public static class RetryHelper
             int delay = (int)Math.Pow(2, retries) * delayMilliseconds;
             timer = new Timer(_ => {
                 timer.Dispose();
-                RetryWithExponentialBackoff(action, maxRetries, requestName, retries + 1);
+                RetryWithExponentialBackoff(action, maxRetries, requestName, failCallback, retries + 1);
             }, null, delay, 0);
         });
     }

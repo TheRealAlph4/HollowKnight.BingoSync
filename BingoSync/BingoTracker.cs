@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Settings;
 
 namespace BingoSync
 {
@@ -12,7 +13,7 @@ namespace BingoSync
         private static List<BingoSquare> _allPossibleSquares;
         private static List<string> _finishedGoals;
         private static Action<string> Log;
-        public static Settings settings { get; set; }
+        public static SaveSettings settings { get; set; }
 
         public static void Setup(Action<string> log)
         {
@@ -36,6 +37,21 @@ namespace BingoSync
                     _allPossibleSquares.AddRange(ser.Deserialize<List<BingoSquare>>(jsonReader));
                 }
             }
+        }
+
+        public static bool GetBoolean(string name)
+        {
+            if (settings == null)
+            {
+                return false;
+            }
+
+            bool current;
+            if (settings.Booleans.TryGetValue(name, out current))
+            {
+                return current;
+            }
+            return false;
         }
 
         public static void UpdateBoolean(string name, bool value)
@@ -140,7 +156,8 @@ namespace BingoSync
             requirement.IsMet = false;
             if (requirement.Type == BingoRequirementType.Bool)
             {
-                if (settings.Booleans.TryGetValue(requirement.VariableName, out var value) && value == requirement.ExpectedValue)
+                settings.Booleans.TryGetValue(requirement.VariableName, out var value);
+                if (value == requirement.ExpectedValue)
                 {
                     requirement.IsMet = true;
                 }
@@ -175,12 +192,16 @@ namespace BingoSync
         }
 
         public static void ClearFinishedGoals() {
+            _allPossibleSquares.ForEach(square => {
+                square.Requirements.ForEach(requirement => requirement.IsMet = false);
+                square.Solved = false;
+            });
             _finishedGoals = new List<string>();
         }
 
         public static void FinishGoal(string goal)
         {
-            if (BingoSyncClient.board == null)
+            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
             {
                 return;
             }

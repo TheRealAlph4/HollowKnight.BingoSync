@@ -1134,21 +1134,6 @@
         "type": "Bool",
         "variableName": "gotCharm_25",
         "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_23",
-        "expectedValue": false
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_24",
-        "expectedValue": false
-      },
-      {
-        "type": "Bool",
-        "variableName": "brokenCharm_25",
-        "expectedValue": false
       }
     ]
   },
@@ -1684,63 +1669,12 @@
   },
   {
     "name": "Kill 6 different Stalking Devouts",
-    "criteria": "Some",
-    "amount": 6,
     "requirements": [
       {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (1)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (2)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (3)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (4)_Deepnest_Spider_Town",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (2)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (3)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider (4)_Deepnest_39",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_34",
-        "expectedValue": true
-      },
-      {
-        "type": "Bool",
-        "variableName": "killedStalkingDevout_Slash Spider_Deepnest_41",
-        "expectedValue": true
+        "type": "Int",
+        "variableName": "killedUnique_SlashSpider",
+        "expectedQuantity": 6,
+        "state": "AtLeast"
       }
     ]
   },

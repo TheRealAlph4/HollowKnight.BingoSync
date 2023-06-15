@@ -20,9 +20,10 @@ namespace BingoSync
         public static string nickname = "";
         public static string color = "";
 
-        public static bool joined = false, joining = false;
+        public static bool joined = false, loading = false;
 
         public static List<BoardSquare> board = null;
+        public static bool isHidden = true;
 
         private static CookieContainer cookieContainer = null;
         private static HttpClientHandler handler = null;
@@ -76,11 +77,24 @@ namespace BingoSync
             }, maxRetries, nameof(LoadCookie));
         }
 
-        public static void ExitRoom()
+        public static void ExitRoom(Action callback)
         {
             joined = false;
-            joining = false;
-            UpdateBoardAndBroadcast(null);
+            loading = true;
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result => {
+                    if (result.Exception != null) {
+                        throw result.Exception;
+                    }
+                    UpdateBoardAndBroadcast(null);
+                    loading = false;
+                    webSocketClient = new ClientWebSocket();
+                    callback();
+                });
+            }, 10, nameof(ExitRoom), () => {
+                loading = false;
+                joined = true;
+            });
         }
 
         private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard) {
@@ -91,11 +105,11 @@ namespace BingoSync
 
         public static void JoinRoom(Action<Exception> callback)
         {
-            if (joining)
+            if (loading)
             {
                 return;
             }
-            joining = true;
+            loading = true;
 
             var joinRoomInput = new JoinRoomInput
             {
@@ -118,15 +132,17 @@ namespace BingoSync
                     {
                         var socketJoin = JsonConvert.DeserializeObject<SocketJoin>(joinRoomResponse.Result);
                         ConnectToBroadcastSocket(socketJoin);
+                        UpdateBoard(true); // TODO: check if card should be hidden
                     });
 
                     joined = true;
                 } catch (Exception _ex)
                 {
                     ex = _ex;
+                    Log($"could not join room: {ex.Message}");
                 } finally
                 {
-                    joining = false;
+                    loading = false;
                     callback(ex);
                 }
             });
@@ -149,6 +165,25 @@ namespace BingoSync
                 {
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
+                });
+            }, maxRetries, nameof(SelectSquare));
+        }
+
+        public static void RevealCard() {
+            if (!isHidden) return;
+            var revealInput = new RevealInput {
+                Room = room,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() => {
+                var payload = JsonConvert.SerializeObject(revealInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = client.PutAsync("api/revealed", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    isHidden = false;
+                    BoardUpdated.ForEach(f => f());
                 });
             }, maxRetries, nameof(SelectSquare));
         }
@@ -210,9 +245,10 @@ namespace BingoSync
                             BoardUpdated.ForEach(f => f());
                         } else if (obj.Type == "new-card") {
                             UpdateBoardAndBroadcast(null);
-                            UpdateBoard();
-                        } else {
-                            return;
+                            UpdateBoard(obj.HideCard);
+                        } else if (obj.Type == "revealed") {
+                            isHidden = false;
+                            BoardUpdated.ForEach(f => f());
                         }
                     }
                 } finally
@@ -222,7 +258,7 @@ namespace BingoSync
             });
         }
 
-        public static void UpdateBoard()
+        public static void UpdateBoard(bool hideCard)
         {
             RetryHelper.RetryWithExponentialBackoff(() => {
                 var task = client.GetAsync($"room/{room}/board");
@@ -235,12 +271,19 @@ namespace BingoSync
                     readTask.ContinueWith(boardResponse =>
                     {
                         var newBoard = JsonConvert.DeserializeObject<List<BoardSquare>>(boardResponse.Result);
+                        isHidden = hideCard;
                         UpdateBoardAndBroadcast(newBoard);
                         Log("updated board");
                     });
                 });
             }, maxRetries, nameof(UpdateBoard));
         }
+    }
+    
+    [DataContract]
+    internal class RevealInput {
+        [JsonProperty("room")]
+        public string Room;
     }
 
     [DataContract]
@@ -270,10 +313,12 @@ namespace BingoSync
     [DataContract]
     internal class Broadcast
     {
-        [JsonProperty("square")]
-        public BoardSquare Square = new BoardSquare();
         [JsonProperty("type")]
         public string Type = string.Empty;
+        [JsonProperty("square")]
+        public BoardSquare Square = new BoardSquare();
+        [JsonProperty("hide_card")]
+        public bool HideCard = false;
     }
 
     [DataContract]
