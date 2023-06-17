@@ -244,12 +244,9 @@ namespace BingoSync
             var index = BingoSyncClient.board.FindIndex(x => x.Name == goal);
             if (index >= 0)
             {
-                BingoSyncClient.SelectSquare(index + 1, (ex) =>
+                BingoSyncClient.SelectSquare(index + 1, () =>
                 {
-                    if (ex != null)
-                    {
-                        _finishedGoals.Remove(goal);
-                    }
+                    _finishedGoals.Remove(goal);
                 });
             }
         }
@@ -258,7 +255,7 @@ namespace BingoSync
     internal class BingoSquare
     {
         public string Name = string.Empty;
-        public Condition Condition;
+        public Condition Condition = new Condition();
     }
 
     internal class Condition

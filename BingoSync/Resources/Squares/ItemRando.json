@@ -1004,17 +1004,19 @@
   {
     "name": "Obtain Vengeful Spirit",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Int",
+      "variableName": "fireballLevel",
+      "expectedQuantity": 1,
+      "state": "AtLeast"
     }
   },
   {
     "name": "Obtain Howling Wraiths",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Int",
+      "variableName": "screamLevel",
+      "expectedQuantity": 1,
+      "state": "AtLeast"
     }
   },
   {
@@ -1307,9 +1309,39 @@
   {
     "name": "Check Crystal Heart",
     "condition": {
-      "type": "Bool",
-      "variableName": "checked_Crystal_Heart",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Crystal_Heart",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Crystal_Heart",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "hasSuperDash",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Crystal_Heart",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1323,17 +1355,149 @@
   {
     "name": "Check Deep Focus",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Deep_Focus",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Deep_Focus",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotCharm_34",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Deep_Focus",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Get 2 Dreamer's checks (Requires Dream nail)",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "Some",
+          "amount": 2,
+          "conditions": [
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "checked_Lurien",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Lurien",
+                  "expectedValue": true
+                }
+              ]
+            },
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "checked_Herrah",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Herrah",
+                  "expectedValue": true
+                }
+              ]
+            },
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "checked_Monomon",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Monomon",
+                  "expectedValue": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Some",
+          "amount": 2,
+          "conditions": [
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "lurienDefeated",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Lurien",
+                  "expectedValue": false
+                }
+              ]
+            },
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "hegemolDefeated",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Herrah",
+                  "expectedValue": false
+                }
+              ]
+            },
+            {
+              "type": "And",
+              "conditions": [
+                {
+                  "type": "Bool",
+                  "variableName": "monomonDefeated",
+                  "expectedValue": true
+                },
+                {
+                  "type": "Bool",
+                  "variableName": "randomized_Monomon",
+                  "expectedValue": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1347,17 +1511,77 @@
   {
     "name": "Check the Hallownest Crown",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Pale_Ore-Crystal_Peak",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Pale_Ore-Crystal_Peak",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "---",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Pale_Ore-Crystal_Peak",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Buy the Basin fountain check",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Vessel_Fragment-Basin",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Vessel_Fragment-Basin",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "fountainVesselSummoned",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Vessel_Fragment-Basin",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1371,25 +1595,115 @@
   {
     "name": "Check Glowing Womb",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Glowing_Womb",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Glowing_Womb",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotCharm_22",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Glowing_Womb",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check the Hive Mask Shard",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Mask_Shard-Hive",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Mask_Shard-Hive",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "collectedHiveShard",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Mask_Shard-Hive",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check Joni's Blessing",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Joni's_Blessing",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Joni's_Blessing",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotCharm_27",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Joni's_Blessing",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1403,9 +1717,39 @@
   {
     "name": "Check Love Key",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Love_Key",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Love_Key",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "hasLoveKey",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Love_Key",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1459,33 +1803,155 @@
   {
     "name": "Check the Stag Nest vessel fragment",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Vessel_Fragment-Stag_Nest",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Vessel_Fragment-Stag_Nest",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "vesselFragStagNest",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Vessel_Fragment-Stag_Nest",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check Shade Soul",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Shade_Soul",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Shade_Soul",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Int",
+              "variableName": "fireballLevel",
+              "expectedQuantity": 2,
+              "state": "AtLeast"
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Shade_Soul",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Get the Abyss Shriek check",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotCheck_Abyss_Shriek",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Abyss_Shriek",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Int",
+              "variableName": "screamLevel",
+              "expectedQuantity": 2,
+              "state": "AtLeast"
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Abyss_Shriek",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check Isma's Tear",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Isma's_Tear",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Isma's_Tear",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "hasAcidArmour",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Isma's_Tear",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
@@ -1500,25 +1966,115 @@
   {
     "name": "Check Shape of Unn",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Shape_of_Unn",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Shape_of_Unn",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotCharm_28",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Shape_of_Unn",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check the journal above Mantis Village",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Wanderer's_Journal-Above_Mantis_Village",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Wanderer's_Journal-Above_Mantis_Village",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "---",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Wanderer's_Journal-Above_Mantis_Village",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
     "name": "Check Void Heart",
     "condition": {
-      "type": "Bool",
-      "variableName": "---",
-      "expectedValue": true
+      "type": "Or",
+      "conditions": [
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "checked_Void_Heart",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Void_Heart",
+              "expectedValue": true
+            }
+          ]
+        },
+        {
+          "type": "And",
+          "conditions": [
+            {
+              "type": "Bool",
+              "variableName": "gotShadeCharm",
+              "expectedValue": true
+            },
+            {
+              "type": "Bool",
+              "variableName": "randomized_Void_Heart",
+              "expectedValue": false
+            }
+          ]
+        }
+      ]
     }
   },
   {
