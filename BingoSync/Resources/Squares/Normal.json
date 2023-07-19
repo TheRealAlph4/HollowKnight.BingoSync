@@ -169,7 +169,7 @@
       "conditions": [
         {
           "type": "Bool",
-          "variableName": "giantBuzzerDefeated",
+          "variableName": "killedBigBuzzer",
           "expectedValue": true
         },
         {
