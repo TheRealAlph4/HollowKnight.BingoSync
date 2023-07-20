@@ -4,15 +4,20 @@ using MonoMod.Utils;
 using System.Collections;
 using System.Reflection;
 using BingoSync.CustomVariables;
+using BingoSync.CustomVariables.Rando;
 using Settings;
 using UnityEngine;
+using ItemChanger;
+using System.Threading.Tasks;
 
 namespace BingoSync
 {
-    public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
+    public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.3";
+        public override string GetVersion() => "0.0.0.4";
+
+        const bool Debug = false;
 
         const float fadeDuration = 0.2f;
 
@@ -62,12 +67,16 @@ namespace BingoSync
             // Tram
             ModHooks.SetPlayerIntHook += Tram.CheckIfStationWasVisited;
 
-            // Stalking Devouts
-            ModHooks.OnReceiveDeathEventHook += StalkingDevouts.CheckIfStalkingDevoutWasKilled;
+            // Unique Enemies
+            ModHooks.OnReceiveDeathEventHook += UniqueEnemies.CheckIfUniqueEnemyWasKilled;
 
             // Giant Geo Egg
             ModHooks.HeroUpdateHook += GiantGeoEgg.CheckIfGiantGeoEggWasDestroyed;
             ModHooks.ColliderCreateHook += GiantGeoEgg.FindGiantGeoEggGameObject;
+
+            // Rando
+            AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
+            AbstractPlacement.OnVisitStateChangedGlobal += Checks.PlacementStateChange;
 
             // Menu
             On.UIManager.ContinueGame += ContinueGame;
@@ -110,6 +119,9 @@ namespace BingoSync
         {
             MenuUI.layoutRoot.BeginFade(0, fadeDuration);
             ConfigureBingoSyncOnGameStart();
+            Task.Run(() => {
+                Checks.GetRandomizedPlacements();
+            });
             orig(self);
         }
 
@@ -117,6 +129,9 @@ namespace BingoSync
         {
             MenuUI.layoutRoot.BeginFade(0, fadeDuration);
             ConfigureBingoSyncOnGameStart();
+            Task.Run(() => {
+                Checks.GetRandomizedPlacements();
+            });
             orig(self, permaDeath, bossRush);
         }
 
@@ -135,6 +150,8 @@ namespace BingoSync
         {
             PlayerData.instance.SetBoolInternal(name, orig);
             BingoTracker.UpdateBoolean(name, orig);
+            if (Debug)
+                Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
             return orig;
         }
 
@@ -143,15 +160,17 @@ namespace BingoSync
             var previous = PlayerData.instance.GetIntInternal(name);
             PlayerData.instance.SetIntInternal(name, current);
             BingoTracker.UpdateInteger(name, previous, current);
+            if (Debug)
+                Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
             return current;
         }
 
-        public void OnLoadLocal(SaveSettings s)
+        public void OnLoadLocal(Settings.SaveSettings s)
         {
             BingoTracker.settings = s;
         }
 
-        public SaveSettings OnSaveLocal()
+        public Settings.SaveSettings OnSaveLocal()
         {
             return BingoTracker.settings;
         }

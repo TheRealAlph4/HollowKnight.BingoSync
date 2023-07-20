@@ -15,8 +15,8 @@
     <Product>BingoSync</Product>
     <Description>A Hollow Knight Mod</Description>
     <Copyright>Copyright ©  2023</Copyright>
-    <AssemblyVersion>0.0.0.3</AssemblyVersion>
-    <FileVersion>0.0.0.3</FileVersion>
+    <AssemblyVersion>0.0.0.4</AssemblyVersion>
+    <FileVersion>0.0.0.4</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -325,16 +325,25 @@
     <Reference Include="MagicUI">
 	  <HintPath>$(HollowKnightRefs)/Mods/MagicUI/MagicUI.dll</HintPath>
     </Reference>
+    <Reference Include="RandomizerMod">
+      <HintPath>$(HollowKnightRefs)/Mods/Randomizer 4/RandomizerMod.dll</HintPath>
+    </Reference>
+    <Reference Include="RandomizerCore">
+      <HintPath>$(HollowKnightRefs)/Mods/RandomizerCore/RandomizerCore.dll</HintPath>
+    </Reference>
+    <Reference Include="ItemChanger">
+      <HintPath>$(HollowKnightRefs)/Mods/ItemChanger/ItemChanger.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
     <None Include="ReadMe.md" />
     <None Include="Resources\.gitignore" />
-    <None Include="Resources\bingo.json" />
+    <None Include="Resources\Squares\*.json" />
     <None Include="Resources\Images\*.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\bingo.json" />
+    <EmbeddedResource Include="Resources\Squares\*.json" />
     <EmbeddedResource Include="Resources\Images\*.png" />
   </ItemGroup>
 </Project>

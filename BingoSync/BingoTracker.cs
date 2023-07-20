@@ -18,13 +18,14 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             _finishedGoals = new List<string>();
+            _allPossibleSquares = new List<BingoSquare>();
 
             Log = log;
 
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             foreach (var resource in resources)
             {
-                if (!resource.StartsWith("BingoSync.Resources.bingo"))
+                if (!resource.StartsWith("BingoSync.Resources.Squares"))
                 {
                     continue;
                 }
@@ -33,9 +34,24 @@ namespace BingoSync
                 using (JsonTextReader jsonReader = new JsonTextReader(reader))
                 {
                     JsonSerializer ser = new JsonSerializer();
-                    _allPossibleSquares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                    _allPossibleSquares.AddRange(ser.Deserialize<List<BingoSquare>>(jsonReader));
                 }
             }
+        }
+
+        public static bool GetBoolean(string name)
+        {
+            if (settings == null)
+            {
+                return false;
+            }
+
+            bool current;
+            if (settings.Booleans.TryGetValue(name, out current))
+            {
+                return current;
+            }
+            return false;
         }
 
         public static void UpdateBoolean(string name, bool value)
@@ -116,12 +132,13 @@ namespace BingoSync
 
         private static bool IsSolved(BingoSquare square)
         {
-            if (square.Solved)
+            if (square.Condition.Solved)
             {
                 return true;
             }
 
-            square.Requirements.ForEach(UpdateRequirement);
+            UpdateCondition(square.Condition);
+            /*
             switch (square.Criteria)
             {
                 case RequirementCriteria.All:
@@ -131,32 +148,33 @@ namespace BingoSync
                     square.Solved = square.Requirements.FindAll(requirement => requirement.IsMet).Count() == square.Amount;
                     break;
             }
+            */
 
-            return square.Solved;
+            return square.Condition.Solved;
         }
 
-        private static void UpdateRequirement(BingoSquareRequirement requirement)
+        private static void UpdateCondition(Condition condition)
         {
-            requirement.IsMet = false;
-            if (requirement.Type == BingoRequirementType.Bool)
+            condition.Solved = false;
+            if (condition.Type == ConditionType.Bool)
             {
-                settings.Booleans.TryGetValue(requirement.VariableName, out var value);
-                if (value == requirement.ExpectedValue)
+                settings.Booleans.TryGetValue(condition.VariableName, out var value);
+                if (value == condition.ExpectedValue)
                 {
-                    requirement.IsMet = true;
+                    condition.Solved = true;
                 }
             }
-            if (requirement.Type == BingoRequirementType.Int)
+            else if (condition.Type == ConditionType.Int)
             {
                 int quantity = 0;
                 int current, added, removed;
-                if (!settings.Integers.TryGetValue(requirement.VariableName, out current)
-                    || !settings.IntegersTotalAdded.TryGetValue(requirement.VariableName, out added)
-                    || !settings.IntegersTotalRemoved.TryGetValue(requirement.VariableName, out removed))
+                if (!settings.Integers.TryGetValue(condition.VariableName, out current)
+                    || !settings.IntegersTotalAdded.TryGetValue(condition.VariableName, out added)
+                    || !settings.IntegersTotalRemoved.TryGetValue(condition.VariableName, out removed))
                 {
                     return;
                 }
-                switch (requirement.State)
+                switch (condition.State)
                 {
                     case BingoRequirementState.AtLeast:
                         quantity = current;
@@ -168,19 +186,41 @@ namespace BingoSync
                         quantity = removed;
                         break;
                 }
-                if (quantity >= requirement.ExpectedQuantity)
+                if (quantity >= condition.ExpectedQuantity)
                 {
-                    requirement.IsMet = true;
+                    condition.Solved = true;
+                }
+            }
+            else {
+                condition.Conditions.ForEach(UpdateCondition);
+                if (condition.Type == ConditionType.Or) {
+                    if (condition.Conditions.Any(cond => cond.Solved)) {
+                        condition.Solved = true;
+                    }
+                }
+                else if (condition.Type == ConditionType.And) {
+                    if (condition.Conditions.All(cond => cond.Solved)) {
+                        condition.Solved = true;
+                    }
+                }
+                else if (condition.Type == ConditionType.Some) {
+                    if (condition.Conditions.FindAll(cond => cond.Solved).Count >= condition.Amount) {
+                        condition.Solved = true;
+                    }
                 }
             }
         }
 
         public static void ClearFinishedGoals() {
             _allPossibleSquares.ForEach(square => {
-                square.Requirements.ForEach(requirement => requirement.IsMet = false);
-                square.Solved = false;
+                ClearCondition(square.Condition);
             });
             _finishedGoals = new List<string>();
+        }
+
+        public static void ClearCondition(Condition condition) {
+            condition.Solved = false;
+            condition.Conditions.ForEach(ClearCondition);
         }
 
         public static void FinishGoal(string goal)
@@ -204,12 +244,9 @@ namespace BingoSync
             var index = BingoSyncClient.board.FindIndex(x => x.Name == goal);
             if (index >= 0)
             {
-                BingoSyncClient.SelectSquare(index + 1, (ex) =>
+                BingoSyncClient.SelectSquare(index + 1, () =>
                 {
-                    if (ex != null)
-                    {
-                        _finishedGoals.Remove(goal);
-                    }
+                    _finishedGoals.Remove(goal);
                 });
             }
         }
@@ -217,23 +254,29 @@ namespace BingoSync
 
     internal class BingoSquare
     {
-        public List<BingoSquareRequirement> Requirements = new List<BingoSquareRequirement>();
-        public RequirementCriteria Criteria = RequirementCriteria.All;
-        public int Amount = 0;
         public string Name = string.Empty;
-        public bool Solved;
+        public Condition Condition = new Condition();
     }
 
-    enum RequirementCriteria
+    internal class Condition
     {
-        All,
-        Some,
+        public ConditionType Type = ConditionType.And;
+        public int Amount = 0;
+        public bool Solved = false;
+        public string VariableName = string.Empty;
+        public BingoRequirementState State = BingoRequirementState.AtLeast;
+        public int ExpectedQuantity = 0;
+        public bool ExpectedValue = false;
+        public List<Condition> Conditions = new List<Condition>();
     }
 
-    enum BingoRequirementType
+    enum ConditionType
     {
         Bool,
         Int,
+        Or,
+        And,
+        Some,
     }
 
     enum BingoRequirementState
@@ -241,15 +284,5 @@ namespace BingoSync
         AtLeast,
         Added,
         Removed,
-    }
-
-    internal class BingoSquareRequirement
-    {
-        public BingoRequirementType Type = BingoRequirementType.Bool;
-        public string VariableName = string.Empty;
-        public BingoRequirementState State = BingoRequirementState.AtLeast;
-        public int ExpectedQuantity = 0;
-        public bool ExpectedValue = false;
-        public bool IsMet = false;
     }
 }
