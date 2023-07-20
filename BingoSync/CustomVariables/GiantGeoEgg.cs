@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Satchel;
+using UnityEngine;
 
 namespace BingoSync.CustomVariables
 {
@@ -8,22 +9,13 @@ namespace BingoSync.CustomVariables
         private static string objectName = "Giant Geo Egg";
         private static string fsmName = "Geo Rock";
         private static string destroyedStateName = "Destroy";
-        private static GameObject giantGeoEgg = null;
 
-        public static void CheckIfGiantGeoEggWasDestroyed()
+        public static void CreateGiantGeoRockTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
-            if (giantGeoEgg == null) return;
-            var fsm = giantGeoEgg.LocateMyFSM(fsmName);
-            if (fsm == null) return;
-            if (fsm.ActiveStateName != destroyedStateName) return;
-            BingoTracker.UpdateBoolean(variableName, true);
+            orig(self);
+            if (self == null || self.FsmName != fsmName) return;
+            if (self.gameObject == null || self.gameObject.name != objectName) return;
+            self.AddCustomAction(destroyedStateName, () => BingoTracker.UpdateBoolean(variableName, true));
         }
-
-        public static void FindGiantGeoEggGameObject(GameObject obj)
-        {
-            if (obj == null || obj.name != objectName) return;
-            giantGeoEgg = obj;
-        }
-
     }
 }

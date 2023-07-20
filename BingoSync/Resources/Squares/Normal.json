@@ -1,1585 +1,1585 @@
 [
-  {
-    "name": "Failed Champion",
-    "condition": {
-      "type": "Bool",
-      "variableName": "falseKnightDreamDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "False Knight + Brooding Mawlek",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "falseKnightDefeated",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "killedMawlek",
-          "expectedValue": true
+    {
+        "name": "Failed Champion",
+        "condition": {
+            "type": "Bool",
+            "variableName": "falseKnightDreamDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Soul Master",
-    "condition": {
-      "type": "Bool",
-      "variableName": "mageLordDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Soul Tyrant",
-    "condition": {
-      "type": "Bool",
-      "variableName": "mageLordDreamDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Hornet 2",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hornetOutskirtsDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Crystal Guardian 1",
-    "condition": {
-      "type": "Bool",
-      "variableName": "defeatedMegaBeamMiner",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Crystal Guardian 2",
-    "condition": {
-      "type": "Int",
-      "variableName": "killsMegaBeamMiner",
-      "expectedQuantity": 2,
-      "state": "Removed"
-    }
-  },
-  {
-    "name": "Dung Defender",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedDungDefender",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Flukemarm",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedFlukeMother",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Nosk",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedMimicSpider",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Mantis Lords",
-    "condition": {
-      "type": "Bool",
-      "variableName": "defeatedMantisLords",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Collector",
-    "condition": {
-      "type": "Bool",
-      "variableName": "collectorDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Pick up the Love Key",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasLoveKey",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Traitor Lord",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedTraitorLord",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Uumuu",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedMegaJellyfish",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Watcher Knights",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedBlackKnight",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Lurien",
-    "condition": {
-      "type": "Bool",
-      "variableName": "lurienDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Monomon",
-    "condition": {
-      "type": "Bool",
-      "variableName": "monomonDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Herrah",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hegemolDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Vengefly King + Massive Moss Charger",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "killedBigBuzzer",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "killedMegaMossCharger",
-          "expectedValue": true
+    },
+    {
+        "name": "False Knight + Brooding Mawlek",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "falseKnightDefeated",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "killedMawlek",
+                    "expectedValue": true
+                }
+            ]
         }
-      ]
-    }
-  },
-  {
-    "name": "Xero",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostXero",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Gorb",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostAladar",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Elder Hu",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostHu",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Galien",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostGalien",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Markoth",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostMarkoth",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Marmu",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostMarmu",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "No Eyes",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedGhostNoEyes",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Upgrade Grimmchild once",
-    "condition": {
-      "type": "Int",
-      "variableName": "grimmChildLevel",
-      "expectedQuantity": 1,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Broken Vessel",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedInfectedKnight",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Lost Kin",
-    "condition": {
-      "type": "Bool",
-      "variableName": "infectedKnightDreamDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Shade Soul",
-    "condition": {
-      "type": "Int",
-      "variableName": "fireballLevel",
-      "expectedQuantity": 2,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Abyss Shriek",
-    "condition": {
-      "type": "Int",
-      "variableName": "screamLevel",
-      "expectedQuantity": 2,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Howling Wraiths",
-    "condition": {
-      "type": "Int",
-      "variableName": "screamLevel",
-      "expectedQuantity": 1,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Desolate Dive",
-    "condition": {
-      "type": "Int",
-      "variableName": "quakeLevel",
-      "expectedQuantity": 1,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Nail 2",
-    "condition": {
-      "type": "Int",
-      "variableName": "nailSmithUpgrades",
-      "expectedQuantity": 2,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Nail 3",
-    "condition": {
-      "type": "Int",
-      "variableName": "nailSmithUpgrades",
-      "expectedQuantity": 3,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Dream Nail",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasDreamNail",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Dream Gate",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasDreamGate",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Have 2 Pale Ore",
-    "condition": {
-      "type": "Int",
-      "variableName": "ore",
-      "expectedQuantity": 2,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Cyclone Slash",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasCyclone",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Great Slash",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasDashSlash",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Dash Slash",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasUpwardSlash",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Monarch Wings",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasDoubleJump",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Crystal Heart",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasSuperDash",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Shade Cloak",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasShadowDash",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Isma's Tear",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasAcidArmour",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Tram Pass + Visit all 5 Tram Stations",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "visited_Room_Tram_0",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "visited_Room_Tram_1",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "visited_Room_Tram_2",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "visited_Room_Tram_RG_0",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "visited_Room_Tram_RG_1",
-          "expectedValue": true
+    },
+    {
+        "name": "Soul Master",
+        "condition": {
+            "type": "Bool",
+            "variableName": "mageLordDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Lumafly Lantern",
-    "condition": {
-      "type": "Bool",
-      "variableName": "hasLantern",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "All Grubs: Xroads (5) + Fog Canyon (1)",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Int",
-          "variableName": "grubsSaved_CROSSROADS",
-          "expectedQuantity": 5,
-          "state": "AtLeast"
-        },
-        {
-          "type": "Int",
-          "variableName": "grubsSaved_FOG_CANYON",
-          "expectedQuantity": 1,
-          "state": "AtLeast"
+    },
+    {
+        "name": "Soul Tyrant",
+        "condition": {
+            "type": "Bool",
+            "variableName": "mageLordDreamDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Save the 5 grubs in CoT",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsSaved_CITY",
-      "expectedQuantity": 5,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "All Grubs: Greenpath (4) + Fungal (2)",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Int",
-          "variableName": "grubsSaved_GREEN_PATH",
-          "expectedQuantity": 4,
-          "state": "AtLeast"
-        },
-        {
-          "type": "Int",
-          "variableName": "grubsSaved_WASTES",
-          "expectedQuantity": 2,
-          "state": "AtLeast"
+    },
+    {
+        "name": "Hornet 2",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hornetOutskirtsDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Save the 7 grubs in Crystal Peaks",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsSaved_PEAK",
-      "expectedQuantity": 7,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Save the 3 grubs in Waterways",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsSaved_WATERWAYS",
-      "expectedQuantity": 3,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Save the 3 grubs in Queen's Garden",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsSaved_ROYAL_GARDENS",
-      "expectedQuantity": 3,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Save the 5 grubs in Deepnest",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsSaved_DEEPNEST",
-      "expectedQuantity": 5,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Save 15 grubs",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsCollected",
-      "expectedQuantity": 15,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Save 20 grubs",
-    "condition": {
-      "type": "Int",
-      "variableName": "grubsCollected",
-      "expectedQuantity": 20,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Obtain fountain vessel fragment",
-    "condition": {
-      "type": "Bool",
-      "variableName": "fountainVesselSummoned",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Obtain 3 extra notches",
-    "condition": {
-      "type": "Int",
-      "variableName": "charmSlots",
-      "expectedQuantity": 3,
-      "state": "Added"
-    }
-  },
-  {
-    "name": "Obtain 1 extra soul vessel",
-    "condition": {
-      "type": "Int",
-      "variableName": "MPReserveMax",
-      "expectedQuantity": 33,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Obtain 1 extra mask",
-    "condition": {
-      "type": "Int",
-      "variableName": "maxHealthBase",
-      "expectedQuantity": 6,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Obtain 2 extra masks",
-    "condition": {
-      "type": "Int",
-      "variableName": "maxHealthBase",
-      "expectedQuantity": 7,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Have 5 Wanderer's Journals",
-    "condition": {
-      "type": "Int",
-      "variableName": "trinket1",
-      "expectedQuantity": 5,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Have 5 Hallownest Seals",
-    "condition": {
-      "type": "Int",
-      "variableName": "trinket2",
-      "expectedQuantity": 5,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Collect 3 King's Idols",
-    "condition": {
-      "type": "Int",
-      "variableName": "trinket3",
-      "expectedQuantity": 3,
-      "state": "Added"
-    }
-  },
-  {
-    "name": "Collect 1 Arcane Egg",
-    "condition": {
-      "type": "Int",
-      "variableName": "trinket4",
-      "expectedQuantity": 1,
-      "state": "Added"
-    }
-  },
-  {
-    "name": "Give Flower to Elderbug",
-    "condition": {
-      "type": "Bool",
-      "variableName": "elderbugGaveFlower",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Defeat Colosseum Zote",
-    "condition": {
-      "type": "Bool",
-      "variableName": "zoteDefeated",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Colosseum 1",
-    "condition": {
-      "type": "Bool",
-      "variableName": "colosseumBronzeCompleted",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Rescue Bretta + Sly",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "slyRescued",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "brettaRescued",
-          "expectedValue": true
+    },
+    {
+        "name": "Crystal Guardian 1",
+        "condition": {
+            "type": "Bool",
+            "variableName": "defeatedMegaBeamMiner",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Use 2 Simple Keys",
-    "condition": {
-      "type": "Int",
-      "variableName": "simpleKeys",
-      "expectedQuantity": 2,
-      "state": "Removed"
-    }
-  },
-  {
-    "name": "Rescue Zote in Deepnest",
-    "condition": {
-      "type": "Bool",
-      "variableName": "zoteRescuedDeepnest",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Use City Crest + Ride both CoT large elevators",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "openedCityGate",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "usedLift1",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "usedLift2",
-          "expectedValue": true
+    },
+    {
+        "name": "Crystal Guardian 2",
+        "condition": {
+            "type": "Int",
+            "variableName": "killsMegaBeamMiner",
+            "expectedQuantity": 2,
+            "state": "Removed"
         }
-      ]
-    }
-  },
-  {
-    "name": "Talk to Lemm with Crest Equipped",
-    "condition": {
-      "type": "Bool",
-      "variableName": "metLemmWithCrest",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Have 1500 geo in the bank",
-    "condition": {
-      "type": "Int",
-      "variableName": "bankerBalance",
-      "expectedQuantity": 1500,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Break the 420 geo rock in Kingdom's Edge",
-    "condition": {
-      "type": "Bool",
-      "variableName": "destroyedGiantGeoEgg",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Unlock Hidden Stag Station",
-    "condition": {
-      "type": "Bool",
-      "variableName": "openedHiddenStation",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Unlock Queen's Garden Stag",
-    "condition": {
-      "type": "Bool",
-      "variableName": "openedGardensStagStation",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Unlock Deepnest Stag",
-    "condition": {
-      "type": "Bool",
-      "variableName": "openedDeepnest",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Buy 6 map pins from Iselda (All but two)",
-    "condition": {
-      "type": "Some",
-      "amount": 6,
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hasPinShop",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinStag",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinBench",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinCocoon",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinSpa",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinDreamPlant",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinGhost",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinTram",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_b",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_r",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_w",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_y",
-          "expectedValue": true
+    },
+    {
+        "name": "Dung Defender",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedDungDefender",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Buy 8 map pins from Iselda (All)",
-    "condition": {
-      "type": "Some",
-      "amount": 8,
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hasPinShop",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinStag",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinBench",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinCocoon",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinSpa",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinDreamPlant",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinGhost",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasPinTram",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_b",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_r",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_w",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hasMarker_y",
-          "expectedValue": true
+    },
+    {
+        "name": "Flukemarm",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedFlukeMother",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Unlock Queen's Stag + King's Stag Stations",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "openedFungalWastes",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "openedRuins2",
-          "expectedValue": true
+    },
+    {
+        "name": "Nosk",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedMimicSpider",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Talk to Hornet at CoT Statue + Herrah",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hornetFountainEncounter",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hornetDenEncounter",
-          "expectedValue": true
+    },
+    {
+        "name": "Mantis Lords",
+        "condition": {
+            "type": "Bool",
+            "variableName": "defeatedMantisLords",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Watch Cloth Die",
-    "condition": {
-      "type": "Bool",
-      "variableName": "clothKilled",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Kill Myla",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedMyla",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Spend 3000 geo",
-    "condition": {
-      "type": "Int",
-      "variableName": "geoSpent",
-      "expectedQuantity": 3000,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Spend 4000 geo",
-    "condition": {
-      "type": "Int",
-      "variableName": "geoSpent",
-      "expectedQuantity": 4000,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Spend 5000 geo",
-    "condition": {
-      "type": "Int",
-      "variableName": "geoSpent",
-      "expectedQuantity": 5000,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Pay for 6 tolls",
-    "condition": {
-      "type": "Int",
-      "variableName": "paidTolls",
-      "expectedQuantity": 6,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Longnail + MoP",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_18",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_13",
-          "expectedValue": true
+    },
+    {
+        "name": "Collector",
+        "condition": {
+            "type": "Bool",
+            "variableName": "collectorDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Fragile Heart, Greed, and Strength",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_23",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_24",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_25",
-          "expectedValue": true
+    },
+    {
+        "name": "Pick up the Love Key",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasLoveKey",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Sprintmaster + Dashmaster",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_37",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_31",
-          "expectedValue": true
+    },
+    {
+        "name": "Traitor Lord",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedTraitorLord",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Deep Focus + Quick Focus",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_34",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_7",
-          "expectedValue": true
+    },
+    {
+        "name": "Uumuu",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedMegaJellyfish",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Spell Twister + Shaman Stone",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_19",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_33",
-          "expectedValue": true
+    },
+    {
+        "name": "Watcher Knights",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedBlackKnight",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Lifeblood Heart + Joni's Blessing",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_8",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_27",
-          "expectedValue": true
+    },
+    {
+        "name": "Lurien",
+        "condition": {
+            "type": "Bool",
+            "variableName": "lurienDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Weaversong",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_39",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Grubsong",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_3",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Sharp Shadow",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_16",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Shape of Unn",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_28",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Thorns of agony + Baldur Shell + Spore Shroom",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_12",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_5",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_17",
-          "expectedValue": true
+    },
+    {
+        "name": "Monomon",
+        "condition": {
+            "type": "Bool",
+            "variableName": "monomonDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Quick Slash",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_32",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Heavy Blow + Steady Body",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_15",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_14",
-          "expectedValue": true
+    },
+    {
+        "name": "Herrah",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hegemolDefeated",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Talk to Mask Maker",
-    "condition": {
-      "type": "Bool",
-      "variableName": "maskmakerMet",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Talk to Midwife",
-    "condition": {
-      "type": "Bool",
-      "variableName": "midwifeMet",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Have 4 Rancid Eggs",
-    "condition": {
-      "type": "Int",
-      "variableName": "rancidEggs",
-      "expectedQuantity": 4,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Kill your shade in Jiji's Hut",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedShadeJiji",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Collect 500 essence",
-    "condition": {
-      "type": "Int",
-      "variableName": "dreamOrbs",
-      "expectedQuantity": 500,
-      "state": "Added"
-    }
-  },
-  {
-    "name": "Dream Wielder",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_30",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Interact with 5 Cornifer locations",
-    "condition": {
-      "type": "Some",
-      "amount": 5,
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Crossroads_33",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Ruins1_31",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Fungus1_06",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Fungus1_24",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Fungus2_18",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Fungus2_25",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Fungus3_25",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Mines_30",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Cliffs_01",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Deepnest_01b",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Waterways_09",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Abyss_04",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "cornifer_Deepnest_East_03",
-          "expectedValue": true
+    },
+    {
+        "name": "Vengefly King + Massive Moss Charger",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "killedBigBuzzer",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "killedMegaMossCharger",
+                    "expectedValue": true
+                }
+            ]
         }
-      ]
-    }
-  },
-  {
-    "name": "Flukenest",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_11",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Stag Nest vessel fragment",
-    "condition": {
-      "type": "Bool",
-      "variableName": "vesselFragStagNest",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Complete 4 full dream trees",
-    "condition": {
-      "type": "Int",
-      "variableName": "dreamTreesCompleted",
-      "expectedQuantity": 4,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Kill 2 Soul Warriors",
-    "condition": {
-      "type": "Int",
-      "variableName": "killsMageKnight",
-      "expectedQuantity": 2,
-      "state": "Removed"
-    }
-  },
-  {
-    "name": "Buy 6 maps",
-    "condition": {
-      "type": "Some",
-      "amount": 6,
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "mapAbyss",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapCity",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapCliffs",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapCrossroads",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapDeepnest",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapFogCanyon",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapFungalWastes",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapGreenpath",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapMines",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapOutskirts",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapRestingGround",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapRoyalGardens",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "mapWaterways",
-          "expectedValue": true
+    },
+    {
+        "name": "Xero",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostXero",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Talk to Emilitia (shortcut out of sewers)",
-    "condition": {
-      "type": "Bool",
-      "variableName": "metEmilitia",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Descending Dark",
-    "condition": {
-      "type": "Int",
-      "variableName": "quakeLevel",
-      "expectedQuantity": 2,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Glowing Womb + Grimmchild",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_22",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "gotCharm_40",
-          "expectedValue": true
+    },
+    {
+        "name": "Gorb",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostAladar",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Take a bath in all 4 Hot Springs",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hotSpringBath_CROSSROADS",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hotSpringBath_DEEPNEST",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hotSpringBath_CITY",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "hotSpringBath_OUTSKIRTS",
-          "expectedValue": true
+    },
+    {
+        "name": "Elder Hu",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostHu",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Hiveblood",
-    "condition": {
-      "type": "Bool",
-      "variableName": "gotCharm_29",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Hive Knight",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedHiveKnight",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Mask Shard  in the Hive",
-    "condition": {
-      "type": "Bool",
-      "variableName": "collectedHiveShard",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Parry Revek 3 times without dying (Glade of Hope Guard)",
-    "condition": {
-      "type": "Int",
-      "variableName": "parryRevekConsecutive",
-      "expectedQuantity": 3,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Void Tendrils Journal Entry",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hasJournal",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "killedAbyssTendril",
-          "expectedValue": true
+    },
+    {
+        "name": "Galien",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostGalien",
+            "expectedValue": true
         }
-      ]
-    }
-  },
-  {
-    "name": "Goam and Garpede Journal Entries",
-    "condition": {
-      "type": "And",
-      "conditions": [
-        {
-          "type": "Bool",
-          "variableName": "hasJournal",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "killedWorm",
-          "expectedValue": true
-        },
-        {
-          "type": "Bool",
-          "variableName": "killedBigCentipede",
-          "expectedValue": true
+    },
+    {
+        "name": "Markoth",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostMarkoth",
+            "expectedValue": true
         }
-      ]
+    },
+    {
+        "name": "Marmu",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostMarmu",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "No Eyes",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedGhostNoEyes",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Upgrade Grimmchild once",
+        "condition": {
+            "type": "Int",
+            "variableName": "grimmChildLevel",
+            "expectedQuantity": 1,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Broken Vessel",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedInfectedKnight",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Lost Kin",
+        "condition": {
+            "type": "Bool",
+            "variableName": "infectedKnightDreamDefeated",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Shade Soul",
+        "condition": {
+            "type": "Int",
+            "variableName": "fireballLevel",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Abyss Shriek",
+        "condition": {
+            "type": "Int",
+            "variableName": "screamLevel",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Howling Wraiths",
+        "condition": {
+            "type": "Int",
+            "variableName": "screamLevel",
+            "expectedQuantity": 1,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Desolate Dive",
+        "condition": {
+            "type": "Int",
+            "variableName": "quakeLevel",
+            "expectedQuantity": 1,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Nail 2",
+        "condition": {
+            "type": "Int",
+            "variableName": "nailSmithUpgrades",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Nail 3",
+        "condition": {
+            "type": "Int",
+            "variableName": "nailSmithUpgrades",
+            "expectedQuantity": 3,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Dream Nail",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasDreamNail",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Dream Gate",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasDreamGate",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Have 2 Pale Ore",
+        "condition": {
+            "type": "Int",
+            "variableName": "ore",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Cyclone Slash",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasCyclone",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Great Slash",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasDashSlash",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Dash Slash",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasUpwardSlash",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Monarch Wings",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasDoubleJump",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Crystal Heart",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasSuperDash",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Shade Cloak",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasShadowDash",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Isma's Tear",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasAcidArmour",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Tram Pass + Visit all 5 Tram Stations",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "visited_Room_Tram_0",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "visited_Room_Tram_1",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "visited_Room_Tram_2",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "visited_Room_Tram_RG_0",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "visited_Room_Tram_RG_1",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Lumafly Lantern",
+        "condition": {
+            "type": "Bool",
+            "variableName": "hasLantern",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "All Grubs: Xroads (5) + Fog Canyon (1)",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Int",
+                    "variableName": "grubsSaved_CROSSROADS",
+                    "expectedQuantity": 5,
+                    "state": "AtLeast"
+                },
+                {
+                    "type": "Int",
+                    "variableName": "grubsSaved_FOG_CANYON",
+                    "expectedQuantity": 1,
+                    "state": "AtLeast"
+                }
+            ]
+        }
+    },
+    {
+        "name": "Save the 5 grubs in CoT",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsSaved_CITY",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "All Grubs: Greenpath (4) + Fungal (2)",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Int",
+                    "variableName": "grubsSaved_GREEN_PATH",
+                    "expectedQuantity": 4,
+                    "state": "AtLeast"
+                },
+                {
+                    "type": "Int",
+                    "variableName": "grubsSaved_WASTES",
+                    "expectedQuantity": 2,
+                    "state": "AtLeast"
+                }
+            ]
+        }
+    },
+    {
+        "name": "Save the 7 grubs in Crystal Peaks",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsSaved_PEAK",
+            "expectedQuantity": 7,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Save the 3 grubs in Waterways",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsSaved_WATERWAYS",
+            "expectedQuantity": 3,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Save the 3 grubs in Queen's Garden",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsSaved_ROYAL_GARDENS",
+            "expectedQuantity": 3,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Save the 5 grubs in Deepnest",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsSaved_DEEPNEST",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Save 15 grubs",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsCollected",
+            "expectedQuantity": 15,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Save 20 grubs",
+        "condition": {
+            "type": "Int",
+            "variableName": "grubsCollected",
+            "expectedQuantity": 20,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Obtain fountain vessel fragment",
+        "condition": {
+            "type": "Bool",
+            "variableName": "fountainVesselSummoned",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Obtain 3 extra notches",
+        "condition": {
+            "type": "Int",
+            "variableName": "charmSlots",
+            "expectedQuantity": 3,
+            "state": "Added"
+        }
+    },
+    {
+        "name": "Obtain 1 extra soul vessel",
+        "condition": {
+            "type": "Int",
+            "variableName": "MPReserveMax",
+            "expectedQuantity": 33,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Obtain 1 extra mask",
+        "condition": {
+            "type": "Int",
+            "variableName": "maxHealthBase",
+            "expectedQuantity": 6,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Obtain 2 extra masks",
+        "condition": {
+            "type": "Int",
+            "variableName": "maxHealthBase",
+            "expectedQuantity": 7,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Have 5 Wanderer's Journals",
+        "condition": {
+            "type": "Int",
+            "variableName": "trinket1",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Have 5 Hallownest Seals",
+        "condition": {
+            "type": "Int",
+            "variableName": "trinket2",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Collect 3 King's Idols",
+        "condition": {
+            "type": "Int",
+            "variableName": "trinket3",
+            "expectedQuantity": 3,
+            "state": "Added"
+        }
+    },
+    {
+        "name": "Collect 1 Arcane Egg",
+        "condition": {
+            "type": "Int",
+            "variableName": "trinket4",
+            "expectedQuantity": 1,
+            "state": "Added"
+        }
+    },
+    {
+        "name": "Give Flower to Elderbug",
+        "condition": {
+            "type": "Bool",
+            "variableName": "elderbugGaveFlower",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Defeat Colosseum Zote",
+        "condition": {
+            "type": "Bool",
+            "variableName": "zoteDefeated",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Colosseum 1",
+        "condition": {
+            "type": "Bool",
+            "variableName": "colosseumBronzeCompleted",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Rescue Bretta + Sly",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "slyRescued",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "brettaRescued",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Use 2 Simple Keys",
+        "condition": {
+            "type": "Int",
+            "variableName": "simpleKeys",
+            "expectedQuantity": 2,
+            "state": "Removed"
+        }
+    },
+    {
+        "name": "Rescue Zote in Deepnest",
+        "condition": {
+            "type": "Bool",
+            "variableName": "zoteRescuedDeepnest",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Use City Crest + Ride both CoT large elevators",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "openedCityGate",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "usedLift1",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "usedLift2",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Talk to Lemm with Crest Equipped",
+        "condition": {
+            "type": "Bool",
+            "variableName": "metLemmWithCrest",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Have 1500 geo in the bank",
+        "condition": {
+            "type": "Int",
+            "variableName": "bankerBalance",
+            "expectedQuantity": 1500,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Break the 420 geo rock in Kingdom's Edge",
+        "condition": {
+            "type": "Bool",
+            "variableName": "destroyedGiantGeoEgg",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Unlock Hidden Stag Station",
+        "condition": {
+            "type": "Bool",
+            "variableName": "openedHiddenStation",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Unlock Queen's Garden Stag",
+        "condition": {
+            "type": "Bool",
+            "variableName": "openedGardensStagStation",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Unlock Deepnest Stag",
+        "condition": {
+            "type": "Bool",
+            "variableName": "openedDeepnest",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Buy 6 map pins from Iselda (All but two)",
+        "condition": {
+            "type": "Some",
+            "amount": 6,
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinShop",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinStag",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinBench",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinCocoon",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinSpa",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinDreamPlant",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinGhost",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinTram",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_b",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_r",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_w",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_y",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Buy 8 map pins from Iselda (All)",
+        "condition": {
+            "type": "Some",
+            "amount": 8,
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinShop",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinStag",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinBench",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinCocoon",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinSpa",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinDreamPlant",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinGhost",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasPinTram",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_b",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_r",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_w",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hasMarker_y",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Unlock Queen's Stag + King's Stag Stations",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "openedFungalWastes",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "openedRuins2",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Talk to Hornet at CoT Statue + Herrah",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hornetFountainEncounter",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hornetDenEncounter",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Watch Cloth Die",
+        "condition": {
+            "type": "Bool",
+            "variableName": "clothKilled",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Kill Myla",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedMyla",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Spend 3000 geo",
+        "condition": {
+            "type": "Int",
+            "variableName": "geoSpent",
+            "expectedQuantity": 3000,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Spend 4000 geo",
+        "condition": {
+            "type": "Int",
+            "variableName": "geoSpent",
+            "expectedQuantity": 4000,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Spend 5000 geo",
+        "condition": {
+            "type": "Int",
+            "variableName": "geoSpent",
+            "expectedQuantity": 5000,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Pay for 6 tolls",
+        "condition": {
+            "type": "Int",
+            "variableName": "paidTolls",
+            "expectedQuantity": 6,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Longnail + MoP",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_18",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_13",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Fragile Heart, Greed, and Strength",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_23",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_24",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_25",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Sprintmaster + Dashmaster",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_37",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_31",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Deep Focus + Quick Focus",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_34",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_7",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Spell Twister + Shaman Stone",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_19",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_33",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Lifeblood Heart + Joni's Blessing",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_8",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_27",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Weaversong",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_39",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Grubsong",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_3",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Sharp Shadow",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_16",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Shape of Unn",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_28",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Thorns of agony + Baldur Shell + Spore Shroom",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_12",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_5",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_17",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Quick Slash",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_32",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Heavy Blow + Steady Body",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_15",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_14",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Talk to Mask Maker",
+        "condition": {
+            "type": "Bool",
+            "variableName": "maskmakerMet",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Talk to Midwife",
+        "condition": {
+            "type": "Bool",
+            "variableName": "midwifeMet",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Have 4 Rancid Eggs",
+        "condition": {
+            "type": "Int",
+            "variableName": "rancidEggs",
+            "expectedQuantity": 4,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Kill your shade in Jiji's Hut",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedShadeJiji",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Collect 500 essence",
+        "condition": {
+            "type": "Int",
+            "variableName": "dreamOrbs",
+            "expectedQuantity": 500,
+            "state": "Added"
+        }
+    },
+    {
+        "name": "Dream Wielder",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_30",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Interact with 5 Cornifer locations",
+        "condition": {
+            "type": "Some",
+            "amount": 5,
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Crossroads_33",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Ruins1_31",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Fungus1_06",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Fungus1_24",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Fungus2_18",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Fungus2_25",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Fungus3_25",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Mines_30",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Cliffs_01",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Deepnest_01b",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Waterways_09",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Abyss_04",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_Deepnest_East_03",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Flukenest",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_11",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Stag Nest vessel fragment",
+        "condition": {
+            "type": "Bool",
+            "variableName": "vesselFragStagNest",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Complete 4 full dream trees",
+        "condition": {
+            "type": "Int",
+            "variableName": "dreamTreesCompleted",
+            "expectedQuantity": 4,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Kill 2 Soul Warriors",
+        "condition": {
+            "type": "Int",
+            "variableName": "killsMageKnight",
+            "expectedQuantity": 2,
+            "state": "Removed"
+        }
+    },
+    {
+        "name": "Buy 6 maps",
+        "condition": {
+            "type": "Some",
+            "amount": 6,
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "mapAbyss",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapCity",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapCliffs",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapCrossroads",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapDeepnest",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapFogCanyon",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapFungalWastes",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapGreenpath",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapMines",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapOutskirts",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapRestingGround",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapRoyalGardens",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "mapWaterways",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Talk to Emilitia (shortcut out of sewers)",
+        "condition": {
+            "type": "Bool",
+            "variableName": "metEmilitia",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Descending Dark",
+        "condition": {
+            "type": "Int",
+            "variableName": "quakeLevel",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Glowing Womb + Grimmchild",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_22",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_40",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Take a bath in all 4 Hot Springs",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hotSpringBath_CROSSROADS",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hotSpringBath_DEEPNEST",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hotSpringBath_CITY",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hotSpringBath_OUTSKIRTS",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Hiveblood",
+        "condition": {
+            "type": "Bool",
+            "variableName": "gotCharm_29",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Hive Knight",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedHiveKnight",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Mask Shard  in the Hive",
+        "condition": {
+            "type": "Bool",
+            "variableName": "collectedHiveShard",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Parry Revek 3 times without dying (Glade of Hope Guard)",
+        "condition": {
+            "type": "Int",
+            "variableName": "parryRevekConsecutive",
+            "expectedQuantity": 3,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Void Tendrils Journal Entry",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hasJournal",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "killedAbyssTendril",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Goam and Garpede Journal Entries",
+        "condition": {
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "hasJournal",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "killedWorm",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "killedBigCentipede",
+                    "expectedValue": true
+                }
+            ]
+        }
+    },
+    {
+        "name": "Kill 6 different Stalking Devouts",
+        "condition": {
+            "type": "Int",
+            "variableName": "killedUnique_SlashSpider",
+            "expectedQuantity": 6,
+            "state": "AtLeast"
+        }
+    },
+    {
+        "name": "Kill 4 Mimics",
+        "condition": {
+            "type": "Int",
+            "variableName": "killsGrubMimic",
+            "expectedQuantity": 4,
+            "state": "Removed"
+        }
+    },
+    {
+        "name": "Talk to Bardoon",
+        "condition": {
+            "type": "Bool",
+            "variableName": "bigCatMeet",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Talk to the Fluke Hermit",
+        "condition": {
+            "type": "Bool",
+            "variableName": "metFlukeHermit",
+            "expectedValue": true
+        }
+    },
+    {
+        "name": "Pale Lurker",
+        "condition": {
+            "type": "Bool",
+            "variableName": "killedPaleLurker",
+            "expectedValue": true
+        }
     }
-  },
-  {
-    "name": "Kill 6 different Stalking Devouts",
-    "condition": {
-      "type": "Int",
-      "variableName": "killedUnique_SlashSpider",
-      "expectedQuantity": 6,
-      "state": "AtLeast"
-    }
-  },
-  {
-    "name": "Kill 4 Mimics",
-    "condition": {
-      "type": "Int",
-      "variableName": "killsGrubMimic",
-      "expectedQuantity": 4,
-      "state": "Removed"
-    }
-  },
-  {
-    "name": "Talk to Bardoon",
-    "condition": {
-      "type": "Bool",
-      "variableName": "bigCatMeet",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Talk to the Fluke Hermit",
-    "condition": {
-      "type": "Bool",
-      "variableName": "metFlukeHermit",
-      "expectedValue": true
-    }
-  },
-  {
-    "name": "Pale Lurker",
-    "condition": {
-      "type": "Bool",
-      "variableName": "killedPaleLurker",
-      "expectedValue": true
-    }
-  }
 ]

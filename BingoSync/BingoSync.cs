@@ -9,6 +9,7 @@ using Settings;
 using UnityEngine;
 using ItemChanger;
 using System.Threading.Tasks;
+using Satchel;
 
 namespace BingoSync
 {
@@ -71,8 +72,19 @@ namespace BingoSync
             ModHooks.OnReceiveDeathEventHook += UniqueEnemies.CheckIfUniqueEnemyWasKilled;
 
             // Giant Geo Egg
-            ModHooks.HeroUpdateHook += GiantGeoEgg.CheckIfGiantGeoEggWasDestroyed;
-            ModHooks.ColliderCreateHook += GiantGeoEgg.FindGiantGeoEggGameObject;
+            On.PlayMakerFSM.OnEnable += GiantGeoEgg.CreateGiantGeoRockTrigger;
+            
+            // Marissa
+            On.PlayMakerFSM.OnEnable += Marissa.CreateMarissaKilledTrigger;
+
+            // Stag
+            On.PlayMakerFSM.OnEnable += Stag.CreateStagTravelTrigger;
+
+            // BreakableFloors
+            On.PlayMakerFSM.OnEnable += BreakableFloors.CreateBreakableFloorsTrigger;
+
+            // Oro Training Dummy
+            On.PlayMakerFSM.OnEnable += OroTrainingDummy.CreateOroTrainingDummyTrigger;
 
             // Rando
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
