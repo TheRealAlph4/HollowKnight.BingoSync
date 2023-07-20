@@ -148,7 +148,7 @@ namespace BingoSync
             });
         }
 
-        public static void SelectSquare(int square, Action<Exception> errorCallback, bool clear = false)
+        public static void SelectSquare(int square, Action errorCallback, bool clear = false)
         {
             var selectInput = new SelectInput
             {
@@ -166,7 +166,7 @@ namespace BingoSync
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                 });
-            }, maxRetries, nameof(SelectSquare));
+            }, maxRetries, nameof(SelectSquare), errorCallback);
         }
 
         public static void RevealCard() {
