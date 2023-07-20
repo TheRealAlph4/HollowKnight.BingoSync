@@ -8,7 +8,6 @@ using BingoSync.CustomVariables.Rando;
 using Settings;
 using UnityEngine;
 using ItemChanger;
-using System;
 using System.Threading.Tasks;
 
 namespace BingoSync
@@ -16,7 +15,9 @@ namespace BingoSync
     public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.3";
+        public override string GetVersion() => "0.0.0.4";
+
+        const bool Debug = false;
 
         const float fadeDuration = 0.2f;
 
@@ -35,7 +36,7 @@ namespace BingoSync
             On.GeoCounter.TakeGeo += GeoSpent.UpdateGeoSpent;
             On.GeoCounter.Update += GeoSpent.UpdateGeoText;
 
-            // Toll/home/teos/Documents/projects/BingoSync/BingoSync/__Exports/BingoSync/BingoSync.zips
+            // Tolls
             On.GeoCounter.TakeGeo += Tolls.UpdateTolls;
 
             // Grubs
@@ -77,9 +78,6 @@ namespace BingoSync
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
             AbstractPlacement.OnVisitStateChangedGlobal += Checks.PlacementStateChange;
 
-            AbstractItem.AfterGiveGlobal += Test;
-            AbstractPlacement.OnVisitStateChangedGlobal += TestP;
-
             // Menu
             On.UIManager.ContinueGame += ContinueGame;
             On.UIManager.StartNewGame += StartNewGame;
@@ -97,16 +95,6 @@ namespace BingoSync
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
-        }
-
-        private void TestP(VisitStateChangedEventArgs args)
-        {
-            Log($"state change: {args.Placement.Name} {args.Orig} {args.NewFlags}");
-        }
-
-        private void Test(ReadOnlyGiveEventArgs args)
-        {
-            Log($"after give: {args.Item.name} {args.Placement.Name}");
         }
 
         private IEnumerator FadeOut(On.UIManager.orig_FadeOutCanvasGroup orig, UIManager self, CanvasGroup cg)
@@ -162,7 +150,8 @@ namespace BingoSync
         {
             PlayerData.instance.SetBoolInternal(name, orig);
             BingoTracker.UpdateBoolean(name, orig);
-            //Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
+            if (Debug)
+                Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
             return orig;
         }
 
@@ -171,7 +160,8 @@ namespace BingoSync
             var previous = PlayerData.instance.GetIntInternal(name);
             PlayerData.instance.SetIntInternal(name, current);
             BingoTracker.UpdateInteger(name, previous, current);
-            //Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
+            if (Debug)
+                Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
             return current;
         }
 
