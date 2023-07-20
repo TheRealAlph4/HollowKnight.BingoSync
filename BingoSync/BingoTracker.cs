@@ -89,7 +89,7 @@ namespace BingoSync
             }
 
             int previous;
-            if (settings.Integers.TryGetValue(name, out previous))
+            if (!settings.Integers.TryGetValue(name, out previous))
             {
                 previous = 0;
             }
@@ -138,17 +138,6 @@ namespace BingoSync
             }
 
             UpdateCondition(square.Condition);
-            /*
-            switch (square.Criteria)
-            {
-                case RequirementCriteria.All:
-                    square.Solved = square.Requirements.All(requirement => requirement.IsMet);
-                    break;
-                case RequirementCriteria.Some:
-                    square.Solved = square.Requirements.FindAll(requirement => requirement.IsMet).Count() == square.Amount;
-                    break;
-            }
-            */
 
             return square.Condition.Solved;
         }
