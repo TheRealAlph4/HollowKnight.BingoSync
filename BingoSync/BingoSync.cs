@@ -148,7 +148,6 @@ namespace BingoSync
 
         private bool UpdateBoolInternal(string name, bool orig)
         {
-            PlayerData.instance.SetBoolInternal(name, orig);
             BingoTracker.UpdateBoolean(name, orig);
             if (Debug)
                 Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
@@ -158,7 +157,6 @@ namespace BingoSync
         private int UpdateIntInternal(string name, int current)
         {
             var previous = PlayerData.instance.GetIntInternal(name);
-            PlayerData.instance.SetIntInternal(name, current);
             BingoTracker.UpdateInteger(name, previous, current);
             if (Debug)
                 Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
