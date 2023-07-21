@@ -796,26 +796,6 @@
                     "type": "Bool",
                     "variableName": "hasPinTram",
                     "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_b",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_r",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_w",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_y",
-                    "expectedValue": true
                 }
             ]
         }
@@ -864,26 +844,6 @@
                 {
                     "type": "Bool",
                     "variableName": "hasPinTram",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_b",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_r",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_w",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasMarker_y",
                     "expectedValue": true
                 }
             ]
