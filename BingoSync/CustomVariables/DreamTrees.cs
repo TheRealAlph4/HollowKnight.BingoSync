@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using BingoSync.Helpers;
 using MonoMod.Cil;
 
 namespace BingoSync.CustomVariables
@@ -19,6 +20,9 @@ namespace BingoSync.CustomVariables
                 {
                     var dreamTreesCompleted = BingoTracker.GetInteger(variableName);
                     BingoTracker.UpdateInteger(variableName, dreamTreesCompleted + 1);
+                    var zone = ZoneHelper.GreaterZone(GameManager.instance.sm.mapZone);
+                    string regionVariableName = $"dreamTreeCompleted_{zone}";
+                    BingoTracker.UpdateBoolean(regionVariableName, true);
                 });
             }
         }

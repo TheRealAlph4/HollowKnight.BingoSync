@@ -86,6 +86,21 @@ namespace BingoSync
             // Oro Training Dummy
             On.PlayMakerFSM.OnEnable += OroTrainingDummy.CreateOroTrainingDummyTrigger;
 
+            // Millibelle
+            On.PlayMakerFSM.OnEnable += Millibelle.CreateMillibelleHitTrigger;
+
+            // Chests
+            On.PlayMakerFSM.OnEnable += Chests.CreateChestOpenTrigger;
+
+            // Benches
+            On.PlayMakerFSM.OnEnable += Benches.CreateBenchTrigger;
+
+            // Tiso
+            On.PlayMakerFSM.OnEnable += Tiso.CreateTisoShieldTrigger;
+
+            // Telescope
+            On.PlayMakerFSM.OnEnable += Telescope.CreateTelescopeTrigger;
+
             // Rando
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
             AbstractPlacement.OnVisitStateChangedGlobal += Checks.PlacementStateChange;

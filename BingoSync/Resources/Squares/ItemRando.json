@@ -395,9 +395,10 @@
     {
         "name": "Check the Crystal Crawler Journal Entry",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "killsLaserBug",
+            "expectedQuantity": 1,
+            "state": "Removed"
         }
     },
     {
@@ -478,7 +479,7 @@
         "name": "Slash Millibelle in Pleasure House",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "millibelleHit",
             "expectedValue": true
         }
     },
@@ -1348,7 +1349,7 @@
         "name": "Open the Crystal Peaks chest",
         "condition": {
             "type": "Bool",
-            "variableName": "---[NOT CHECK, OPEN]",
+            "variableName": "chestOpen_Mines_37",
             "expectedValue": true
         }
     },
@@ -1504,7 +1505,7 @@
         "name": "Complete the Greenpath Root",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "dreamTreeCompleted_GREEN_PATH",
             "expectedValue": true
         }
     },
@@ -1710,7 +1711,7 @@
         "name": "Complete the Kingdom's Edge Root",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "dreamTreeCompleted_OUTSKIRTS",
             "expectedValue": true
         }
     },
@@ -2793,7 +2794,7 @@
         "name": "Sit on the City of Tears Quirrel bench",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "bench_Ruins1_02",
             "expectedValue": true
         }
     },
@@ -2880,7 +2881,7 @@
         "name": "Enter Godhome",
         "condition": {
             "type": "Bool",
-            "variableName": "enteredGGAtrium",
+            "variableName": "---",
             "expectedValue": true
         }
     },
@@ -3091,7 +3092,7 @@
         "name": "Talk to Salubra while overcharmed",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "salubraConvoOvercharm",
             "expectedValue": true
         }
     },
@@ -3314,7 +3315,7 @@
         "name": "Look through Lurien's telescope",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "telescopeInteract",
             "expectedValue": true
         }
     },
@@ -3330,7 +3331,7 @@
         "name": "Swat Tiso's shield away from his corpse",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "tisoShieldHit",
             "expectedValue": true
         }
     },
@@ -3426,7 +3427,7 @@
         "name": "Sit down in Hidden Station",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "bench_Abyss_22",
             "expectedValue": true
         }
     },
