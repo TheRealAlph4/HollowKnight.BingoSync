@@ -2849,7 +2849,7 @@
         "name": "Open the Dirtmouth / Crystal Peaks elevator",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "switchOpen_Town",
             "expectedValue": true
         }
     },
@@ -2881,7 +2881,7 @@
         "name": "Enter Godhome",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "zoneVisited_GODS_GLORY",
             "expectedValue": true
         }
     },
@@ -3287,7 +3287,7 @@
         "name": "Visit Shrine of Believers",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "roomVisited_Dream_Room_Believer_Shrine",
             "expectedValue": true
         }
     },
@@ -3334,49 +3334,134 @@
     {
         "name": "Visit Distant Village or Hive",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "zoneVisited_HIVE",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "zoneVisited_ROYAL_GARDENS",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Visit Lake of Unn or Blue Lake",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Crossroads_50",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Fungus1_26",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Fungus1_Slug",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
         "name": "Visit Overgrown Mound or Crystalised Mound (Crystalised requires dive)",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Room_Fungus_Shaman",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Mines_35",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Visit Queen's Gardens or Cast Off Shell",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Room_Wyrm",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "zoneVisited_BEASTS_DEN",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Deepnest_10",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Room_spider_small",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
         "name": "Visit Soul Sanctum or Royal Waterways",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "zoneVisited_SOUL_SOCIETY",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "zoneVisited_WATERWAYS",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Visit Tower of Love (Love Key not required)",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Ruins2_11_b",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "roomVisited_Ruins2_11",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {

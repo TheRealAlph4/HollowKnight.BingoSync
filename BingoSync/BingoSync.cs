@@ -10,6 +10,7 @@ using UnityEngine;
 using ItemChanger;
 using System.Threading.Tasks;
 using Satchel;
+using System;
 
 namespace BingoSync
 {
@@ -92,6 +93,9 @@ namespace BingoSync
             // Chests
             On.PlayMakerFSM.OnEnable += Chests.CreateChestOpenTrigger;
 
+            // Switches
+            On.PlayMakerFSM.OnEnable += Switches.CreateSwitchOpenTrigger;
+
             // Benches
             On.PlayMakerFSM.OnEnable += Benches.CreateBenchTrigger;
 
@@ -100,6 +104,9 @@ namespace BingoSync
 
             // Telescope
             On.PlayMakerFSM.OnEnable += Telescope.CreateTelescopeTrigger;
+
+            // Scenes
+            On.HeroController.EnterScene += Scenes.EnterRoom;
 
             // Rando
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
