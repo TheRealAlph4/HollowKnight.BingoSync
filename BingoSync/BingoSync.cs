@@ -17,7 +17,7 @@ namespace BingoSync
     public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.4";
+        public override string GetVersion() => "0.0.0.6";
 
         const bool Debug = false;
 
