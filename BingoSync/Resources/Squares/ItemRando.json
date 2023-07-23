@@ -3242,9 +3242,10 @@
     {
         "name": "Slash two Shade Gates",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "shadeGatesHit",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
         }
     },
     {

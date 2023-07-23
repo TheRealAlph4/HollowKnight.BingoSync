@@ -105,6 +105,9 @@ namespace BingoSync
             // Telescope
             On.PlayMakerFSM.OnEnable += Telescope.CreateTelescopeTrigger;
 
+            // Shade Gates
+            On.PlayMakerFSM.OnEnable += ShadeGates.CreateShadeGateTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
 
