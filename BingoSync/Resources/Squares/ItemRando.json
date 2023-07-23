@@ -3563,7 +3563,7 @@
         "name": "Dream Nail White Lady",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "dreamDialogue_Room_Queen_Dream Dialogue",
             "expectedValue": true
         }
     },
@@ -3571,7 +3571,7 @@
         "name": "Dream Nail Willoh's meal",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "dreamDialogue_Fungus2_34_Dream Dialogue (1)",
             "expectedValue": true
         }
     },

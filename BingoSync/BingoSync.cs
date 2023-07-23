@@ -108,6 +108,9 @@ namespace BingoSync
             // Shade Gates
             On.PlayMakerFSM.OnEnable += ShadeGates.CreateShadeGateTrigger;
 
+            // Dream Nail Dialogue
+            On.PlayMakerFSM.OnEnable += DreamNailDialogue.CreateDreamNailDialogueTrigger;
+
             // Lore Tablets
             On.PlayMakerFSM.OnEnable += LoreTablets.CreateLoreTabletTrigger;
 
