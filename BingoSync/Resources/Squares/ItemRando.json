@@ -3429,9 +3429,24 @@
                     "expectedValue": true
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "zoneVisited_ROYAL_GARDENS",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "zoneVisited_BEASTS_DEN",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Deepnest_10",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "roomVisited_Room_spider_small",
+                            "expectedValue": true
+                        }
+                    ]
                 }
             ]
         }
@@ -3493,24 +3508,9 @@
                     "expectedValue": true
                 },
                 {
-                    "type": "Or",
-                    "conditions": [
-                        {
-                            "type": "Bool",
-                            "variableName": "zoneVisited_BEASTS_DEN",
-                            "expectedValue": true
-                        },
-                        {
-                            "type": "Bool",
-                            "variableName": "roomVisited_Deepnest_10",
-                            "expectedValue": true
-                        },
-                        {
-                            "type": "Bool",
-                            "variableName": "roomVisited_Room_spider_small",
-                            "expectedValue": true
-                        }
-                    ]
+                    "type": "Bool",
+                    "variableName": "zoneVisited_ROYAL_GARDENS",
+                    "expectedValue": true
                 }
             ]
         }
