@@ -566,25 +566,38 @@
     {
         "name": "Have 5 or more Charms",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "charmsOwned",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
         }
     },
     {
         "name": "Equip 5 Charms at the same time",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "charmsEquipped",
+            "expectedQuantity": 5,
+            "state": "AtLeast"
         }
     },
     {
         "name": "Obtain Carefree Melody",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "gotCharm_40",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Int",
+                    "variableName": "grimmChildLevel",
+                    "expectedQuantity": 5,
+                    "state": "AtLeast"
+                }
+            ]
         }
     },
     {
@@ -2760,7 +2773,7 @@
         "name": "Get Brumm's flame",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "gotBrummsFlame",
             "expectedValue": true
         }
     },

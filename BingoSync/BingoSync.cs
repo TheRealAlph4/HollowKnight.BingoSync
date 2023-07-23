@@ -116,6 +116,9 @@ namespace BingoSync
 
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
+            
+            // Charms
+            ModHooks.SetPlayerBoolHook += Charms.CheckEquippedCharms;
 
             // Rando
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
