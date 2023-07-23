@@ -108,6 +108,9 @@ namespace BingoSync
             // Shade Gates
             On.PlayMakerFSM.OnEnable += ShadeGates.CreateShadeGateTrigger;
 
+            // Lore Tablets
+            On.PlayMakerFSM.OnEnable += LoreTablets.CreateLoreTabletTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
 

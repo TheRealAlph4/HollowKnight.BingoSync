@@ -2841,7 +2841,7 @@
         "name": "Check/Read the Dung Defender sign before Isma's Grove",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "readLoreTablet_Waterways_07_Inspect Region",
             "expectedValue": true
         }
     },
@@ -2945,73 +2945,159 @@
     {
         "name": "Check/Read 3 lore tablets in Teacher's Archives",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (1)",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (2)",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Check/Read the lore tablet in Ancient Basin",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "readLoreTablet_Abyss_06_Core_Tut_tablet_Abyss",
             "expectedValue": true
         }
     },
     {
         "name": "Check/Read two lore tablets in City of Tears proper (No sub areas)",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Ruins1_02_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Ruins2_Watcher_Room_Inspect Region",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Check/Read the lore tablet in Howling Cliffs",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "readLoreTablet_Cliffs_01_Tut_tablet_top",
             "expectedValue": true
         }
     },
     {
         "name": "Check/Read three lore tablets in Greenpath",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Some",
+            "amount": 3,
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_17_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_21_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_32_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_30_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_19_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus1_13_Inspect Region",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Check/Read the lore tablet in Kingdom's Edge (requires Spore Shroom)",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "readLoreTablet_Deepnest_East_17_Tut_tablet_top",
             "expectedValue": true
         }
     },
     {
         "name": "Check/Read both Pilgrim's Way lore tablets",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Crossroads_11_alt_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus2_21_Inspect Region",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Check/Read both lore tablets in Soul Sanctum",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Ruins1_23_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Ruins1_32_Inspect Region",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
         "name": "Check/Read both lore tablets in Mantis Village",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus2_12_Inspect Region",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "readLoreTablet_Fungus2_14_Inspect Region",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
