@@ -78,7 +78,11 @@ namespace BingoSync
 
             LoadDefaults();
 
-            layoutRoot.VisibilityCondition = () => { return isBingoMenuUIVisible; };
+            layoutRoot.VisibilityCondition = () => {
+                BingoSyncClient.Update();
+                Update();
+                return isBingoMenuUIVisible;
+            };
             layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.HideMenu, () => {
                 isBingoMenuUIVisible = !isBingoMenuUIVisible;
             });
@@ -86,14 +90,14 @@ namespace BingoSync
 
         private static void Update()
         {
-            if (BingoSyncClient.joined)
+            if (BingoSyncClient.GetState() == BingoSyncClient.State.Connected)
             {
                 roomButton.Content = "Exit Room";
                 roomButton.Enabled = true;
                 SetEnabled(false);
-            } else if (BingoSyncClient.loading)
+            } else if (BingoSyncClient.GetState() == BingoSyncClient.State.Loading)
             {
-                roomButton.Content = "Joining...";
+                roomButton.Content = "Loading...";
                 roomButton.Enabled = false;
                 SetEnabled(false);
             } else
@@ -111,7 +115,7 @@ namespace BingoSync
 
         private static void RoomButtonClicked(MagicUI.Elements.Button sender)
         {
-            if (!BingoSyncClient.joined)
+            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
             {
                 BingoSyncClient.room = SanitizeRoomCode(MenuUI.roomCode.Text);
                 BingoSyncClient.nickname = MenuUI.nickname.Text;

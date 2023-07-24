@@ -214,6 +214,7 @@ namespace BingoSync
 
         public static void FinishGoal(string goal)
         {
+            BingoSyncClient.Update();
             if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
             {
                 return;
@@ -222,7 +223,7 @@ namespace BingoSync
             {
                 return;
             }
-            if (BingoSyncClient.joined == false)
+            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
             {
                 return;
             }

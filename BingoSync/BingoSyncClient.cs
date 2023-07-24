@@ -13,14 +13,17 @@ namespace BingoSync
 {
     internal class BingoSyncClient
     {
+        public enum State
+        {
+            None, Disconnected, Connected, Loading 
+        };
+
         private static Action<string> Log;
 
         public static string room = "";
         public static string password = "";
         public static string nickname = "";
         public static string color = "";
-
-        public static bool joined = false, loading = false;
 
         public static List<BoardSquare> board = null;
         public static bool isHidden = true;
@@ -29,6 +32,11 @@ namespace BingoSync
         private static HttpClientHandler handler = null;
         private static HttpClient client = null;
         private static ClientWebSocket webSocketClient = null;
+
+        private static State forcedState = State.None;
+        private static WebSocketState lastSocketState = WebSocketState.None;
+
+        private static bool shouldConnect = false;
 
         public static List<Action> BoardUpdated;
 
@@ -50,6 +58,25 @@ namespace BingoSync
             webSocketClient = new ClientWebSocket();
 
             BoardUpdated = new List<Action>();
+        }
+
+        public static void Update()
+        {
+            if (webSocketClient.State == lastSocketState)
+                return;
+            forcedState = State.None;
+            lastSocketState = webSocketClient.State;
+        }
+
+        public static State GetState()
+        {
+            if (forcedState != State.None)
+                return forcedState;
+            if (webSocketClient.State == WebSocketState.Open)
+                return State.Connected;
+            else if (webSocketClient.State == WebSocketState.Connecting)
+                return State.Loading;
+            return State.Disconnected;
         }
 
         private static void LoadCookie()
@@ -79,21 +106,19 @@ namespace BingoSync
 
         public static void ExitRoom(Action callback)
         {
-            joined = false;
-            loading = true;
+            shouldConnect = false;
+            forcedState = State.Loading;
             RetryHelper.RetryWithExponentialBackoff(() => {
                 return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result => {
                     if (result.Exception != null) {
                         throw result.Exception;
                     }
                     UpdateBoardAndBroadcast(null);
-                    loading = false;
                     webSocketClient = new ClientWebSocket();
+                    forcedState = State.None;
                     callback();
                 });
             }, 10, nameof(ExitRoom), () => {
-                loading = false;
-                joined = true;
             });
         }
 
@@ -105,11 +130,12 @@ namespace BingoSync
 
         public static void JoinRoom(Action<Exception> callback)
         {
-            if (loading)
+            if (GetState() == State.Loading)
             {
                 return;
             }
-            loading = true;
+            forcedState = State.Loading;
+            shouldConnect = true;
 
             var joinRoomInput = new JoinRoomInput
             {
@@ -134,16 +160,14 @@ namespace BingoSync
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
                     });
-
-                    joined = true;
                 } catch (Exception _ex)
                 {
                     ex = _ex;
                     Log($"could not join room: {ex.Message}");
                 } finally
                 {
-                    loading = false;
                     callback(ex);
+                    forcedState = State.None;
                 }
             });
         }
@@ -192,6 +216,7 @@ namespace BingoSync
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
             RetryHelper.RetryWithExponentialBackoff(() => {
+                webSocketClient = new ClientWebSocket();
                 var connectTask = webSocketClient.ConnectAsync(socketUri, CancellationToken.None);
                 return connectTask.ContinueWith(connectResponse =>
                 {
@@ -215,10 +240,9 @@ namespace BingoSync
 
         private static void ListenForBoardUpdates(SocketJoin socketJoin)
         {
-            if (webSocketClient.State != WebSocketState.Open)
+            if (shouldConnect && webSocketClient.State != WebSocketState.Open && webSocketClient.State != WebSocketState.Connecting)
             {
                 Log($"socket is closed, will try to connect again");
-                webSocketClient = new ClientWebSocket();
                 ConnectToBroadcastSocket(socketJoin);
                 return;
             }
