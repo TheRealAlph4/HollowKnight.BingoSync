@@ -114,6 +114,12 @@ namespace BingoSync
             // Lore Tablets
             On.PlayMakerFSM.OnEnable += LoreTablets.CreateLoreTabletTrigger;
 
+            // Nail Arts
+            On.PlayMakerFSM.OnEnable += NailArts.CreateNailArtsTrigger;
+
+            // Spa Gladiator
+            On.PlayMakerFSM.OnEnable += SpaGladiator.CreateSplashedTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
             

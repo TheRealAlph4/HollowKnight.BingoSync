@@ -486,9 +486,66 @@
     {
         "name": "Check/Kill 4 Mimics",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Mimic_Grub-Crystal_Peak",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Some",
+                            "amount": 4,
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "check_Mimic_Grub-Crystal_Peak",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "check_Mimic_Grub-Deepnest_1",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "check_Mimic_Grub-Deepnest_2",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "check_Mimic_Grub-Deepnest_3",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "killed_Grub Mimic_Room_Colosseum_Silver",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Mimic_Grub-Crystal_Peak",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Int",
+                            "variableName": "killsGrubMimic",
+                            "expectedQuantity": 4,
+                            "state": "Removed"
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -1922,9 +1979,29 @@
     {
         "name": "Visit all 4 shops (Sly, Iselda, Salubra and Leg Eater)",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "paidLegEater",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "metSlyShop",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "metIselda",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "metCharmSlug",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
@@ -3174,9 +3251,24 @@
     {
         "name": "Use a Nail Art in its vanilla Nailmaster's Hut",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "nailArtUsed_Dash Slash_Room_nailmaster_03",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "nailArtUsed_Great Slash_Room_nailmaster_02",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "nailArtUsed_Cyclone Slash_Room_nailmaster",
+                    "expectedValue": true
+                }
+            ]
         }
     },
     {
@@ -3379,7 +3471,7 @@
         "name": "Splash the NPC in the Colosseum's hot spring",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "spaGladiatorSplashed",
             "expectedValue": true
         }
     },
