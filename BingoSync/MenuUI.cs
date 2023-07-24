@@ -25,6 +25,8 @@ namespace BingoSync
             if (password != null)
                 password.Text = BingoSync.modSettings.DefaultPassword;
             selectedColor = BingoSync.modSettings.DefaultColor;
+            if (layoutRoot == null)
+                return;
             MagicUI.Elements.Button selectedColorButton = layoutRoot.GetElement<MagicUI.Elements.Button>(selectedColor);
             if (selectedColorButton != null) {
                 selectedColorButton.BorderColor = Color.white;

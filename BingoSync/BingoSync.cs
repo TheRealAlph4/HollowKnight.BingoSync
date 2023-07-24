@@ -9,8 +9,6 @@ using Settings;
 using UnityEngine;
 using ItemChanger;
 using System.Threading.Tasks;
-using Satchel;
-using System;
 
 namespace BingoSync
 {
