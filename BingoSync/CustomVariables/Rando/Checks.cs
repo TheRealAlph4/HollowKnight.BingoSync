@@ -9,6 +9,12 @@ namespace BingoSync.CustomVariables.Rando
         {
             var variableName = $"gotCheck_{args.Placement.Name}";
             BingoTracker.UpdateBoolean(variableName, true);
+
+            if (args.Placement.AllObtained())
+            {
+                var allObtainedVariableName = $"allObtained_{args.Placement.Name}";
+                BingoTracker.UpdateBoolean(allObtainedVariableName, true);
+            }
         }
 
         public static void PlacementStateChange(VisitStateChangedEventArgs args)

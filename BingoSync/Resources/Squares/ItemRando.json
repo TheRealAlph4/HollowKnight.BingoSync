@@ -2978,9 +2978,54 @@
     {
         "name": "Check the Goam and Garpede Journal Entries",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Goam",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Journal_Entry-Goam",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Journal_Entry-Garpede",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Goam",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "hasJournal",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "killedWorm",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "killedBigCentipede",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3011,7 +3056,7 @@
         "name": "Buy out Leg Eater",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "allObtained_Leg_Eater",
             "expectedValue": true
         }
     },
@@ -3193,9 +3238,44 @@
     {
         "name": "Check the Charged Lumafly Journal Entry",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Charged_Lumafly",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Journal_Entry-Charged_Lumafly",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Charged_Lumafly",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "hasJournal",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "killedZapBug",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3426,7 +3506,7 @@
         "name": "Buy out Salubra",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "allObtained_Salubra",
             "expectedValue": true
         }
     },
@@ -3494,9 +3574,44 @@
     {
         "name": "Check the Void Tendrils Journal Entry",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Void_Tendrils",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Journal_Entry-Void_Tendrils",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Void_Tendrils",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "hasJournal",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "killedAbyssTendril",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3692,7 +3807,7 @@
         "name": "Get all the Grubfather checks",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "allObtained_Grubfather",
             "expectedValue": true
         }
     },
@@ -3700,7 +3815,7 @@
         "name": "Get all the Seer checks",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "allObtained_Seer",
             "expectedValue": true
         }
     }
