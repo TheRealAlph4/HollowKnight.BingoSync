@@ -162,9 +162,10 @@
     {
         "name": "Defeat any one Radiant Boss",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "bossStatueTargetLevel",
+            "expectedQuantity": 2,
+            "state": "AtLeast"
         }
     },
     {
@@ -3032,7 +3033,7 @@
         "name": "Open Jiji's Hut and buy out Jiji",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "allObtained_Egg_Shop",
             "expectedValue": true
         }
     },
@@ -3072,9 +3073,29 @@
     {
         "name": "Enter the Lifeblood Core room without wearing any Lifeblood charms",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "And",
+            "conditions": [
+                {
+                    "type": "Bool",
+                    "variableName": "inLifebloodCoreRoom",
+                    "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "equippedCharm_8",
+                    "expectedValue": false
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "equippedCharm_9",
+                    "expectedValue": false
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "equippedCharm_27",
+                    "expectedValue": false
+                }
+            ]
         }
     },
     {
@@ -3354,9 +3375,10 @@
     {
         "name": "Eternal Ordeal: 20 Zotes",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "eternalOrdealCount",
+            "expectedQuantity": 20,
+            "state": "AtLeast"
         }
     },
     {

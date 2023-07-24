@@ -120,6 +120,9 @@ namespace BingoSync
             // Spa Gladiator
             On.PlayMakerFSM.OnEnable += SpaGladiator.CreateSplashedTrigger;
 
+            // Eternal Ordeal
+            On.PlayMakerFSM.OnEnable += EternalOrdeal.CreateCounterTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
             
