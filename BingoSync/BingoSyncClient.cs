@@ -218,6 +218,7 @@ namespace BingoSync
             if (webSocketClient.State != WebSocketState.Open)
             {
                 Log($"socket is closed, will try to connect again");
+                webSocketClient = new ClientWebSocket();
                 ConnectToBroadcastSocket(socketJoin);
                 return;
             }
