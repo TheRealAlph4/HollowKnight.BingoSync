@@ -156,7 +156,7 @@ namespace BingoSync
 
                     var textObject = new TextObject(layoutRoot, $"square_{row}_{column}")
                     {
-                        FontSize = 14,
+                        FontSize = 12,
                         Text = "",
                         VerticalAlignment = VerticalAlignment.Center,
                         HorizontalAlignment = HorizontalAlignment.Center,

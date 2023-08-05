@@ -9,6 +9,8 @@ using Settings;
 using UnityEngine;
 using ItemChanger;
 using System.Threading.Tasks;
+using System;
+using static UnityEngine.GraphicsBuffer;
 
 namespace BingoSync
 {
@@ -48,10 +50,10 @@ namespace BingoSync
             // Revek
             On.HeroController.NailParry += Revek.CheckParry;
             On.HeroController.EnterScene += Revek.EnterRoom;
-            
+
             // Lifts
             ModHooks.SetPlayerBoolHook += Lifts.CheckIfLiftWasUsed;
-            
+
             // Jiji
             ModHooks.SetPlayerBoolHook += Jiji.CheckIfKilledShadeInJijis;
 
@@ -63,16 +65,20 @@ namespace BingoSync
 
             // Hive Shard
             ModHooks.SetPlayerBoolHook += HiveShard.CheckIfHiveShardWasCollected;
-        
+
             // Tram
             ModHooks.SetPlayerIntHook += Tram.CheckIfStationWasVisited;
 
             // Unique Enemies
             ModHooks.OnReceiveDeathEventHook += UniqueEnemies.CheckIfUniqueEnemyWasKilled;
+            On.ScuttlerControl.Hit += UniqueEnemies.HitLightseed;
+            On.HealthManager.TakeDamage += UniqueEnemies.KillGulkaWithSpikeBall;
+            On.HealthManager.TakeDamage += UniqueEnemies.OomasKilledWithMinions_GlowingWomb;
+            On.SetHP.OnEnter += UniqueEnemies.OomasKilledWithMinions_Weaversong_Grimmchild;
 
             // Giant Geo Egg
             On.PlayMakerFSM.OnEnable += GiantGeoEgg.CreateGiantGeoRockTrigger;
-            
+
             // Marissa
             On.PlayMakerFSM.OnEnable += Marissa.CreateMarissaKilledTrigger;
 
@@ -121,11 +127,23 @@ namespace BingoSync
             // Eternal Ordeal
             On.PlayMakerFSM.OnEnable += EternalOrdeal.CreateCounterTrigger;
 
+            // Void Pool
+            On.PlayMakerFSM.OnEnable += VoidPool.CreateVoidPoolTrigger;
+
+            // Shinies
+            On.PlayMakerFSM.OnEnable += Shinies.CreateTrinketTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
             
             // Charms
             ModHooks.SetPlayerBoolHook += Charms.CheckEquippedCharms;
+
+            // Bow
+            ModHooks.HeroUpdateHook += Bow.BowToNPC;
+
+            // NailHit
+            ModHooks.SlashHitHook += NailHit.ProcessNailHit;
 
             // Rando
             AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;

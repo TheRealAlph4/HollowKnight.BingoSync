@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Satchel;
+﻿using System.Collections.Generic;
 
 namespace BingoSync.CustomVariables
 {

@@ -4,6 +4,7 @@
     {
         public static void StartConversation(On.DialogueBox.orig_StartConversation orig, DialogueBox self, string convName, string sheetName)
         {
+            orig(self, convName, sheetName);
             // Lemm with Crest
             if (convName == "RELICDEALER_DUNG") {
                 BingoTracker.UpdateBoolean("metLemmWithCrest", true);
@@ -18,7 +19,10 @@
                 var variableName = $"cornifer_{scene}";
                 BingoTracker.UpdateBoolean(variableName, true);
             }
-            orig(self, convName, sheetName);
+            // Mr Mushroom
+            if (convName.StartsWith("MR_MUSHROOM")) {
+                BingoTracker.UpdateBoolean("metMrMushroom", true);
+            }
         }
     }
 }
