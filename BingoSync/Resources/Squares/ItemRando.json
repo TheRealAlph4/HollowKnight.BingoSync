@@ -439,7 +439,7 @@
         "name": "Kill a Gulka with its own projectile",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "killGulkaWithSpikeBall",
             "expectedValue": true
         }
     },
@@ -455,7 +455,7 @@
         "name": "Kill a Lightseed",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "killedLightseed",
             "expectedValue": true
         }
     },
@@ -1605,7 +1605,7 @@
                     "conditions": [
                         {
                             "type": "Bool",
-                            "variableName": "---",
+                            "variableName": "gotShiny_14_Mines_34",
                             "expectedValue": true
                         },
                         {
@@ -1660,7 +1660,7 @@
         "name": "Bow to the Fungal Core Elder",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "bowFungalCoreElder",
             "expectedValue": true
         }
     },
@@ -1926,17 +1926,168 @@
     {
         "name": "Get two Pale Ore checks (Grubs / Essence excluded)",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Some",
+            "amount": 2,
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Pale_Ore-Crystal_Peak",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Crystal_Peak",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "gotShiny_14_Mines_34",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Crystal_Peak",
+                            "expectedValue": false
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Pale_Ore-Basin",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Basin",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "gotShiny_14_Abyss_17",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Basin",
+                            "expectedValue": false
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Pale_Ore-Colosseum",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Colosseum",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "gotShiny_14_Room_Colosseum_Silver",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Colosseum",
+                            "expectedValue": false
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Pale_Ore-Nosk",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Nosk",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "gotShiny_14_Deepnest_32",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Pale_Ore-Nosk",
+                            "expectedValue": false
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
         "name": "Check the journal below Stone Sanctuary",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Wanderer's_Journal-Greenpath_Lower",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Wanderer's_Journal-Greenpath_Lower",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "gotShiny_1_Fungus1_11",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Wanderer's_Journal-Greenpath_Lower",
+                            "expectedValue": false
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -2008,9 +2159,207 @@
     {
         "name": "Check three different spell locations",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Some",
+                    "amount": 3,
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Vengeful_Spirit",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Vengeful_Spirit",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Shade_Soul",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Shade_Soul",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Desolate_Dive",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Desolate_Dive",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Descending_Dark",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Descending_Dark",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Howling_Wraiths",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Howling_Wraiths",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Abyss_Shriek",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Abyss_Shriek",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Some",
+                    "amount": 3,
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "fireballLevel",
+                                    "expectedQuantity": 1,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Vengeful_Spirit",
+                                    "expectedValue": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "fireballLevel",
+                                    "expectedQuantity": 2,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Shade_Soul",
+                                    "expectedValue": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "quakeLevel",
+                                    "expectedQuantity": 1,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Desolate_Dive",
+                                    "expectedValue": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "quakeLevel",
+                                    "expectedQuantity": 2,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Descending_Dark",
+                                    "expectedValue": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "screamLevel",
+                                    "expectedQuantity": 1,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Howling_Wraiths",
+                                    "expectedValue": false
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Int",
+                                    "variableName": "screamLevel",
+                                    "expectedQuantity": 2,
+                                    "state": "AtLeast"
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Abyss_Shriek",
+                                    "expectedValue": false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -2239,7 +2588,7 @@
                     "conditions": [
                         {
                             "type": "Bool",
-                            "variableName": "---",
+                            "variableName": "gotShiny_1_Fungus2_17",
                             "expectedValue": true
                         },
                         {
@@ -2915,9 +3264,10 @@
     {
         "name": "Kill 3 Oomas using a minion charm",
         "condition": {
-            "type": "Bool",
-            "variableName": "---",
-            "expectedValue": true
+            "type": "Int",
+            "variableName": "killsOomaWithMinionCharm",
+            "expectedQuantity": 3,
+            "state": "AtLeast"
         }
     },
     {
@@ -3319,7 +3669,7 @@
         "name": "Bow to Moss Prophet, dead or alive",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "bowMossProphet",
             "expectedValue": true
         }
     },
@@ -3327,7 +3677,7 @@
         "name": "Interact with Mr. Mushroom once (Does not require Spore Shroom)",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "metMrMushroom",
             "expectedValue": true
         }
     },
@@ -3648,7 +3998,7 @@
         "name": "Slash the Beast's Den Trilobite",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "nailHitTrilobiteStatue",
             "expectedValue": true
         }
     },
@@ -3797,7 +4147,7 @@
         "name": "Swim in a Void Pool",
         "condition": {
             "type": "Bool",
-            "variableName": "---",
+            "variableName": "voidPoolSwim",
             "expectedValue": true
         }
     },
