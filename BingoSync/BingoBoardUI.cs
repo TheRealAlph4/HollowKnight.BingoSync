@@ -115,7 +115,7 @@ namespace BingoSync
             layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, () => {
                 BingoSyncClient.RevealCard();
             });
-            layoutRoot.VisibilityCondition = () => (BingoSyncClient.GetState() == BingoSyncClient.State.Connected && isBingoBoardVisible);
+            layoutRoot.VisibilityCondition = () => (BingoSyncClient.GetState() != BingoSyncClient.State.Disconnected && isBingoBoardVisible);
             BingoSyncClient.BoardUpdated.Add(UpdateGrid);
         }
 

@@ -64,6 +64,7 @@ namespace BingoSync
         {
             if (webSocketClient.State == lastSocketState)
                 return;
+            BoardUpdated.ForEach(f => f());
             forcedState = State.None;
             lastSocketState = webSocketClient.State;
         }
