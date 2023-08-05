@@ -403,6 +403,15 @@
         }
     },
     {
+        "name": "Kill a Crystal Crawler",
+        "condition": {
+            "type": "Int",
+            "variableName": "killsLaserBug",
+            "expectedQuantity": 1,
+            "state": "Removed"
+        }
+    },
+    {
         "name": "Kill 6 different Stalking Devouts",
         "condition": {
             "type": "Int",
