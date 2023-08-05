@@ -3684,19 +3684,79 @@
     {
         "name": "Nail 2",
         "condition": {
-            "type": "Int",
-            "variableName": "nailSmithUpgrades",
-            "expectedQuantity": 2,
-            "state": "AtLeast"
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Nailsmith_Upgrade_2",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "gotCheck_Nailsmith_Upgrade_2",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Nailsmith_Upgrade_2",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Int",
+                            "variableName": "nailSmithUpgrades",
+                            "expectedQuantity": 2,
+                            "state": "AtLeast"
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
         "name": "Nail 3",
         "condition": {
-            "type": "Int",
-            "variableName": "nailSmithUpgrades",
-            "expectedQuantity": 3,
-            "state": "AtLeast"
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Nailsmith_Upgrade_3",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "gotCheck_Nailsmith_Upgrade_3",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Nailsmith_Upgrade_3",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Int",
+                            "variableName": "nailSmithUpgrades",
+                            "expectedQuantity": 3,
+                            "state": "AtLeast"
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
