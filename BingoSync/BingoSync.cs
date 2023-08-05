@@ -9,15 +9,13 @@ using Settings;
 using UnityEngine;
 using ItemChanger;
 using System.Threading.Tasks;
-using System;
-using static UnityEngine.GraphicsBuffer;
 
 namespace BingoSync
 {
     public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
-        public override string GetVersion() => "0.0.0.7";
+        public override string GetVersion() => "0.0.0.8";
 
         const bool Debug = false;
 
