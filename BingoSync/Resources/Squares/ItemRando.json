@@ -3129,9 +3129,39 @@
     {
         "name": "Break the 420 geo rock in Kingdom's Edge",
         "condition": {
-            "type": "Bool",
-            "variableName": "destroyedGiantGeoEgg",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Geo_Rock-Kingdom's_Edge_420_Geo_Rock",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Geo_Rock-Kingdom's_Edge_420_Geo_Rock",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Geo_Rock-Kingdom's_Edge_420_Geo_Rock",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "destroyedGiantGeoEgg",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3811,9 +3841,39 @@
     {
         "name": "Complete Path of Pain",
         "condition": {
-            "type": "Bool",
-            "variableName": "killedBindingSeal",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Seal_of_Binding",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Journal_Entry-Seal_of_Binding",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Journal_Entry-Seal_of_Binding",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "killedBindingSeal",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
