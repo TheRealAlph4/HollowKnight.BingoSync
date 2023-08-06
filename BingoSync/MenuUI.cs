@@ -19,6 +19,11 @@ namespace BingoSync
         public static LayoutRoot layoutRoot;
         private static bool isBingoMenuUIVisible = true;
 
+        public static void SetVisible(bool visible)
+        {
+            isBingoMenuUIVisible = visible;
+        }
+
         public static void LoadDefaults() {
             if (nickname != null)
                 nickname.Text = BingoSync.modSettings.DefaultNickname;

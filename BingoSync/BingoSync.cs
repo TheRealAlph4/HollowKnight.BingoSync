@@ -19,8 +19,6 @@ namespace BingoSync
 
         const bool Debug = false;
 
-        const float fadeDuration = 0.2f;
-
         public static ModSettings modSettings { get; set; } = new ModSettings();
 
         public override void Initialize()
@@ -166,11 +164,21 @@ namespace BingoSync
             BingoBoardUI.Setup(Log);
         }
 
+        private void ShowMenu()
+        {
+            MenuUI.SetVisible(true);
+        }
+
+        private void HideMenu()
+        {
+            MenuUI.SetVisible(false);
+        }
+
         private IEnumerator FadeOut(On.UIManager.orig_FadeOutCanvasGroup orig, UIManager self, CanvasGroup cg)
         {
             if (cg.name == "MainMenuScreen")
             {
-                MenuUI.layoutRoot.BeginFade(0, fadeDuration);
+                HideMenu();
             }
             return orig(self, cg);
         }
@@ -179,14 +187,14 @@ namespace BingoSync
         {
             if (cg.name == "MainMenuScreen")
             {
-                MenuUI.layoutRoot.BeginFade(1, fadeDuration);
+                ShowMenu();
             }
             return orig(self, cg);
         }
 
         private void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
         {
-            MenuUI.layoutRoot.BeginFade(0, fadeDuration);
+            HideMenu();
             ConfigureBingoSyncOnGameStart();
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();
@@ -196,7 +204,7 @@ namespace BingoSync
 
         private void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
         {
-            MenuUI.layoutRoot.BeginFade(0, fadeDuration);
+            HideMenu();
             ConfigureBingoSyncOnGameStart();
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();
