@@ -4305,11 +4305,6 @@
                         },
                         {
                             "type": "Bool",
-                            "variableName": "hasJournal",
-                            "expectedValue": true
-                        },
-                        {
-                            "type": "Bool",
                             "variableName": "killedZapBug",
                             "expectedValue": true
                         }
