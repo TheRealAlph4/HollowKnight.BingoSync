@@ -3320,9 +3320,39 @@
     {
         "name": "Check/Read the Dung Defender sign before Isma's Grove",
         "condition": {
-            "type": "Bool",
-            "variableName": "readLoreTablet_Waterways_07_Inspect Region",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Dung_Defender",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Lore_Tablet-Dung_Defender",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Dung_Defender",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "readLoreTablet_Waterways_07_Inspect Region",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3493,19 +3523,109 @@
             "type": "And",
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Upper",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Archives_Upper",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Upper",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (1)",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Right",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Archives_Right",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Right",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (1)",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (2)",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Left",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Archives_Left",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Archives_Left",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus3_archive_02_Inspect Region (2)",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -3513,9 +3633,39 @@
     {
         "name": "Check/Read the lore tablet in Ancient Basin",
         "condition": {
-            "type": "Bool",
-            "variableName": "readLoreTablet_Abyss_06_Core_Tut_tablet_Abyss",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Ancient_Basin",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Lore_Tablet-Ancient_Basin",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Ancient_Basin",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "readLoreTablet_Abyss_06_Core_Tut_tablet_Abyss",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3524,14 +3674,74 @@
             "type": "And",
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Ruins1_02_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-City_Entrance",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-City_Entrance",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-City_Entrance",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Ruins1_02_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Ruins2_Watcher_Room_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Watcher's_Spire",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Watcher's_Spire",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Watcher's_Spire",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Ruins2_Watcher_Room_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -3539,9 +3749,39 @@
     {
         "name": "Check/Read the lore tablet in Howling Cliffs",
         "condition": {
-            "type": "Bool",
-            "variableName": "readLoreTablet_Cliffs_01_Tut_tablet_top",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Howling_Cliffs",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Lore_Tablet-Howling_Cliffs",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Howling_Cliffs",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "readLoreTablet_Cliffs_01_Tut_tablet_top",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3551,34 +3791,214 @@
             "amount": 3,
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_17_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Upper_Hidden",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_Upper_Hidden",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Upper_Hidden",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_17_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_21_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Stag",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_Stag",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Stag",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_21_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_32_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Lifeblood",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_Lifeblood",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Lifeblood",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_32_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_30_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Below_Toll",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_Below_Toll",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Below_Toll",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_30_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_19_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Lower_Hidden",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_Lower_Hidden",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_Lower_Hidden",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_19_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus1_13_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_QG",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Greenpath_QG",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Greenpath_QG",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus1_13_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -3586,9 +4006,39 @@
     {
         "name": "Check/Read the lore tablet in Kingdom's Edge (requires Spore Shroom)",
         "condition": {
-            "type": "Bool",
-            "variableName": "readLoreTablet_Deepnest_East_17_Tut_tablet_top",
-            "expectedValue": true
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Kingdom's_Edge",
+                            "expectedValue": true
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "checked_Lore_Tablet-Kingdom's_Edge",
+                            "expectedValue": true
+                        }
+                    ]
+                },
+                {
+                    "type": "And",
+                    "conditions": [
+                        {
+                            "type": "Bool",
+                            "variableName": "randomized_Lore_Tablet-Kingdom's_Edge",
+                            "expectedValue": false
+                        },
+                        {
+                            "type": "Bool",
+                            "variableName": "readLoreTablet_Deepnest_East_17_Tut_tablet_top",
+                            "expectedValue": true
+                        }
+                    ]
+                }
+            ]
         }
     },
     {
@@ -3597,14 +4047,74 @@
             "type": "And",
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Crossroads_11_alt_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Pilgrim's_Way_1",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Pilgrim's_Way_1",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Pilgrim's_Way_1",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Crossroads_11_alt_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus2_21_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Pilgrim's_Way_2",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Pilgrim's_Way_2",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Pilgrim's_Way_2",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus2_21_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -3615,14 +4125,74 @@
             "type": "And",
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Ruins1_23_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Sanctum_Entrance",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Sanctum_Entrance",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Sanctum_Entrance",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Ruins1_23_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Ruins1_32_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Sanctum_Past_Soul_Master",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Sanctum_Past_Soul_Master",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Sanctum_Past_Soul_Master",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Ruins1_32_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -3633,14 +4203,74 @@
             "type": "And",
             "conditions": [
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus2_12_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Mantis_Outskirts",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Mantis_Outskirts",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Mantis_Outskirts",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus2_12_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
-                    "type": "Bool",
-                    "variableName": "readLoreTablet_Fungus2_14_Inspect Region",
-                    "expectedValue": true
+                    "type": "Or",
+                    "conditions": [
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Mantis_Village",
+                                    "expectedValue": true
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "checked_Lore_Tablet-Mantis_Village",
+                                    "expectedValue": true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "And",
+                            "conditions": [
+                                {
+                                    "type": "Bool",
+                                    "variableName": "randomized_Lore_Tablet-Mantis_Village",
+                                    "expectedValue": false
+                                },
+                                {
+                                    "type": "Bool",
+                                    "variableName": "readLoreTablet_Fungus2_14_Inspect Region",
+                                    "expectedValue": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
