@@ -129,6 +129,9 @@ namespace BingoSync
             // Shinies
             On.PlayMakerFSM.OnEnable += Shinies.CreateTrinketTrigger;
 
+            // City Gate
+            On.PlayMakerFSM.OnEnable += CityGate.CreateCityGateOpenedTrigger;
+
             // Scenes
             On.HeroController.EnterScene += Scenes.EnterRoom;
             
