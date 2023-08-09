@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -15,7 +14,7 @@ namespace BingoSync
     {
         public enum State
         {
-            None, Disconnected, Connected, Loading 
+            None, Disconnected, Connected, Loading
         };
 
         private static Action<string> Log;
@@ -82,7 +81,8 @@ namespace BingoSync
 
         private static void LoadCookie()
         {
-            RetryHelper.RetryWithExponentialBackoff(() => {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
                 var task = client.GetAsync("");
                 return task.ContinueWith(responseTask =>
                 {
@@ -109,9 +109,12 @@ namespace BingoSync
         {
             shouldConnect = false;
             forcedState = State.Loading;
-            RetryHelper.RetryWithExponentialBackoff(() => {
-                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result => {
-                    if (result.Exception != null) {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
+                {
+                    if (result.Exception != null)
+                    {
                         throw result.Exception;
                     }
                     UpdateBoardAndBroadcast(null);
@@ -119,11 +122,14 @@ namespace BingoSync
                     forcedState = State.None;
                     callback();
                 });
-            }, 10, nameof(ExitRoom), () => {
+            }, 4, nameof(ExitRoom), () =>
+            {
+                forcedState = State.None;
             });
         }
 
-        private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard) {
+        private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard)
+        {
             board = newBoard;
             BingoTracker.ClearFinishedGoals();
             BoardUpdated.ForEach(f => f());
@@ -161,11 +167,13 @@ namespace BingoSync
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
                     });
-                } catch (Exception _ex)
+                }
+                catch (Exception _ex)
                 {
                     ex = _ex;
                     Log($"could not join room: {ex.Message}");
-                } finally
+                }
+                finally
                 {
                     callback(ex);
                     forcedState = State.None;
@@ -182,7 +190,8 @@ namespace BingoSync
                 Color = color,
                 RemoveColor = clear,
             };
-            RetryHelper.RetryWithExponentialBackoff(() => {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
                 var payload = JsonConvert.SerializeObject(selectInput);
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 var task = client.PutAsync("api/select", content);
@@ -194,12 +203,15 @@ namespace BingoSync
             }, maxRetries, nameof(SelectSquare), errorCallback);
         }
 
-        public static void RevealCard() {
+        public static void RevealCard()
+        {
             if (!isHidden) return;
-            var revealInput = new RevealInput {
+            var revealInput = new RevealInput
+            {
                 Room = room,
             };
-            RetryHelper.RetryWithExponentialBackoff(() => {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
                 var payload = JsonConvert.SerializeObject(revealInput);
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
                 var task = client.PutAsync("api/revealed", content);
@@ -216,7 +228,8 @@ namespace BingoSync
         private static void ConnectToBroadcastSocket(SocketJoin socketJoin)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
-            RetryHelper.RetryWithExponentialBackoff(() => {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
                 webSocketClient = new ClientWebSocket();
                 var connectTask = webSocketClient.ConnectAsync(socketUri, CancellationToken.None);
                 return connectTask.ContinueWith(connectResponse =>
@@ -239,27 +252,21 @@ namespace BingoSync
             }, maxRetries, nameof(ConnectToBroadcastSocket));
         }
 
-        private static void ListenForBoardUpdates(SocketJoin socketJoin)
+        private static async void ListenForBoardUpdates(SocketJoin socketJoin)
         {
-            if (shouldConnect && webSocketClient.State != WebSocketState.Open && webSocketClient.State != WebSocketState.Connecting)
-            {
-                Log($"socket is closed, will try to connect again");
-                ConnectToBroadcastSocket(socketJoin);
-                return;
-            }
             var buffer = new byte[1024];
-            var result = webSocketClient.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-            _ = result.ContinueWith(responseTask =>
+            while (webSocketClient.State == WebSocketState.Open)
             {
                 try
                 {
-                    var response = responseTask.Result;
+                    var response = await webSocketClient.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                     if (response.MessageType == WebSocketMessageType.Text)
                     {
                         var json = Encoding.UTF8.GetString(buffer, 0, response.Count);
                         var obj = JsonConvert.DeserializeObject<Broadcast>(json);
                         if (board == null) return;
-                        if (obj.Type == "goal") {
+                        if (obj.Type == "goal")
+                        {
                             for (int i = 0; i < board.Count; i++)
                             {
                                 if (board[i].Slot == obj.Square.Slot)
@@ -269,24 +276,36 @@ namespace BingoSync
                                 }
                             }
                             BoardUpdated.ForEach(f => f());
-                        } else if (obj.Type == "new-card") {
+                        }
+                        else if (obj.Type == "new-card")
+                        {
                             UpdateBoardAndBroadcast(null);
                             UpdateBoard(obj.HideCard);
-                        } else if (obj.Type == "revealed") {
+                        }
+                        else if (obj.Type == "revealed")
+                        {
                             isHidden = false;
                             BoardUpdated.ForEach(f => f());
                         }
                     }
-                } finally
-                {
-                    ListenForBoardUpdates(socketJoin);
                 }
-            });
+                catch (Exception ex)
+                {
+                    Log($"error receiving data from socket: {ex.Message}");
+                }
+            }
+            if (shouldConnect)
+            {
+                Log($"socket is closed, will try to connect again");
+                ConnectToBroadcastSocket(socketJoin);
+                return;
+            }
         }
 
         public static void UpdateBoard(bool hideCard)
         {
-            RetryHelper.RetryWithExponentialBackoff(() => {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
                 var task = client.GetAsync($"room/{room}/board");
                 return task.ContinueWith(responseTask =>
                 {
@@ -305,9 +324,10 @@ namespace BingoSync
             }, maxRetries, nameof(UpdateBoard));
         }
     }
-    
+
     [DataContract]
-    internal class RevealInput {
+    internal class RevealInput
+    {
         [JsonProperty("room")]
         public string Room;
     }
