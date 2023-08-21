@@ -298,24 +298,6 @@
         }
     },
     {
-        "name": "Nail 2",
-        "condition": {
-            "type": "Int",
-            "variableName": "nailSmithUpgrades",
-            "expectedQuantity": 2,
-            "state": "AtLeast"
-        }
-    },
-    {
-        "name": "Nail 3",
-        "condition": {
-            "type": "Int",
-            "variableName": "nailSmithUpgrades",
-            "expectedQuantity": 3,
-            "state": "AtLeast"
-        }
-    },
-    {
         "name": "Dream Nail",
         "condition": {
             "type": "Bool",
