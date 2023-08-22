@@ -166,6 +166,7 @@ namespace BingoSync
                         var socketJoin = JsonConvert.DeserializeObject<SocketJoin>(joinRoomResponse.Result);
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
+                        SetColor(color);
                     });
                 }
                 catch (Exception _ex)
@@ -179,6 +180,26 @@ namespace BingoSync
                     forcedState = State.None;
                 }
             });
+        }
+
+        public static void SetColor(string color)
+        {
+            var setColorInput = new SetColorInput
+            {
+                Room = room,
+                Color = color,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(setColorInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = client.PutAsync("api/color", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                });
+            }, maxRetries, nameof(SetColor));
         }
 
         public static void SelectSquare(int square, Action errorCallback, bool clear = false)
@@ -324,6 +345,15 @@ namespace BingoSync
                 });
             }, maxRetries, nameof(UpdateBoard));
         }
+    }
+
+    [DataContract]
+    internal class SetColorInput
+    {
+        [JsonProperty("room")]
+        public string Room;
+        [JsonProperty("color")]
+        public string Color;
     }
 
     [DataContract]
