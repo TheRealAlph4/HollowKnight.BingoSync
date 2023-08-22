@@ -11,9 +11,11 @@ namespace BingoSync
         private static MenuButton savePasswordButton;
         private static MenuButton saveColorButton;
         private static MenuOptionHorizontal revealCardOnStartSelector;
+        private static MenuOptionHorizontal unmarkGoalsSelector;
 
         public static void RefreshMenu() {
             revealCardOnStartSelector?.menuSetting?.RefreshValueFromGameSettings();
+            unmarkGoalsSelector?.menuSetting?.RefreshValueFromGameSettings();
 
             var nickDesc = saveNicknameButton?.descriptionText?.GetComponentInParent<Text>();
             if (nickDesc != null) {
@@ -55,63 +57,97 @@ namespace BingoSync
                     RegularGridLayout.CreateVerticalLayout(105f),
                     c =>
                     {
-                        c.AddKeybind("Toggle Board", BingoSync.modSettings.Keybinds.ToggleBoard, new KeybindConfig {
+                        c.AddKeybind("Toggle Board", BingoSync.modSettings.Keybinds.ToggleBoard, new KeybindConfig
+                        {
                             Label = "Toggle Board",
                             CancelAction = CancelAction,
                         })
-                        .AddKeybind("Hide Menu", BingoSync.modSettings.Keybinds.HideMenu, new KeybindConfig {
+                        .AddKeybind("Hide Menu", BingoSync.modSettings.Keybinds.HideMenu, new KeybindConfig
+                        {
                             Label = "Hide Menu",
                             CancelAction = CancelAction,
                         })
-                        .AddKeybind("Reveal Card", BingoSync.modSettings.Keybinds.RevealCard, new KeybindConfig {
+                        .AddKeybind("Reveal Card", BingoSync.modSettings.Keybinds.RevealCard, new KeybindConfig
+                        {
                             Label = "Reveal Card",
                             CancelAction = CancelAction,
                         })
-                        .AddHorizontalOption("Reveal Card On Start", new HorizontalOptionConfig {
+                        .AddHorizontalOption("Reveal Card On Start", new HorizontalOptionConfig
+                        {
                             Label = "Reveal Card on Game Start",
-                            Options = new string[] {"No", "Yes"},
+                            Options = new string[] { "No", "Yes" },
                             CancelAction = CancelAction,
-                            ApplySetting = (menu, index) => {
+                            ApplySetting = (menu, index) =>
+                            {
                                 BingoSync.modSettings.RevealCardOnGameStart = (index == 1);
                             },
-                            RefreshSetting = (menu, alsoApply) => {
+                            RefreshSetting = (menu, alsoApply) =>
+                            {
                                 var shouldRevealOnStart = BingoSync.modSettings.RevealCardOnGameStart;
                                 menu.optionList.SetOptionTo(shouldRevealOnStart ? 1 : 0);
                             }
                         }, out revealCardOnStartSelector)
-                        .AddMenuButton("Save Nickname", new MenuButtonConfig {
+                        .AddMenuButton("Save Nickname", new MenuButtonConfig
+                        {
                             Label = "Save Default Nickname",
-                            Description = new DescriptionInfo {
+                            Description = new DescriptionInfo
+                            {
                                 Text = GetSaveNicknameDescriptionText()
                             },
                             CancelAction = CancelAction,
-                            SubmitAction = _ => {
+                            SubmitAction = _ =>
+                            {
                                 BingoSync.modSettings.DefaultNickname = MenuUI.nickname.Text;
                                 RefreshMenu();
                             }
                         }, out saveNicknameButton)
-                        .AddMenuButton("Save Password", new MenuButtonConfig {
+                        .AddMenuButton("Save Password", new MenuButtonConfig
+                        {
                             Label = "Save Default Password",
-                            Description = new DescriptionInfo {
+                            Description = new DescriptionInfo
+                            {
                                 Text = GetSavePasswordDescriptionText()
                             },
                             CancelAction = CancelAction,
-                            SubmitAction = _ => {
+                            SubmitAction = _ =>
+                            {
                                 BingoSync.modSettings.DefaultPassword = MenuUI.password.Text;
                                 RefreshMenu();
                             }
                         }, out savePasswordButton)
-                        .AddMenuButton("Save Color", new MenuButtonConfig {
+                        .AddMenuButton("Save Color", new MenuButtonConfig
+                        {
                             Label = "Save Default Color",
-                            Description = new DescriptionInfo {
+                            Description = new DescriptionInfo
+                            {
                                 Text = GetSaveColorDescriptionText()
                             },
                             CancelAction = CancelAction,
-                            SubmitAction = _ => {
+                            SubmitAction = _ =>
+                            {
                                 BingoSync.modSettings.DefaultColor = MenuUI.selectedColor;
                                 RefreshMenu();
                             }
-                        }, out saveColorButton);
+                        }, out saveColorButton)
+                        .AddHorizontalOption("Unmark Goals", new HorizontalOptionConfig
+                        {
+                            Label = "Unmark Goals",
+                            Description = new DescriptionInfo
+                            {
+                                Text = "Some goals will be unmarked if their conditions are no longer met. WARNING: Can cause board inconsistencies on rare situations"
+                            },
+                            Options = new string[] { "No", "Yes" },
+                            CancelAction = CancelAction,
+                            ApplySetting = (menu, index) =>
+                            {
+                                BingoSync.modSettings.UnmarkGoals = (index == 1);
+                            },
+                            RefreshSetting = (menu, alsoApply) =>
+                            {
+                                var shouldUnmarkGoals = BingoSync.modSettings.UnmarkGoals;
+                                menu.optionList.SetOptionTo(shouldUnmarkGoals ? 1 : 0);
+                            }
+                        }, out unmarkGoalsSelector);
                     })
                 .AddControls(
                     new SingleContentLayout(new AnchoredPosition(

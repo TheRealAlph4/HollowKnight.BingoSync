@@ -242,7 +242,7 @@
             "type": "Int",
             "variableName": "grimmChildLevel",
             "expectedQuantity": 1,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -267,7 +267,7 @@
             "type": "Int",
             "variableName": "fireballLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -276,7 +276,7 @@
             "type": "Int",
             "variableName": "screamLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -285,7 +285,7 @@
             "type": "Int",
             "variableName": "screamLevel",
             "expectedQuantity": 1,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -294,7 +294,7 @@
             "type": "Int",
             "variableName": "quakeLevel",
             "expectedQuantity": 1,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -319,8 +319,9 @@
             "type": "Int",
             "variableName": "ore",
             "expectedQuantity": 2,
-            "state": "AtLeast"
-        }
+            "state": "Current"
+        },
+        "canUnmark": true
     },
     {
         "name": "Cyclone Slash",
@@ -428,13 +429,13 @@
                     "type": "Int",
                     "variableName": "grubsSaved_CROSSROADS",
                     "expectedQuantity": 5,
-                    "state": "AtLeast"
+                    "state": "Current"
                 },
                 {
                     "type": "Int",
                     "variableName": "grubsSaved_FOG_CANYON",
                     "expectedQuantity": 1,
-                    "state": "AtLeast"
+                    "state": "Current"
                 }
             ]
         }
@@ -445,7 +446,7 @@
             "type": "Int",
             "variableName": "grubsSaved_CITY",
             "expectedQuantity": 5,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -457,13 +458,13 @@
                     "type": "Int",
                     "variableName": "grubsSaved_GREEN_PATH",
                     "expectedQuantity": 4,
-                    "state": "AtLeast"
+                    "state": "Current"
                 },
                 {
                     "type": "Int",
                     "variableName": "grubsSaved_WASTES",
                     "expectedQuantity": 2,
-                    "state": "AtLeast"
+                    "state": "Current"
                 }
             ]
         }
@@ -474,7 +475,7 @@
             "type": "Int",
             "variableName": "grubsSaved_PEAK",
             "expectedQuantity": 7,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -483,7 +484,7 @@
             "type": "Int",
             "variableName": "grubsSaved_WATERWAYS",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -492,7 +493,7 @@
             "type": "Int",
             "variableName": "grubsSaved_ROYAL_GARDENS",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -501,7 +502,7 @@
             "type": "Int",
             "variableName": "grubsSaved_DEEPNEST",
             "expectedQuantity": 5,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -510,7 +511,7 @@
             "type": "Int",
             "variableName": "grubsCollected",
             "expectedQuantity": 15,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -519,7 +520,7 @@
             "type": "Int",
             "variableName": "grubsCollected",
             "expectedQuantity": 20,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -540,30 +541,12 @@
         }
     },
     {
-        "name": "Obtain 1 extra soul vessel",
-        "condition": {
-            "type": "Int",
-            "variableName": "MPReserveMax",
-            "expectedQuantity": 33,
-            "state": "AtLeast"
-        }
-    },
-    {
-        "name": "Obtain 1 extra mask",
-        "condition": {
-            "type": "Int",
-            "variableName": "maxHealthBase",
-            "expectedQuantity": 6,
-            "state": "AtLeast"
-        }
-    },
-    {
         "name": "Obtain 2 extra masks",
         "condition": {
             "type": "Int",
             "variableName": "maxHealthBase",
             "expectedQuantity": 7,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -572,8 +555,9 @@
             "type": "Int",
             "variableName": "trinket1",
             "expectedQuantity": 5,
-            "state": "AtLeast"
-        }
+            "state": "Current"
+        },
+        "canUnmark": true
     },
     {
         "name": "Have 5 Hallownest Seals",
@@ -581,8 +565,9 @@
             "type": "Int",
             "variableName": "trinket2",
             "expectedQuantity": 5,
-            "state": "AtLeast"
-        }
+            "state": "Current"
+        },
+        "canUnmark": true
     },
     {
         "name": "Collect 3 King's Idols",
@@ -603,109 +588,10 @@
         }
     },
     {
-        "name": "Give Flower to Elderbug",
-        "condition": {
-            "type": "Bool",
-            "variableName": "elderbugGaveFlower",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Defeat Colosseum Zote",
-        "condition": {
-            "type": "Bool",
-            "variableName": "zoteDefeated",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Colosseum 1",
-        "condition": {
-            "type": "Bool",
-            "variableName": "colosseumBronzeCompleted",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Rescue Bretta + Sly",
-        "condition": {
-            "type": "And",
-            "conditions": [
-                {
-                    "type": "Bool",
-                    "variableName": "slyRescued",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "brettaRescued",
-                    "expectedValue": true
-                }
-            ]
-        }
-    },
-    {
-        "name": "Use 2 Simple Keys",
-        "condition": {
-            "type": "Int",
-            "variableName": "simpleKeys",
-            "expectedQuantity": 2,
-            "state": "Removed"
-        }
-    },
-    {
-        "name": "Rescue Zote in Deepnest",
-        "condition": {
-            "type": "Bool",
-            "variableName": "zoteRescuedDeepnest",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Use City Crest + Ride both CoT large elevators",
-        "condition": {
-            "type": "And",
-            "conditions": [
-                {
-                    "type": "Bool",
-                    "variableName": "openedCityGate",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "usedLift1",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "usedLift2",
-                    "expectedValue": true
-                }
-            ]
-        }
-    },
-    {
         "name": "Talk to Lemm with Crest Equipped",
         "condition": {
             "type": "Bool",
             "variableName": "metLemmWithCrest",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Have 1500 geo in the bank",
-        "condition": {
-            "type": "Int",
-            "variableName": "bankerBalance",
-            "expectedQuantity": 1500,
-            "state": "AtLeast"
-        }
-    },
-    {
-        "name": "Break the 420 geo rock in Kingdom's Edge",
-        "condition": {
-            "type": "Bool",
-            "variableName": "destroyedGiantGeoEgg",
             "expectedValue": true
         }
     },
@@ -731,104 +617,6 @@
             "type": "Bool",
             "variableName": "openedDeepnest",
             "expectedValue": true
-        }
-    },
-    {
-        "name": "Buy 6 map pins from Iselda (All but two)",
-        "condition": {
-            "type": "Some",
-            "amount": 6,
-            "conditions": [
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinShop",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinStag",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinBench",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinCocoon",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinSpa",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinDreamPlant",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinGhost",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinTram",
-                    "expectedValue": true
-                }
-            ]
-        }
-    },
-    {
-        "name": "Buy 8 map pins from Iselda (All)",
-        "condition": {
-            "type": "Some",
-            "amount": 8,
-            "conditions": [
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinShop",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinStag",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinBench",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinCocoon",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinSpa",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinDreamPlant",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinGhost",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hasPinTram",
-                    "expectedValue": true
-                }
-            ]
         }
     },
     {
@@ -876,47 +664,12 @@
         }
     },
     {
-        "name": "Kill Myla",
-        "condition": {
-            "type": "Bool",
-            "variableName": "killedMyla",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Spend 3000 geo",
-        "condition": {
-            "type": "Int",
-            "variableName": "geoSpent",
-            "expectedQuantity": 3000,
-            "state": "AtLeast"
-        }
-    },
-    {
-        "name": "Spend 4000 geo",
-        "condition": {
-            "type": "Int",
-            "variableName": "geoSpent",
-            "expectedQuantity": 4000,
-            "state": "AtLeast"
-        }
-    },
-    {
-        "name": "Spend 5000 geo",
-        "condition": {
-            "type": "Int",
-            "variableName": "geoSpent",
-            "expectedQuantity": 5000,
-            "state": "AtLeast"
-        }
-    },
-    {
         "name": "Pay for 6 tolls",
         "condition": {
             "type": "Int",
             "variableName": "paidTolls",
             "expectedQuantity": 6,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1114,29 +867,14 @@
         }
     },
     {
-        "name": "Talk to Mask Maker",
-        "condition": {
-            "type": "Bool",
-            "variableName": "maskmakerMet",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Talk to Midwife",
-        "condition": {
-            "type": "Bool",
-            "variableName": "midwifeMet",
-            "expectedValue": true
-        }
-    },
-    {
         "name": "Have 4 Rancid Eggs",
         "condition": {
             "type": "Int",
             "variableName": "rancidEggs",
             "expectedQuantity": 4,
-            "state": "AtLeast"
-        }
+            "state": "Current"
+        },
+        "canUnmark": true
     },
     {
         "name": "Kill your shade in Jiji's Hut",
@@ -1144,15 +882,6 @@
             "type": "Bool",
             "variableName": "killedShadeJiji",
             "expectedValue": true
-        }
-    },
-    {
-        "name": "Collect 500 essence",
-        "condition": {
-            "type": "Int",
-            "variableName": "dreamOrbs",
-            "expectedQuantity": 500,
-            "state": "Added"
         }
     },
     {
@@ -1254,15 +983,6 @@
         }
     },
     {
-        "name": "Complete 4 full dream trees",
-        "condition": {
-            "type": "Int",
-            "variableName": "dreamTreesCompleted",
-            "expectedQuantity": 4,
-            "state": "AtLeast"
-        }
-    },
-    {
         "name": "Kill 2 Soul Warriors",
         "condition": {
             "type": "Int",
@@ -1346,20 +1066,12 @@
         }
     },
     {
-        "name": "Talk to Emilitia (shortcut out of sewers)",
-        "condition": {
-            "type": "Bool",
-            "variableName": "metEmilitia",
-            "expectedValue": true
-        }
-    },
-    {
         "name": "Descending Dark",
         "condition": {
             "type": "Int",
             "variableName": "quakeLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1438,7 +1150,7 @@
             "type": "Int",
             "variableName": "parryRevekConsecutive",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1483,37 +1195,12 @@
         }
     },
     {
-        "name": "Kill 6 different Stalking Devouts",
-        "condition": {
-            "type": "Int",
-            "variableName": "killedUnique_SlashSpider",
-            "expectedQuantity": 6,
-            "state": "AtLeast"
-        }
-    },
-    {
         "name": "Kill 4 Mimics",
         "condition": {
             "type": "Int",
             "variableName": "killsGrubMimic",
             "expectedQuantity": 4,
             "state": "Removed"
-        }
-    },
-    {
-        "name": "Talk to Bardoon",
-        "condition": {
-            "type": "Bool",
-            "variableName": "bigCatMeet",
-            "expectedValue": true
-        }
-    },
-    {
-        "name": "Talk to the Fluke Hermit",
-        "condition": {
-            "type": "Bool",
-            "variableName": "metFlukeHermit",
-            "expectedValue": true
         }
     },
     {

@@ -8,6 +8,7 @@ namespace Settings
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new KeyBinds();
         public bool RevealCardOnGameStart = false;
+        public bool UnmarkGoals = false;
         public string DefaultNickname = "";
         public string DefaultPassword = "";
         public string DefaultColor = "red";

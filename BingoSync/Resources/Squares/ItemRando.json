@@ -165,7 +165,7 @@
             "type": "Int",
             "variableName": "bossStatueTargetLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -357,7 +357,7 @@
             "type": "Int",
             "variableName": "killedUnique_GreatShieldZombie",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -374,7 +374,7 @@
             "type": "Int",
             "variableName": "killedUnique_LazyFlyer",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -417,7 +417,7 @@
             "type": "Int",
             "variableName": "killedUnique_SlashSpider",
             "expectedQuantity": 6,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -474,7 +474,7 @@
             "type": "Int",
             "variableName": "killedUnique_PrayerSlug",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -636,8 +636,9 @@
             "type": "Int",
             "variableName": "charmsOwned",
             "expectedQuantity": 5,
-            "state": "AtLeast"
-        }
+            "state": "Current"
+        },
+        "canUnmark": true
     },
     {
         "name": "Equip 5 Charms at the same time",
@@ -645,7 +646,7 @@
             "type": "Int",
             "variableName": "charmsEquipped",
             "expectedQuantity": 5,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -662,7 +663,7 @@
                     "type": "Int",
                     "variableName": "grimmChildLevel",
                     "expectedQuantity": 5,
-                    "state": "AtLeast"
+                    "state": "Current"
                 }
             ]
         }
@@ -1013,7 +1014,7 @@
             "type": "Int",
             "variableName": "quakeLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1062,7 +1063,7 @@
             "type": "Int",
             "variableName": "screamLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1071,7 +1072,7 @@
             "type": "Int",
             "variableName": "fireballLevel",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1088,7 +1089,7 @@
             "type": "Int",
             "variableName": "fireballLevel",
             "expectedQuantity": 1,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1097,7 +1098,7 @@
             "type": "Int",
             "variableName": "screamLevel",
             "expectedQuantity": 1,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1106,7 +1107,7 @@
             "type": "Int",
             "variableName": "grubsCollected",
             "expectedQuantity": 15,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1267,7 +1268,7 @@
             "type": "Int",
             "variableName": "charmSlots",
             "expectedQuantity": 6,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -1294,7 +1295,7 @@
             "type": "Int",
             "variableName": "MPReserveMax",
             "expectedQuantity": 33,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -2277,7 +2278,7 @@
                                     "type": "Int",
                                     "variableName": "fireballLevel",
                                     "expectedQuantity": 1,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2293,7 +2294,7 @@
                                     "type": "Int",
                                     "variableName": "fireballLevel",
                                     "expectedQuantity": 2,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2309,7 +2310,7 @@
                                     "type": "Int",
                                     "variableName": "quakeLevel",
                                     "expectedQuantity": 1,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2325,7 +2326,7 @@
                                     "type": "Int",
                                     "variableName": "quakeLevel",
                                     "expectedQuantity": 2,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2341,7 +2342,7 @@
                                     "type": "Int",
                                     "variableName": "screamLevel",
                                     "expectedQuantity": 1,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2357,7 +2358,7 @@
                                     "type": "Int",
                                     "variableName": "screamLevel",
                                     "expectedQuantity": 2,
-                                    "state": "AtLeast"
+                                    "state": "Current"
                                 },
                                 {
                                     "type": "Bool",
@@ -2436,7 +2437,7 @@
                             "type": "Int",
                             "variableName": "fireballLevel",
                             "expectedQuantity": 2,
-                            "state": "AtLeast"
+                            "state": "Current"
                         },
                         {
                             "type": "Bool",
@@ -2475,7 +2476,7 @@
                             "type": "Int",
                             "variableName": "screamLevel",
                             "expectedQuantity": 2,
-                            "state": "AtLeast"
+                            "state": "Current"
                         },
                         {
                             "type": "Bool",
@@ -2531,7 +2532,7 @@
             "type": "Int",
             "variableName": "dreamTreesCompleted",
             "expectedQuantity": 4,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -2685,7 +2686,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_ABYSS",
                             "expectedQuantity": 2,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -2744,7 +2745,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_CITY",
                             "expectedQuantity": 5,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -2808,13 +2809,13 @@
                             "type": "Int",
                             "variableName": "grubsSaved_CROSSROADS",
                             "expectedQuantity": 5,
-                            "state": "AtLeast"
+                            "state": "Current"
                         },
                         {
                             "type": "Int",
                             "variableName": "grubsSaved_FOG_CANYON",
                             "expectedQuantity": 1,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -2873,7 +2874,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_DEEPNEST",
                             "expectedQuantity": 5,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -2937,13 +2938,13 @@
                             "type": "Int",
                             "variableName": "grubsSaved_GREEN_PATH",
                             "expectedQuantity": 4,
-                            "state": "AtLeast"
+                            "state": "Current"
                         },
                         {
                             "type": "Int",
                             "variableName": "grubsSaved_WASTES",
                             "expectedQuantity": 2,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -3012,7 +3013,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_PEAK",
                             "expectedQuantity": 7,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -3061,7 +3062,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_ROYAL_GARDENS",
                             "expectedQuantity": 3,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -3110,7 +3111,7 @@
                             "type": "Int",
                             "variableName": "grubsSaved_WATERWAYS",
                             "expectedQuantity": 3,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -3123,7 +3124,7 @@
             "type": "Int",
             "variableName": "floorsBroken",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -3179,7 +3180,7 @@
             "type": "Int",
             "variableName": "geoSpent",
             "expectedQuantity": 3000,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -3188,7 +3189,7 @@
             "type": "Int",
             "variableName": "geoSpent",
             "expectedQuantity": 4000,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -3197,17 +3198,28 @@
             "type": "Int",
             "variableName": "geoSpent",
             "expectedQuantity": 5000,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
         "name": "Have 1500 geo in the bank",
         "condition": {
-            "type": "Int",
-            "variableName": "bankerBalance",
-            "expectedQuantity": 1500,
-            "state": "AtLeast"
-        }
+            "type": "Or",
+            "conditions": [
+                {
+                    "type": "Int",
+                    "variableName": "bankerBalance",
+                    "expectedQuantity": 1500,
+                    "state": "Current"
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "millibelleHit",
+                    "expectedValue": true
+                }
+            ]
+        },
+        "canUnmark": true
     },
     {
         "name": "Talk to Bardoon",
@@ -3306,7 +3318,7 @@
             "type": "Int",
             "variableName": "killsOomaWithMinionCharm",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -3486,7 +3498,7 @@
             "type": "Int",
             "variableName": "healthBlue",
             "expectedQuantity": 10,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -4377,7 +4389,7 @@
                             "type": "Int",
                             "variableName": "nailSmithUpgrades",
                             "expectedQuantity": 2,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -4416,7 +4428,7 @@
                             "type": "Int",
                             "variableName": "nailSmithUpgrades",
                             "expectedQuantity": 3,
-                            "state": "AtLeast"
+                            "state": "Current"
                         }
                     ]
                 }
@@ -4452,7 +4464,7 @@
             "type": "Int",
             "variableName": "eternalOrdealCount",
             "expectedQuantity": 20,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -4625,7 +4637,7 @@
             "type": "Int",
             "variableName": "parryRevekConsecutive",
             "expectedQuantity": 3,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {
@@ -4642,7 +4654,7 @@
             "type": "Int",
             "variableName": "shadeGatesHit",
             "expectedQuantity": 2,
-            "state": "AtLeast"
+            "state": "Current"
         }
     },
     {

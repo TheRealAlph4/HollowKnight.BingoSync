@@ -222,7 +222,7 @@ namespace BingoSync
                     isHidden = false;
                     BoardUpdated.ForEach(f => f());
                 });
-            }, maxRetries, nameof(SelectSquare));
+            }, maxRetries, nameof(RevealCard));
         }
 
         private static void ConnectToBroadcastSocket(SocketJoin socketJoin)
@@ -272,6 +272,7 @@ namespace BingoSync
                                 if (board[i].Slot == obj.Square.Slot)
                                 {
                                     board[i] = obj.Square;
+                                    BingoTracker.GoalUpdated(board[i].Name, i);
                                     break;
                                 }
                             }
