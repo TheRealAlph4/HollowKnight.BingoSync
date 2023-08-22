@@ -39,7 +39,7 @@ namespace BingoSync
 
         public static List<Action> BoardUpdated;
 
-        private static int maxRetries = 10;
+        private static int maxRetries = 5;
 
         public static void Setup(Action<string> log)
         {
@@ -122,8 +122,10 @@ namespace BingoSync
                     forcedState = State.None;
                     callback();
                 });
-            }, 4, nameof(ExitRoom), () =>
+            }, maxRetries, nameof(ExitRoom), () =>
             {
+                UpdateBoardAndBroadcast(null);
+                webSocketClient = new ClientWebSocket();
                 forcedState = State.None;
             });
         }
