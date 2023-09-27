@@ -962,6 +962,11 @@
                     "type": "Bool",
                     "variableName": "cornifer_Deepnest_East_03",
                     "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "cornifer_RestingGrounds_09",
+                    "expectedValue": true
                 }
             ]
         }
