@@ -10,8 +10,8 @@ namespace BingoSync
     {
         public static string selectedColor = "";
         public static TextInput roomCode, nickname, password;
-        private static List<MagicUI.Elements.Button> colorButtons;
-        private static MagicUI.Elements.Button roomButton;
+        private static List<Button> colorButtons;
+        private static Button roomButton;
 
         private static int buttonSize = 100;
         private static int inputSize = buttonSize * 5 + 40;
@@ -32,7 +32,7 @@ namespace BingoSync
             selectedColor = BingoSync.modSettings.DefaultColor;
             if (layoutRoot == null)
                 return;
-            MagicUI.Elements.Button selectedColorButton = layoutRoot.GetElement<MagicUI.Elements.Button>(selectedColor);
+            Button selectedColorButton = layoutRoot.GetElement<Button>(selectedColor);
             if (selectedColorButton != null) {
                 selectedColorButton.BorderColor = Color.white;
             }
@@ -43,11 +43,11 @@ namespace BingoSync
             layoutRoot = new(true, "Persistent layout");
             StackLayout layout = new(layoutRoot)
             {
-                HorizontalAlignment = HorizontalAlignment.Left,
+                HorizontalAlignment = HorizontalAlignment.Right,
                 VerticalAlignment = VerticalAlignment.Center,
                 Spacing = 10,
                 Orientation = Orientation.Vertical,
-                Padding = new(20),
+                Padding = new Padding(0, 50, 20, 0),
             };
 
             roomCode = new(layoutRoot, "RoomCode")
@@ -120,7 +120,7 @@ namespace BingoSync
             return input.Split('/').Last();
         }
 
-        private static void RoomButtonClicked(MagicUI.Elements.Button sender)
+        private static void RoomButtonClicked(Button sender)
         {
             if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
             {
@@ -154,6 +154,21 @@ namespace BingoSync
             });
         }
 
+        private static Button CreateColorButton(string text, Color color)
+        {
+            Button button = new(layoutRoot, text.ToLower())
+            {
+                Content = text,
+                FontSize = 15,
+                Margin = 20,
+                BorderColor = color,
+                ContentColor = color,
+                MinWidth = buttonSize,
+            };
+            button.Click += SelectColor;
+            return button;
+        }
+
         private static StackLayout CreateButtons()
         {
             StackLayout buttonLayout = new(layoutRoot)
@@ -161,74 +176,58 @@ namespace BingoSync
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
                 Spacing = 10,
+                Orientation = Orientation.Vertical,
+            };
+
+            StackLayout row1 = new(layoutRoot)
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Spacing = 10,
                 Orientation = Orientation.Horizontal,
             };
 
-            MagicUI.Elements.Button orange = new(layoutRoot, "orange")
+            var orange = CreateColorButton("Orange", Colors.Orange);
+            row1.Children.Add(orange);
+            var red = CreateColorButton("Red", Colors.Red);
+            row1.Children.Add(red);
+            var blue = CreateColorButton("Blue", Colors.Blue);
+            row1.Children.Add(blue);
+            var green = CreateColorButton("Green", Colors.Green);
+            row1.Children.Add(green);
+            var purple = CreateColorButton("Purple", Colors.Purple);
+            row1.Children.Add(purple);
+
+            StackLayout row2 = new(layoutRoot)
             {
-                Content = "Orange",
-                FontSize = 15,
-                Margin = 20,
-                BorderColor = new Color(1, 0.612f, 0.071f),
-                ContentColor = new Color(1, 0.612f, 0.071f),
-                MinWidth = buttonSize,
-            };
-            MagicUI.Elements.Button red = new(layoutRoot, "red")
-            {
-                Content = "Red",
-                FontSize = 15,
-                Margin = 20,
-                BorderColor = Color.red,
-                ContentColor = Color.red,
-                MinWidth = buttonSize,
-            };
-            MagicUI.Elements.Button blue = new(layoutRoot, "blue")
-            {
-                Content = "Blue",
-                FontSize = 15,
-                Margin = 20,
-                BorderColor = Color.blue,
-                ContentColor = Color.blue,
-                MinWidth = buttonSize,
-            };
-            MagicUI.Elements.Button green = new(layoutRoot, "green")
-            {
-                Content = "Green",
-                FontSize = 15,
-                Margin = 20,
-                BorderColor = Color.green,
-                ContentColor = Color.green,
-                MinWidth = buttonSize,
-            };
-            MagicUI.Elements.Button purple = new(layoutRoot, "purple")
-            {
-                Content = "Purple",
-                FontSize = 15,
-                Margin = 20,
-                BorderColor = new Color(0.51f, 0.18f, 0.75f),
-                ContentColor = new Color(0.51f, 0.18f, 0.75f),
-                MinWidth = buttonSize,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Center,
+                Spacing = 10,
+                Orientation = Orientation.Horizontal,
             };
 
-            buttonLayout.Children.Add(orange);
-            orange.Click += SelectColor;
-            buttonLayout.Children.Add(red);
-            red.Click += SelectColor;
-            buttonLayout.Children.Add(blue);
-            blue.Click += SelectColor;
-            buttonLayout.Children.Add(green);
-            green.Click += SelectColor;
-            buttonLayout.Children.Add(purple);
-            purple.Click += SelectColor;
+            var navy = CreateColorButton("Navy", Colors.Navy);
+            row2.Children.Add(navy);
+            var teal = CreateColorButton("Teal", Colors.Teal);
+            row2.Children.Add(teal);
+            var brown = CreateColorButton("Brown", Colors.Brown);
+            row2.Children.Add(brown);
+            var pink = CreateColorButton("Pink", Colors.Pink);
+            row2.Children.Add(pink);
+            var yellow = CreateColorButton("Yellow", Colors.Yellow);
+            row2.Children.Add(yellow);
 
-            colorButtons = new List<MagicUI.Elements.Button> {orange, red, blue, green, purple};
+            buttonLayout.Children.Add(row1);
+            buttonLayout.Children.Add(row2);
+
+            colorButtons = new List<Button> {orange, red, blue, green, purple, navy, teal, brown, pink, yellow};
 
             return buttonLayout;
         }
 
-        private static void SelectColor(MagicUI.Elements.Button sender)
+        private static void SelectColor(Button sender)
         {
-            MagicUI.Elements.Button previousSelectedColor = layoutRoot.GetElement<MagicUI.Elements.Button>(selectedColor);
+            Button previousSelectedColor = layoutRoot.GetElement<Button>(selectedColor);
             previousSelectedColor.BorderColor = previousSelectedColor.ContentColor;
             selectedColor = sender.Name;
             sender.BorderColor = Color.white;
