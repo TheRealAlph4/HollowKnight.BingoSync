@@ -118,8 +118,19 @@ namespace BingoSync
             }
         }
 
+        public static bool IsBoardAvailable()
+        {
+            BingoSyncClient.Update();
+            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
+                return false;
+            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
+                return false;
+            return true;
+        }
+
         public static void ProcessBingo()
         {
+            if (!IsBoardAvailable()) return;
             _allPossibleSquares.ForEach(square =>
             {
                 bool wasSolved = square.Condition.Solved;
@@ -217,12 +228,7 @@ namespace BingoSync
 
         public static void UpdateGoal(string goal, bool shouldUnmark)
         {
-            BingoSyncClient.Update();
-            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
-                return;
-            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
-                return;
-
+            if (!IsBoardAvailable()) return;
             var index = BingoSyncClient.board.FindIndex(x => x.Name == goal);
             if (index == -1)
                 return;

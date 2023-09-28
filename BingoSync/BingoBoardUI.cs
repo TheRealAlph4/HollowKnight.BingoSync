@@ -21,7 +21,7 @@ namespace BingoSync
         public static bool isBingoBoardVisible = true;
         private static Action<string> Log;
         private static TextureLoader Loader;
-        private static Dictionary<string, Color> Colors;
+        private static Dictionary<string, Color> BingoColors;
 
         internal class SquareLayoutObjects
         {
@@ -91,14 +91,19 @@ namespace BingoSync
             Loader = new TextureLoader(assembly, "BingoSync.Resources.Images");
             Loader.Preload();
 
-            Colors = new Dictionary<string, Color>
+            BingoColors = new Dictionary<string, Color>
             {
                 { "blank", Color.black },
-                { "orange", new Color(1, 0.612f, 0.071f) },
-                { "red", Color.red },
-                { "blue", Color.blue },
-                { "green", Color.green },
-                { "purple", Color.magenta },
+                { "orange", Colors.Orange },
+                { "red", Colors.Red },
+                { "blue", Colors.Blue },
+                { "green", Colors.Green },
+                { "purple", Colors.Purple },
+                { "navy", Colors.Navy },
+                { "teal", Colors.Teal },
+                { "brown", Colors.Brown },
+                { "pink", Colors.Pink },
+                { "yellow", Colors.Yellow },
             };
             
             sprite = Loader.GetTexture("BingoSync Base Background.png").ToSprite();
@@ -186,11 +191,11 @@ namespace BingoSync
                 Spacing = 0,
             }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
 
-            var colors = Colors.Keys.ToList();
+            var colors = BingoColors.Keys.ToList();
             var images = new Dictionary<string, Image>();
             for (int brow = 0; brow < colors.Count; brow++) {
                 Color tint;
-                if (Colors.TryGetValue(colors[brow], out tint))
+                if (BingoColors.TryGetValue(colors[brow], out tint))
                 {
                     var backgroundImage = new Image(layoutRoot, sprite, $"image_{brow}_{row}_{column}")
                     {
