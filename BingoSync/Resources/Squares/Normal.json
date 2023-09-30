@@ -607,7 +607,7 @@
         "name": "Unlock Queen's Garden Stag",
         "condition": {
             "type": "Bool",
-            "variableName": "openedGardensStagStation",
+            "variableName": "openedRoyalGardens",
             "expectedValue": true
         }
     },
