@@ -2807,7 +2807,7 @@
                     "conditions": [
                         {
                             "type": "Bool",
-                            "variableName": "randomized_Grub-Crossroads_Stag",
+                            "variableName": "randomized_Grub-Crossroads1Stag",
                             "expectedValue": false
                         },
                         {
