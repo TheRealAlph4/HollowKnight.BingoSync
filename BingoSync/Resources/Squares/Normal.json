@@ -651,6 +651,11 @@
                     "type": "Bool",
                     "variableName": "hornetDenEncounter",
                     "expectedValue": true
+                },
+                {
+                    "type": "Bool",
+                    "variableName": "hornetOutskirtsDefeated",
+                    "expectedValue": true
                 }
             ]
         }
