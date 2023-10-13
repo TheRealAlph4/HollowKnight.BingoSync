@@ -1054,7 +1054,7 @@
                 },
                 {
                     "type": "Bool",
-                    "variableName": "mapRestingGround",
+                    "variableName": "mapRestingGrounds",
                     "expectedValue": true
                 },
                 {
