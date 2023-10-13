@@ -649,12 +649,7 @@
                 },
                 {
                     "type": "Bool",
-                    "variableName": "hornetDenEncounter",
-                    "expectedValue": true
-                },
-                {
-                    "type": "Bool",
-                    "variableName": "hornetOutskirtsDefeated",
+                    "variableName": "metHornetBeastsDen",
                     "expectedValue": true
                 }
             ]
