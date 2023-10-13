@@ -23,6 +23,10 @@
             if (convName.StartsWith("MR_MUSHROOM")) {
                 BingoTracker.UpdateBoolean("metMrMushroom", true);
             }
+            // Hornet at Beast's Den
+            if (convName.StartsWith("HORNET_SPIDER_TOWN")) {
+                BingoTracker.UpdateBoolean("metHornetBeastsDen", true);
+            }
         }
     }
 }

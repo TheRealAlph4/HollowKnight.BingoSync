@@ -649,7 +649,7 @@
                 },
                 {
                     "type": "Bool",
-                    "variableName": "hornetDenEncounter",
+                    "variableName": "metHornetBeastsDen",
                     "expectedValue": true
                 }
             ]
