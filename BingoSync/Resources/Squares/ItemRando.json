@@ -1432,7 +1432,7 @@
         }
     },
     {
-        "name": "Open the Crystal Peaks chest",
+        "name": "Open the Crystal Peak chest",
         "condition": {
             "type": "Bool",
             "variableName": "chestOpen_Mines_37",
@@ -2957,7 +2957,7 @@
         }
     },
     {
-        "name": "Check/Free all grubs in Crystal Peaks (7)",
+        "name": "Check/Free all grubs in Crystal Peak (7)",
         "condition": {
             "type": "Or",
             "conditions": [
@@ -3373,7 +3373,7 @@
         }
     },
     {
-        "name": "Open the Dirtmouth / Crystal Peaks elevator",
+        "name": "Open the Dirtmouth / Crystal Peak elevator",
         "condition": {
             "type": "Bool",
             "variableName": "switchOpen_Town",
