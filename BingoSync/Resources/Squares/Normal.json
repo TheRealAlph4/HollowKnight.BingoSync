@@ -470,7 +470,7 @@
         }
     },
     {
-        "name": "Save the 7 grubs in Crystal Peaks",
+        "name": "Save the 7 grubs in Crystal Peak",
         "condition": {
             "type": "Int",
             "variableName": "grubsSaved_PEAK",
