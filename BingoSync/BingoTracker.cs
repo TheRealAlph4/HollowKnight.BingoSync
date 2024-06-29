@@ -233,7 +233,8 @@ namespace BingoSync
             if (index == -1)
                 return;
             bool marked = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.color);
-            if ((shouldUnmark && marked) || (!shouldUnmark && !marked))
+            bool isBlank = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.BLANK_COLOR);
+            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!BingoSyncClient.isLockout || isBlank)))
             {
                 Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
                 BingoSyncClient.SelectSquare(index + 1, () =>

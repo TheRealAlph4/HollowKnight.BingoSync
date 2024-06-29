@@ -17,6 +17,9 @@ namespace BingoSync
             None, Disconnected, Connected, Loading
         };
 
+        public static string BLANK_COLOR = "blank";
+        private static string LOCKOUT_MODE = "Lockout";
+
         private static Action<string> Log;
 
         public static string room = "";
@@ -26,6 +29,7 @@ namespace BingoSync
 
         public static List<BoardSquare> board = null;
         public static bool isHidden = true;
+        public static bool isLockout = false;
 
         private static CookieContainer cookieContainer = null;
         private static HttpClientHandler handler = null;
@@ -52,6 +56,7 @@ namespace BingoSync
             {
                 BaseAddress = new Uri("https://bingosync.com"),
             };
+            client.DefaultRequestHeaders.UserAgent.ParseAdd($"HollowKnight.BingoSync/{BingoSync.version}");
             LoadCookie();
 
             webSocketClient = new ClientWebSocket();
@@ -168,6 +173,7 @@ namespace BingoSync
                         var socketJoin = JsonConvert.DeserializeObject<SocketJoin>(joinRoomResponse.Result);
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
+                        UpdateSettings();
                         SetColor(color);
                     });
                 }
@@ -305,6 +311,7 @@ namespace BingoSync
                         {
                             UpdateBoardAndBroadcast(null);
                             UpdateBoard(obj.HideCard);
+                            UpdateSettings();
                         }
                         else if (obj.Type == "revealed")
                         {
@@ -346,6 +353,26 @@ namespace BingoSync
                     });
                 });
             }, maxRetries, nameof(UpdateBoard));
+        }
+
+        public static void UpdateSettings()
+        {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var task = client.GetAsync($"room/{room}/room-settings");
+                return task.ContinueWith(responseTask =>
+                {
+                    HttpResponseMessage response = null;
+                    response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    var readTask = response.Content.ReadAsStringAsync();
+                    readTask.ContinueWith(settingsResponse =>
+                    {
+                        var settings = JsonConvert.DeserializeObject<RoomSettingsResponse>(settingsResponse.Result);
+                        isLockout = settings.Settings.LockoutMode == LOCKOUT_MODE;
+                    });
+                });
+            }, maxRetries, nameof(UpdateSettings));
         }
     }
 
@@ -409,6 +436,20 @@ namespace BingoSync
         public string Colors = string.Empty;
         [JsonProperty("slot")]
         public string Slot = string.Empty;
+    }
+
+    [DataContract]
+    internal class RoomSettingsResponse
+    {
+        [JsonProperty("settings")]
+        public RoomSettings Settings = new RoomSettings();
+    }
+
+    [DataContract]
+    internal class RoomSettings
+    {
+        [JsonProperty("lockout_mode")]
+        public string LockoutMode = string.Empty;
     }
 
     [DataContract]
