@@ -110,31 +110,6 @@ namespace BingoSync
             }, maxRetries, nameof(LoadCookie));
         }
 
-        public static void ExitRoom(Action callback)
-        {
-            shouldConnect = false;
-            forcedState = State.Loading;
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
-                {
-                    if (result.Exception != null)
-                    {
-                        throw result.Exception;
-                    }
-                    UpdateBoardAndBroadcast(null);
-                    webSocketClient = new ClientWebSocket();
-                    forcedState = State.None;
-                    callback();
-                });
-            }, maxRetries, nameof(ExitRoom), () =>
-            {
-                UpdateBoardAndBroadcast(null);
-                webSocketClient = new ClientWebSocket();
-                forcedState = State.None;
-            });
-        }
-
         private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard)
         {
             board = newBoard;
@@ -210,26 +185,25 @@ namespace BingoSync
             }, maxRetries, nameof(SetColor));
         }
 
-        public static void SelectSquare(int square, Action errorCallback, bool clear = false)
+        public static void NewCard(string customJSON, bool lockout = true, bool hideCard = true)
         {
-            var selectInput = new SelectInput
+            var newCard = new NewCard
             {
                 Room = room,
-                Slot = square,
-                Color = color,
-                RemoveColor = clear,
+                Game = 18, // this is supposed to be custom alread
+                Variant = 18, // but this is also required for custom ???
+                CustomJSON = customJSON,
+                Lockout = !lockout, // false is lockout here for some godforsaken reason
+                Seed = "",
+                HideCard = hideCard,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var payload = JsonConvert.SerializeObject(selectInput);
+                var payload = JsonConvert.SerializeObject(newCard);
                 var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PutAsync("api/select", content);
-                return task.ContinueWith(responseTask =>
-                {
-                    var response = responseTask.Result;
-                    response.EnsureSuccessStatusCode();
-                });
-            }, maxRetries, nameof(SelectSquare), errorCallback);
+                var task = client.PostAsync("api/new-card", content);
+                return task.ContinueWith(responseTask => { });
+            }, maxRetries, nameof(ChatMessage));
         }
 
         public static void RevealCard()
@@ -252,6 +226,73 @@ namespace BingoSync
                     BoardUpdated.ForEach(f => f());
                 });
             }, maxRetries, nameof(RevealCard));
+        }
+
+        public static void ChatMessage(string text)
+        {
+            var setColorInput = new ChatMessage
+            {
+                Room = room,
+                Text = text,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(setColorInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = client.PutAsync("api/chat", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                });
+            }, maxRetries, nameof(ChatMessage));
+        }
+
+        public static void SelectSquare(int square, Action errorCallback, bool clear = false)
+        {
+            var selectInput = new SelectInput
+            {
+                Room = room,
+                Slot = square,
+                Color = color,
+                RemoveColor = clear,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(selectInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = client.PutAsync("api/select", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                });
+            }, maxRetries, nameof(SelectSquare), errorCallback);
+        }
+
+        public static void ExitRoom(Action callback)
+        {
+            shouldConnect = false;
+            forcedState = State.Loading;
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
+                {
+                    if (result.Exception != null)
+                    {
+                        throw result.Exception;
+                    }
+                    UpdateBoardAndBroadcast(null);
+                    webSocketClient = new ClientWebSocket();
+                    forcedState = State.None;
+                    callback();
+                });
+            }, maxRetries, nameof(ExitRoom), () =>
+            {
+                UpdateBoardAndBroadcast(null);
+                webSocketClient = new ClientWebSocket();
+                forcedState = State.None;
+            });
         }
 
         private static void ConnectToBroadcastSocket(SocketJoin socketJoin)
@@ -457,5 +498,33 @@ namespace BingoSync
     {
         [JsonProperty("socket_key")]
         public string SocketKey = string.Empty;
+    }
+
+    [DataContract]
+    internal class NewCard
+    {
+        [JsonProperty("room")]
+        public string Room;
+        [JsonProperty("game_type")]
+        public int Game;
+        [JsonProperty("variant_type")]
+        public int Variant;
+        [JsonProperty("custom_json")]
+        public string CustomJSON;
+        [JsonProperty("lockout_mode")]
+        public bool Lockout;
+        [JsonProperty("seed")]
+        public string Seed;
+        [JsonProperty("hide_card")]
+        public bool HideCard;
+    }
+
+    [DataContract]
+    public class ChatMessage
+    {
+        [JsonProperty("room")]
+        public string Room;
+        [JsonProperty("text")]
+        public string Text;
     }
 }
