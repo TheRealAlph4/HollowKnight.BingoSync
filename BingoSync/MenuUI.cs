@@ -1,5 +1,6 @@
 ﻿using MagicUI.Core;
 using MagicUI.Elements;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace BingoSync
 {
     public static class MenuUI
-    {
+{
         public static string selectedColor = "";
         public static TextInput roomCode, nickname, password;
         private static List<Button> colorButtons;
@@ -117,7 +118,9 @@ namespace BingoSync
 
         private static string SanitizeRoomCode(string input)
         {
-            return input.Split('/').Last();
+            return new string(input.ToCharArray()
+            .Where(c => !Char.IsWhiteSpace(c))
+            .ToArray()).Split('/').Last();
         }
 
         private static void RoomButtonClicked(Button sender)
@@ -220,7 +223,7 @@ namespace BingoSync
             buttonLayout.Children.Add(row1);
             buttonLayout.Children.Add(row2);
 
-            colorButtons = new List<Button> {orange, red, blue, green, purple, navy, teal, brown, pink, yellow};
+            colorButtons = [orange, red, blue, green, purple, navy, teal, brown, pink, yellow];
 
             return buttonLayout;
         }
