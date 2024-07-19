@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BingoSync", "BingoSync\BingoSync.csproj", "{786B4795-903A-4092-94D4-AF41E6370A9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BingoSync", "BingoSync\BingoSync.csproj", "{786B4795-903A-4092-94D4-AF41E6370A9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E63E098C-EFDB-4B2D-AF36-3CF4FFC6FDE4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
