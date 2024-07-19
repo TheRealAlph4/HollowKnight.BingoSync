@@ -6,43 +6,20 @@ namespace BingoSync.Helpers
     {
         public static MapZone GreaterZone(MapZone zone)
         {
-            switch (zone)
+            return zone switch
             {
-                case MapZone.CITY:
-                case MapZone.LURIENS_TOWER:
-                case MapZone.SOUL_SOCIETY:
-                case MapZone.KINGS_STATION:
-                    return MapZone.CITY;
-                case MapZone.CROSSROADS:
-                case MapZone.SHAMAN_TEMPLE:
-                    return MapZone.CROSSROADS;
-                case MapZone.BEASTS_DEN:
-                case MapZone.DEEPNEST:
-                    return MapZone.DEEPNEST;
-                case MapZone.FOG_CANYON:
-                case MapZone.MONOMON_ARCHIVE:
-                    return MapZone.FOG_CANYON;
-                case MapZone.WASTES:
-                case MapZone.QUEENS_STATION:
-                    return MapZone.WASTES;
-                case MapZone.OUTSKIRTS:
-                case MapZone.HIVE:
-                case MapZone.COLOSSEUM:
-                    return MapZone.OUTSKIRTS;
-                case MapZone.CLIFFS:
-                case MapZone.KINGS_PASS:
-                    return MapZone.CLIFFS;
-                case MapZone.TOWN:
-                    return MapZone.TOWN;
-                case MapZone.WATERWAYS:
-                case MapZone.GODSEEKER_WASTE:
-                    return MapZone.WATERWAYS;
-                case MapZone.PEAK:
-                case MapZone.MINES:
-                    return MapZone.PEAK;
-                default:
-                    return zone;
-            }
+                MapZone.CITY or MapZone.LURIENS_TOWER or MapZone.SOUL_SOCIETY or MapZone.KINGS_STATION => MapZone.CITY,
+                MapZone.CROSSROADS or MapZone.SHAMAN_TEMPLE => MapZone.CROSSROADS,
+                MapZone.BEASTS_DEN or MapZone.DEEPNEST => MapZone.DEEPNEST,
+                MapZone.FOG_CANYON or MapZone.MONOMON_ARCHIVE => MapZone.FOG_CANYON,
+                MapZone.WASTES or MapZone.QUEENS_STATION => MapZone.WASTES,
+                MapZone.OUTSKIRTS or MapZone.HIVE or MapZone.COLOSSEUM => MapZone.OUTSKIRTS,
+                MapZone.CLIFFS or MapZone.KINGS_PASS => MapZone.CLIFFS,
+                MapZone.TOWN => MapZone.TOWN,
+                MapZone.WATERWAYS or MapZone.GODSEEKER_WASTE => MapZone.WATERWAYS,
+                MapZone.PEAK or MapZone.MINES => MapZone.PEAK,
+                _ => zone,
+            };
         }
     }
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 public static class RetryHelper
 {
-    private static int delayMilliseconds = 100;
+    private static readonly int delayMilliseconds = 100;
     private static Action<string> Log;
 
     public static void Setup(Action<string> log) {
@@ -15,9 +15,7 @@ public static class RetryHelper
     {
         if (retries == maxRetries) {
             Log($"All retries used but could not complete request {requestName}");
-            if (failCallback != null) {
-                failCallback();
-            }
+            failCallback?.Invoke();
             return;
         }
 

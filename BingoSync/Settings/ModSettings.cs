@@ -6,7 +6,7 @@ namespace Settings
     public class ModSettings
     {
         [JsonConverter(typeof(PlayerActionSetConverter))]
-        public KeyBinds Keybinds = new KeyBinds();
+        public KeyBinds Keybinds = new();
         public bool RevealCardOnGameStart = false;
         public bool UnmarkGoals = false;
         public string DefaultNickname = "";
