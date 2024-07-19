@@ -34,7 +34,7 @@ namespace BingoSync
         }
 
         public static MenuBuilder CreateMenuScreen(MenuScreen modListMenu) {
-            Action<MenuSelectable> CancelAction = selectable => UIManager.instance.UIGoToDynamicMenu(modListMenu); 
+            void CancelAction(MenuSelectable selectable) => UIManager.instance.UIGoToDynamicMenu(modListMenu);
             return new MenuBuilder(UIManager.instance.UICanvas.gameObject, "BingoSync Menu")
                 .CreateTitle("BingoSync Menu", MenuTitleStyle.vanillaStyle)
                 .CreateContentPane(RectTransformData.FromSizeAndPos(
@@ -60,22 +60,22 @@ namespace BingoSync
                         c.AddKeybind("Toggle Board", BingoSync.modSettings.Keybinds.ToggleBoard, new KeybindConfig
                         {
                             Label = "Toggle Board",
-                            CancelAction = CancelAction,
+                            CancelAction = (Action<MenuSelectable>)CancelAction,
                         })
                         .AddKeybind("Hide Menu", BingoSync.modSettings.Keybinds.HideMenu, new KeybindConfig
                         {
                             Label = "Hide Menu",
-                            CancelAction = CancelAction,
+                            CancelAction = (Action<MenuSelectable>)CancelAction,
                         })
                         .AddKeybind("Reveal Card", BingoSync.modSettings.Keybinds.RevealCard, new KeybindConfig
                         {
                             Label = "Reveal Card",
-                            CancelAction = CancelAction,
+                            CancelAction = (Action<MenuSelectable>)CancelAction,
                         })
                         .AddHorizontalOption("Reveal Card On Start", new HorizontalOptionConfig
                         {
                             Label = "Reveal Card on Game Start",
-                            Options = new string[] { "No", "Yes" },
+                            Options = ["No", "Yes"],
                             CancelAction = CancelAction,
                             ApplySetting = (menu, index) =>
                             {
@@ -136,7 +136,7 @@ namespace BingoSync
                             {
                                 Text = "Some goals will be unmarked if their conditions are no longer met. WARNING: Can cause board inconsistencies on rare situations"
                             },
-                            Options = new string[] { "No", "Yes" },
+                            Options = ["No", "Yes"],
                             CancelAction = CancelAction,
                             ApplySetting = (menu, index) =>
                             {
@@ -160,7 +160,7 @@ namespace BingoSync
                     {
                         Label = "Back",
                         CancelAction = CancelAction,
-                        SubmitAction = CancelAction,
+                        SubmitAction = (Action<MenuSelectable>)CancelAction,
                         Style = MenuButtonStyle.VanillaStyle,
                         Proceed = true
                     }));

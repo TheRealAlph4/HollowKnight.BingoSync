@@ -1,14 +1,5 @@
 ﻿using Modding;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
-using System.Collections;
-using System.Reflection;
-using BingoSync.CustomVariables;
-using BingoSync.CustomVariables.Rando;
 using Settings;
-using UnityEngine;
-using ItemChanger;
-using System.Threading.Tasks;
 
 namespace BingoSync
 {
@@ -43,12 +34,12 @@ namespace BingoSync
 
         public void OnLoadLocal(Settings.SaveSettings s)
         {
-            BingoTracker.settings = s;
+            BingoTracker.Settings = s;
         }
 
         public Settings.SaveSettings OnSaveLocal()
         {
-            return BingoTracker.settings;
+            return BingoTracker.Settings;
         }
 
         public void OnLoadGlobal(ModSettings s)

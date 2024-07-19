@@ -151,7 +151,7 @@ namespace BingoSync
         }
 
         public static void CreateBaseLayout() {
-            bingoLayout = new List<SquareLayoutObjects>();
+            bingoLayout = [];
             for (int row = 0; row < 5; row++)
             {
                 for (int column = 0; column < 5; column++)

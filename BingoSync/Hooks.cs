@@ -3,16 +3,11 @@ using BingoSync.CustomVariables;
 using ItemChanger;
 using Modding;
 using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading.Tasks;
 using MonoMod.Utils;
 using System.Collections;
 using UnityEngine;
-using Settings;
 
 namespace BingoSync
 {

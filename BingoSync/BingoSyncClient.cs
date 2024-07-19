@@ -50,8 +50,10 @@ namespace BingoSync
             Log = log;
 
             cookieContainer = new CookieContainer();
-            handler = new HttpClientHandler();
-            handler.CookieContainer = cookieContainer;
+            handler = new HttpClientHandler
+            {
+                CookieContainer = cookieContainer
+            };
             client = new HttpClient(handler)
             {
                 BaseAddress = new Uri("https://bingosync.com"),
@@ -61,7 +63,7 @@ namespace BingoSync
 
             webSocketClient = new ClientWebSocket();
 
-            BoardUpdated = new List<Action>();
+            BoardUpdated = [];
         }
 
         public static void Update()
