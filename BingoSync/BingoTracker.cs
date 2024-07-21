@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Settings;
+using System.Collections;
 
 namespace BingoSync
 {
@@ -28,14 +29,39 @@ namespace BingoSync
                     continue;
                 }
                 Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource);
-                using (StreamReader reader = new StreamReader(s))
-                using (JsonTextReader jsonReader = new JsonTextReader(reader))
-                {
-                    JsonSerializer ser = new JsonSerializer();
-                    var squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
-                    _allPossibleSquares.AddRange(squares);
-                }
+                using StreamReader reader = new(s);
+                using JsonTextReader jsonReader = new(reader);
+                JsonSerializer ser = new();
+                var squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                _allPossibleSquares.AddRange(squares);
             }
+        }
+
+        public static Dictionary<string, BingoGoal> ProcessGoalsFile(string filepath)
+        {
+            using FileStream filestream = File.Open(filepath, FileMode.Open);
+            return ProcessGoalsStream(filestream);
+        }
+
+        public static Dictionary<string, BingoGoal> ProcessGoalsStream(Stream goalstream)
+        {
+            Dictionary<string, BingoGoal> goals = [];
+            List<BingoSquare> squares = [];
+
+            using (StreamReader reader = new(goalstream))
+            using (JsonTextReader jsonReader = new(reader))
+            {
+                JsonSerializer ser = new();
+                var squaresSer = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                squares.AddRange(squaresSer);
+            }
+
+            foreach (BingoSquare square in squares)
+            {
+                goals.Add(square.Name, new BingoGoal(square.Name, []));
+                _allPossibleSquares.Add(square);
+            }
+            return goals;
         }
 
         public static bool GetBoolean(string name)

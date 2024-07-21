@@ -1,5 +1,6 @@
 ﻿using Modding;
 using Settings;
+using System.Collections.Generic;
 
 namespace BingoSync
 {
@@ -20,17 +21,34 @@ namespace BingoSync
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
+            GameModesManager.Setup(Log);
         }
 
-        private void ShowMenu()
+        public static void ShowMenu()
         {
             MenuUI.SetVisible(true);
         }
 
-        private void HideMenu()
+        public static void HideMenu()
         {
             MenuUI.SetVisible(false);
         }
+
+        public static void AddGameMode(GameMode gameMode)
+        {
+            GameModesManager.AddGameMode(gameMode);
+        }
+
+        public static void RegisterGoalsForCustom(string groupName, Dictionary<string, BingoGoal> goals)
+        {
+            GameModesManager.RegisterGoalsForCustom(groupName, goals);
+        }
+
+        public static Dictionary<string, BingoGoal> GetVanillaGoals()
+        {
+            return GameModesManager.GetVanillaGoals();
+        }
+
 
         public void OnLoadLocal(Settings.SaveSettings s)
         {
