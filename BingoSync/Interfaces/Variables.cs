@@ -5,8 +5,13 @@ namespace BingoSync
 {
     public static class Variables
     {
-        private static readonly Action<string> Log;
+        private static Action<string> Log;
         private static readonly HashSet<string> trackedVariables = [];
+
+        public static void Setup(Action<string> log)
+        {
+            Log = log;
+        }
 
         public static void Track(string variableName)
         {

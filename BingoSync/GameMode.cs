@@ -58,7 +58,7 @@ namespace BingoSync
             return Jsonify(board);
         }
 
-        private static string Jsonify(List<BingoGoal> board)
+        public static string Jsonify(List<BingoGoal> board)
         {
             string output = "[";
             for (int i = 0; i < board.Count; i++)

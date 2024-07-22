@@ -11,10 +11,13 @@ namespace BingoSync
         public static string version = "1.3.0.0";
         public override string GetVersion() => version;
 
+        public override int LoadPriority() => 0;
+
         public static ModSettings modSettings { get; set; } = new ModSettings();
 
         public override void Initialize()
         {
+            Variables.Setup(Log);
             Hooks.Setup();
             RetryHelper.Setup(Log);
             MenuUI.Setup();
@@ -22,6 +25,8 @@ namespace BingoSync
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
             GameModesManager.Setup(Log);
+
+            ModHooks.FinishedLoadingModsHook += MenuUI.SetupGameModeButtons;
         }
 
         public static void ShowMenu()
