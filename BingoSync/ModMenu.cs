@@ -97,7 +97,7 @@ namespace BingoSync
                             CancelAction = CancelAction,
                             SubmitAction = _ =>
                             {
-                                BingoSync.modSettings.DefaultNickname = MenuUI.nickname.Text;
+                                BingoSync.modSettings.DefaultNickname = MenuUI.nicknameInput.Text;
                                 RefreshMenu();
                             }
                         }, out saveNicknameButton)
@@ -111,7 +111,7 @@ namespace BingoSync
                             CancelAction = CancelAction,
                             SubmitAction = _ =>
                             {
-                                BingoSync.modSettings.DefaultPassword = MenuUI.password.Text;
+                                BingoSync.modSettings.DefaultPassword = MenuUI.passwordInput.Text;
                                 RefreshMenu();
                             }
                         }, out savePasswordButton)

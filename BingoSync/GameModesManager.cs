@@ -62,12 +62,13 @@ namespace BingoSync
         public static void Generate(Button sender)
         {
             Log("Generate button clicked");
+            int seed = MenuUI.GetSeed();
             string lockoutString = lockout ? "lockout" : "non-lockout";
-            BingoSyncClient.ChatMessage($"{BingoSyncClient.nickname} is generating {Anify(activeGameMode)} board in {lockoutString} mode");
+            BingoSyncClient.ChatMessage($"{BingoSyncClient.nickname} is generating {Anify(activeGameMode)} board in {lockoutString} mode with seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (activeGameMode != string.Empty)
             {
-                customJSON = _gameModes.Find(gameMode => gameMode.GetName() == activeGameMode).GenerateBoard();
+                customJSON = _gameModes.Find(gameMode => gameMode.GetName() == activeGameMode).GenerateBoard(seed);
             }
             BingoSyncClient.NewCard(customJSON, lockout);
         }

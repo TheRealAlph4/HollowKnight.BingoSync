@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BingoSync
 {
@@ -26,11 +24,11 @@ namespace BingoSync
             return name;
         }
 
-        virtual public string GenerateBoard()
+        virtual public string GenerateBoard(int seed)
         {
             List<BingoGoal> board = [];
             List<BingoGoal> availableGoals = new(goals.Values);
-            Random r = new();
+            Random r = new(seed);
             while (board.Count < 25)
             {
                 int index = r.Next(availableGoals.Count);
