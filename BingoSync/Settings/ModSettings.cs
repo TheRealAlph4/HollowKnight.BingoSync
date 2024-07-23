@@ -7,6 +7,7 @@ namespace Settings
     {
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new();
+        public int BoardID = 0;
         public bool RevealCardOnGameStart = false;
         public bool UnmarkGoals = false;
         public string DefaultNickname = "";

@@ -62,6 +62,11 @@ namespace BingoSync
                             Label = "Toggle Board",
                             CancelAction = (Action<MenuSelectable>)CancelAction,
                         })
+                        .AddKeybind("Cycle Board Opacity", BingoSync.modSettings.Keybinds.CycleBoardOpacity, new KeybindConfig
+                        {
+                            Label = "Cycle Board Opacity",
+                            CancelAction = (Action<MenuSelectable>)CancelAction,
+                        })
                         .AddKeybind("Hide Menu", BingoSync.modSettings.Keybinds.HideMenu, new KeybindConfig
                         {
                             Label = "Hide Menu",
