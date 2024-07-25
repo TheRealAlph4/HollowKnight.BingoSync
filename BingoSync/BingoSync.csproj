@@ -88,6 +88,9 @@
 		<Reference Include="PlayMaker">
 			<HintPath>$(HollowKnightRefs)/PlayMaker.dll</HintPath>
 		</Reference>
+		<Reference Include="RandomizerMod">
+		  <HintPath>Z:\Games\Hollow Knight\Hollow Knight_Data\Managed\Mods\Randomizer 4\RandomizerMod.dll</HintPath>
+		</Reference>
 		<Reference Include="System.ComponentModel.Composition">
 			<HintPath>$(HollowKnightRefs)/System.ComponentModel.Composition.dll</HintPath>
 		</Reference>
@@ -327,9 +330,6 @@
 		</Reference>
 		<Reference Include="MagicUI">
 			<HintPath>$(HollowKnightRefs)/Mods/Satchel/Satchel.dll</HintPath>
-		</Reference>
-		<Reference Include="RandomizerMod">
-			<HintPath>$(HollowKnightRefs)/Mods/Randomizer 4/RandomizerMod.dll</HintPath>
 		</Reference>
 		<Reference Include="ItemChanger">
 			<HintPath>$(HollowKnightRefs)/Mods/ItemChanger/ItemChanger.dll</HintPath>
