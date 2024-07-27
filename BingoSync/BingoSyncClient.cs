@@ -18,7 +18,7 @@ namespace BingoSync
         };
 
         public static string BLANK_COLOR = "blank";
-        private static string LOCKOUT_MODE = "Lockout";
+        private static readonly string LOCKOUT_MODE = "Lockout";
 
         private static Action<string> Log;
 
@@ -43,7 +43,7 @@ namespace BingoSync
 
         public static List<Action> BoardUpdated;
 
-        private static int maxRetries = 5;
+        private static readonly int maxRetries = 20;
 
         public static void Setup(Action<string> log)
         {

@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 
 public static class RetryHelper
 {
-    private static readonly int delayMilliseconds = 100;
+    private static readonly int delayMilliseconds = 10;
+    private static readonly int maxDelayMilliseconds = 1000;
     private static Action<string> Log;
 
     public static void Setup(Action<string> log) {
@@ -13,22 +14,22 @@ public static class RetryHelper
 
     public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, Action failCallback = null, int retries = 0)
     {
-        if (retries == maxRetries) {
+        if (retries >= maxRetries) {
             Log($"All retries used but could not complete request {requestName}");
             failCallback?.Invoke();
             return;
         }
 
         Timer timer = null;
-
         Task currentTask = action.Invoke();
         _ = currentTask.ContinueWith(task =>
         {
             if (task.Exception == null)
             {
+                Log($"{requestName} request was successful on try {retries}");
                 return;
             }
-            int delay = (int)Math.Pow(2, retries) * delayMilliseconds;
+            int delay = Math.Min((2 << retries) * delayMilliseconds, maxDelayMilliseconds);
             timer = new Timer(_ => {
                 timer.Dispose();
                 RetryWithExponentialBackoff(action, maxRetries, requestName, failCallback, retries + 1);

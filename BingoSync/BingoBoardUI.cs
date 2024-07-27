@@ -157,8 +157,8 @@ namespace BingoSync
 
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (BingoSyncClient.GetState() == BingoSyncClient.State.Loading) ? Visibility.Visible : Visibility.Hidden;
-            revealCardButton.Visibility = (BingoSyncClient.board != null && BingoSyncClient.isHidden) ? Visibility.Visible : Visibility.Hidden;
+            loadingText.Visibility = (BingoSyncClient.board == null) ? Visibility.Visible : Visibility.Hidden;
+            revealCardButton.Visibility = (BingoSyncClient.GetState() == BingoSyncClient.State.Connected && BingoSyncClient.board != null && BingoSyncClient.isHidden) ? Visibility.Visible : Visibility.Hidden;
             boards.ForEach(board => board.gridLayout.Visibility = (BingoSyncClient.board == null || BingoSyncClient.isHidden) ? Visibility.Hidden : Visibility.Visible);
 
             if (BingoSyncClient.board == null)
