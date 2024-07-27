@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace BingoSync
@@ -12,11 +14,13 @@ namespace BingoSync
     public static class MenuUI
     {
         private static readonly int colorButtonWidth = 100;
+        private static readonly int lockoutButtonWidth = 50;
+        private static readonly int handModeButtonWidth = 43;
         private static readonly int textFieldWidth = colorButtonWidth * 5 + 40;
+        private static readonly int joinRoomButtonWidth = textFieldWidth - handModeButtonWidth - 10;
         private static readonly int gameModeButtonWidth = (textFieldWidth - 20) / 3;
-        private static readonly int generateButtonWidth = 2 * gameModeButtonWidth + 10;
-        private static readonly int imageButtonWidth = 50;
-        private static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - imageButtonWidth - 20;
+        private static readonly int generateButtonWidth = (int)(1.5 * gameModeButtonWidth) + 10;
+        private static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - lockoutButtonWidth - 20;
         private static readonly int fontSize = 22;
 
         public static readonly LayoutRoot layoutRoot = new(true, "Persistent layout")
@@ -70,8 +74,9 @@ namespace BingoSync
             Content = "Join Room",
             FontSize = fontSize,
             Margin = 20,
-            MinWidth = textFieldWidth,
+            MinWidth = joinRoomButtonWidth,
         };
+        private static ToggleButton handModeToggleButton;
 
         public static StackLayout generationMenu = new(layoutRoot)
         {
@@ -101,33 +106,62 @@ namespace BingoSync
         private static ToggleButton lockoutToggleButton;
 
 
+        public static bool HandMode { get; private set; } = false;
         public static string selectedColor = "";
         private static bool isBingoMenuUIVisible = true;
 
         public static void Setup()
         {
+            Loader.Preload();
+
+            Sprite handModeSprite = Loader.GetTexture("BingoSync Hand Icon.png").ToSprite();
+            Sprite nonHandModeSprite = Loader.GetTexture("BingoSync Eye Icon.png").ToSprite();
+
+            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, ToggleHandMode, "Hand Mode Toggle");
+            Button handModeButton = new(layoutRoot, "handModeToggleButton")
+            {
+                MinWidth = handModeButtonWidth,
+                MinHeight = handModeButtonWidth,
+            };
+            handModeToggleButton.SetButton(handModeButton);
+
+
             connectionMenu.Children.Add(roomCodeInput);
             connectionMenu.Children.Add(nicknameInput);
             connectionMenu.Children.Add(passwordInput);
 
             SetupColorButtons(connectionMenu);
 
-            joinRoomButton.Click += RoomButtonClicked;
-            connectionMenu.Children.Add(joinRoomButton);
+            joinRoomButton.Click += JoinRoomButtonClicked;
 
-            Loader.Preload();
+            StackLayout bottomRow = new(layoutRoot)
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Spacing = 10,
+                Orientation = Orientation.Horizontal,
+            };
+
+            bottomRow.Children.Add(joinRoomButton);
+            bottomRow.Children.Add(handModeToggleButton);
+
+            connectionMenu.Children.Add(bottomRow);
+
+
             Sprite lockoutSprite = Loader.GetTexture("BingoSync Lockout Icon.png").ToSprite();
             Sprite nonLockoutSprite = Loader.GetTexture("BingoSync Non-Lockout Icon.png").ToSprite();
 
             lockoutToggleButton = new(layoutRoot, lockoutSprite, nonLockoutSprite, ToggleLockout, "Lockout Toggle");
             Button lockoutButton = new(layoutRoot, "lockoutToggleButton")
             {
-                MinWidth = imageButtonWidth,
-                MinHeight = imageButtonWidth,
+                MinWidth = lockoutButtonWidth,
+                MinHeight = lockoutButtonWidth,
             };
             lockoutToggleButton.SetButton(lockoutButton);
             lockoutToggleButton.Toggle(null);
 
+
+            
             LoadDefaults();
 
             SetupGenerationMenu();
@@ -251,7 +285,7 @@ namespace BingoSync
 
         private static void SetupGenerationMenu()
         {
-            generateBoardButton.Click += GameModesManager.Generate;
+            generateBoardButton.Click += GenerateButtonClicked;
 
             StackLayout bottomRow = new(layoutRoot)
             {
@@ -321,7 +355,7 @@ namespace BingoSync
             .Split('/').Last();
         }
 
-        private static void RoomButtonClicked(Button sender)
+        private static void JoinRoomButtonClicked(Button sender)
         {
             if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
             {
@@ -345,6 +379,17 @@ namespace BingoSync
             }
         }
 
+        private static void GenerateButtonClicked(Button sender)
+        {
+            GameModesManager.Generate();
+            Task resetBoardVisibility = new(() =>
+            {
+                Thread.Sleep(300);
+                BingoBoardUI.isBingoBoardVisible = true;
+            });
+            resetBoardVisibility.Start();
+        }
+
         private static void SelectColor(Button sender)
         {
             Button previousSelectedColor = layoutRoot.GetElement<Button>(selectedColor);
@@ -356,6 +401,11 @@ namespace BingoSync
         public static void ToggleLockout(Button sender)
         {
             GameModesManager.SetLockout(lockoutToggleButton.IsOn);
+        }
+
+        public static void ToggleHandMode(Button sender)
+        {
+            HandMode = !HandMode;
         }
 
         public static void SelectGameMode(Button sender)

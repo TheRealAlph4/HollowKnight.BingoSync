@@ -3,8 +3,8 @@ using MagicUI.Elements;
 using MagicUI.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Net.WebSockets;
 using System.Reflection;
 using UnityEngine;
 using GridLayout = MagicUI.Elements.GridLayout;
@@ -25,6 +25,11 @@ namespace BingoSync
             public GridLayout gridLayout;
             public List<SquareLayoutObjects> bingoLayout;
         }
+
+        private static readonly Stopwatch timer = new();
+        private static readonly TimeSpan showBoardButtonTimeout = new(days: 0, hours: 0, minutes: 0, seconds: 0, milliseconds: 300);
+        private static int showBoardClickCount = 0;
+
 
         private static readonly List<Board> boards = [];
 
@@ -58,8 +63,10 @@ namespace BingoSync
             ContentColor = Color.white,
             Visibility = Visibility.Hidden,
         };
-
+        
         public static bool isBingoBoardVisible = true;
+        private static bool boardIsConfirmed = false;
+
         private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
         private static readonly Dictionary<string, Color> BingoColors = new()
@@ -84,9 +91,7 @@ namespace BingoSync
 
             commonRoot.VisibilityCondition = () => true;
 
-            revealCardButton.Click += (sender) => {
-                BingoSyncClient.RevealCard();
-            };
+            revealCardButton.Click += RevealButtonClicked;
 
             Loader.Preload();
 
@@ -94,9 +99,12 @@ namespace BingoSync
             boards.Add(CreateBoardWithSprite(Loader.GetTexture("BingoSync Opaque Background.png").ToSprite()));
             boards.Add(CreateBoardWithSprite(Loader.GetTexture("BingoSync Solid Background.png").ToSprite()));
 
+            commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.ToggleBoard, ToggleBoardKeybindClicked);
+            commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, RevealKeybindClicked);
             commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.CycleBoardOpacity, UpdateOpacity);
 
             BingoSyncClient.BoardUpdated.Add(UpdateGrid);
+            BingoSyncClient.BoardUpdated.Add(ConfirmTopLeftOnReveal);
         }
 
         private static Board CreateBoardWithSprite(Sprite sprite)
@@ -134,17 +142,6 @@ namespace BingoSync
 
             CreateBaseLayout(board, sprite);
 
-            board.layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.ToggleBoard, () =>
-            {
-                if (BingoSyncClient.board != null)
-                {
-                    isBingoBoardVisible = !isBingoBoardVisible;
-                }
-            });
-            board.layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, () => {
-                BingoSyncClient.RevealCard();
-            });
-
             board.layoutRoot.VisibilityCondition = () => {
                 return (BingoSyncClient.GetState() != BingoSyncClient.State.Disconnected) && (currentBoard == board.id) && (isBingoBoardVisible);
             };
@@ -161,9 +158,7 @@ namespace BingoSync
         public static void UpdateGrid()
         {
             loadingText.Visibility = (BingoSyncClient.GetState() == BingoSyncClient.State.Loading) ? Visibility.Visible : Visibility.Hidden;
-            Log($"loadingText {loadingText.Visibility}");
             revealCardButton.Visibility = (BingoSyncClient.board != null && BingoSyncClient.isHidden) ? Visibility.Visible : Visibility.Hidden;
-            Log($"revealCardButton {revealCardButton.Visibility}");
             boards.ForEach(board => board.gridLayout.Visibility = (BingoSyncClient.board == null || BingoSyncClient.isHidden) ? Visibility.Hidden : Visibility.Visible);
 
             if (BingoSyncClient.board == null)
@@ -247,6 +242,63 @@ namespace BingoSync
             }
 
             return (stack, images);
+        }
+
+        private static void ToggleBoardKeybindClicked()
+        {
+            if (BingoSyncClient.board == null)
+            {
+                return;
+            }
+            if(!MenuUI.HandMode)
+            {
+                isBingoBoardVisible = !isBingoBoardVisible;
+                return;
+            }
+            if(timer.Elapsed < showBoardButtonTimeout)
+            {
+                ++showBoardClickCount;
+            }
+            else
+            {
+                showBoardClickCount = 1;
+            }
+            if(showBoardClickCount > 2 || isBingoBoardVisible)
+            {
+                showBoardClickCount = 0;
+                isBingoBoardVisible = !isBingoBoardVisible;
+            }
+            timer.Restart();
+        }
+
+        private static void RevealButtonClicked(Button sender)
+        {
+            RevealKeybindClicked();
+        }
+
+        private static void RevealKeybindClicked()
+        {
+            boardIsConfirmed = false;
+            BingoSyncClient.RevealCard();
+            if(MenuUI.HandMode)
+            {
+                isBingoBoardVisible = false;
+            }
+        }
+
+        private static void ConfirmTopLeftOnReveal()
+        {
+            if(!MenuUI.HandMode)
+            {
+                return;
+            }
+            if(BingoSyncClient.board == null || BingoSyncClient.isHidden || boardIsConfirmed)
+            {
+                return;
+            }
+            boardIsConfirmed = true;
+            string message = $"{BingoSyncClient.nickname} revealed their card in hand-mode, their top-left goal is \"{BingoSyncClient.board[0].Name}\"";
+            BingoSyncClient.ChatMessage(message);
         }
     }
 }

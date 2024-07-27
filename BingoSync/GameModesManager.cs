@@ -59,9 +59,8 @@ namespace BingoSync
             lockout = input;
         }
 
-        public static void Generate(Button sender)
+        public static void Generate()
         {
-            Log("Generate button clicked");
             int seed = MenuUI.GetSeed();
             string lockoutString = lockout ? "lockout" : "non-lockout";
             BingoSyncClient.ChatMessage($"{BingoSyncClient.nickname} is generating {Anify(activeGameMode)} board in {lockoutString} mode with seed {seed}");
