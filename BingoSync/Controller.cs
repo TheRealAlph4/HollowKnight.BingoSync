@@ -126,5 +126,10 @@ namespace BingoSync
                 BoardIsVisible = false;
             }
         }
+
+        public static bool ClientIsConnected()
+        {
+            return BingoSyncClient.GetState() == BingoSyncClient.State.Connected;
+        }
     }
 }
