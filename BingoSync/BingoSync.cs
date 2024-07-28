@@ -17,6 +17,7 @@ namespace BingoSync
 
         public override void Initialize()
         {
+            Controller.Setup(Log);
             Variables.Setup(Log);
             Hooks.Setup();
             RetryHelper.Setup(Log);
@@ -31,12 +32,12 @@ namespace BingoSync
 
         public static void ShowMenu()
         {
-            MenuUI.SetVisible(true);
+            Controller.MenuIsVisible = true;
         }
 
         public static void HideMenu()
         {
-            MenuUI.SetVisible(false);
+            Controller.MenuIsVisible = false;
         }
 
         public static void AddGameMode(GameMode gameMode)

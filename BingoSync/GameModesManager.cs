@@ -14,8 +14,6 @@ namespace BingoSync
         private static Action<string> Log;
         private static readonly List<GameMode> _gameModes = [];
         private static readonly Dictionary<string, BingoGoal> _vanillaGoals = [];
-        private static string activeGameMode = string.Empty;
-        private static bool lockout = true;
 
         public static void Setup(Action<string> log)
         {
@@ -44,32 +42,17 @@ namespace BingoSync
             return names;
         }
 
-        public static void SetActiveGameMode(string gameMode)
-        {
-            activeGameMode = gameMode;
-        }
-
-        public static bool GetLockout()
-        {
-            return lockout;
-        }
-
-        public static void SetLockout(bool input)
-        {
-            lockout = input;
-        }
-
         public static void Generate()
         {
             int seed = MenuUI.GetSeed();
-            string lockoutString = lockout ? "lockout" : "non-lockout";
-            BingoSyncClient.ChatMessage($"{BingoSyncClient.nickname} is generating {Anify(activeGameMode)} board in {lockoutString} mode with seed {seed}");
+            string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
+            BingoSyncClient.ChatMessage($"{Controller.RoomNickname} is generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
-            if (activeGameMode != string.Empty)
+            if (Controller.ActiveGameMode != string.Empty)
             {
-                customJSON = _gameModes.Find(gameMode => gameMode.GetName() == activeGameMode).GenerateBoard(seed);
+                customJSON = _gameModes.Find(gameMode => gameMode.GetName() == Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            BingoSyncClient.NewCard(customJSON, lockout);
+            BingoSyncClient.NewCard(customJSON, Controller.MenuIsLockout);
         }
 
         private static void SetupVanillaGoals()

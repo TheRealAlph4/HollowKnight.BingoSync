@@ -17,19 +17,9 @@ namespace BingoSync
             None, Disconnected, Connected, Loading
         };
 
-        public static string BLANK_COLOR = "blank";
         private static readonly string LOCKOUT_MODE = "Lockout";
 
         private static Action<string> Log;
-
-        public static string room = "";
-        public static string password = "";
-        public static string nickname = "";
-        public static string color = "";
-
-        public static List<BoardSquare> board = null;
-        public static bool isHidden = true;
-        public static bool isLockout = false;
 
         private static CookieContainer cookieContainer = null;
         private static HttpClientHandler handler = null;
@@ -114,7 +104,7 @@ namespace BingoSync
 
         private static void UpdateBoardAndBroadcast(List<BoardSquare> newBoard)
         {
-            board = newBoard;
+            Controller.Board = newBoard;
             BingoTracker.ClearFinishedGoals();
             BoardUpdated.ForEach(f => f());
         }
@@ -130,9 +120,9 @@ namespace BingoSync
 
             var joinRoomInput = new JoinRoomInput
             {
-                Room = room,
-                Nickname = nickname,
-                Password = password,
+                Room = Controller.RoomCode,
+                Nickname = Controller.RoomNickname,
+                Password = Controller.RoomPassword,
             };
             var payload = JsonConvert.SerializeObject(joinRoomInput);
             var content = new StringContent(payload, Encoding.UTF8, "application/json");
@@ -151,7 +141,7 @@ namespace BingoSync
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
                         UpdateSettings();
-                        SetColor(color);
+                        SetColor(Controller.RoomColor);
                     });
                 }
                 catch (Exception _ex)
@@ -171,7 +161,7 @@ namespace BingoSync
         {
             var setColorInput = new SetColorInput
             {
-                Room = room,
+                Room = Controller.RoomCode,
                 Color = color,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -191,7 +181,7 @@ namespace BingoSync
         {
             var newCard = new NewCard
             {
-                Room = room,
+                Room = Controller.RoomCode,
                 Game = 18, // this is supposed to be custom alread
                 Variant = 18, // but this is also required for custom ???
                 CustomJSON = customJSON,
@@ -210,10 +200,10 @@ namespace BingoSync
 
         public static void RevealCard()
         {
-            if (!isHidden) return;
+            if (Controller.BoardIsRevealed) return;
             var revealInput = new RevealInput
             {
-                Room = room,
+                Room = Controller.RoomCode,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -224,7 +214,7 @@ namespace BingoSync
                 {
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
-                    isHidden = false;
+                    Controller.BoardIsRevealed = true;
                     BoardUpdated.ForEach(f => f());
                 });
             }, maxRetries, nameof(RevealCard));
@@ -234,7 +224,7 @@ namespace BingoSync
         {
             var setColorInput = new ChatMessage
             {
-                Room = room,
+                Room = Controller.RoomCode,
                 Text = text,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -254,9 +244,9 @@ namespace BingoSync
         {
             var selectInput = new SelectInput
             {
-                Room = room,
+                Room = Controller.RoomCode,
                 Slot = square,
-                Color = color,
+                Color = Controller.RoomColor,
                 RemoveColor = clear,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -336,15 +326,15 @@ namespace BingoSync
                     {
                         var json = Encoding.UTF8.GetString(buffer, 0, response.Count);
                         var obj = JsonConvert.DeserializeObject<Broadcast>(json);
-                        if (board == null) return;
+                        if (!Controller.BoardIsAvailable()) return;
                         if (obj.Type == "goal")
                         {
-                            for (int i = 0; i < board.Count; i++)
+                            for (int i = 0; i < Controller.Board.Count; i++)
                             {
-                                if (board[i].Slot == obj.Square.Slot)
+                                if (Controller.Board[i].Slot == obj.Square.Slot)
                                 {
-                                    board[i] = obj.Square;
-                                    BingoTracker.GoalUpdated(board[i].Name, i);
+                                    Controller.Board[i] = obj.Square;
+                                    BingoTracker.GoalUpdated(Controller.Board[i].Name, i);
                                     break;
                                 }
                             }
@@ -358,7 +348,7 @@ namespace BingoSync
                         }
                         else if (obj.Type == "revealed")
                         {
-                            isHidden = false;
+                            Controller.BoardIsRevealed = true;
                             BoardUpdated.ForEach(f => f());
                         }
                     }
@@ -380,7 +370,7 @@ namespace BingoSync
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{room}/board");
+                var task = client.GetAsync($"room/{Controller.RoomCode}/board");
                 return task.ContinueWith(responseTask =>
                 {
                     HttpResponseMessage response = null;
@@ -390,7 +380,7 @@ namespace BingoSync
                     readTask.ContinueWith(boardResponse =>
                     {
                         var newBoard = JsonConvert.DeserializeObject<List<BoardSquare>>(boardResponse.Result);
-                        isHidden = hideCard;
+                        Controller.BoardIsRevealed = !hideCard;
                         UpdateBoardAndBroadcast(newBoard);
                         Log("updated board");
                     });
@@ -402,7 +392,7 @@ namespace BingoSync
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{room}/room-settings");
+                var task = client.GetAsync($"room/{Controller.RoomCode}/room-settings");
                 return task.ContinueWith(responseTask =>
                 {
                     HttpResponseMessage response = null;
@@ -412,7 +402,7 @@ namespace BingoSync
                     readTask.ContinueWith(settingsResponse =>
                     {
                         var settings = JsonConvert.DeserializeObject<RoomSettingsResponse>(settingsResponse.Result);
-                        isLockout = settings.Settings.LockoutMode == LOCKOUT_MODE;
+                        Controller.RoomIsLockout = settings.Settings.LockoutMode == LOCKOUT_MODE;
                     });
                 });
             }, maxRetries, nameof(UpdateSettings));

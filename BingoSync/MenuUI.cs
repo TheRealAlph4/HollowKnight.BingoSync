@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace BingoSync
@@ -106,10 +104,6 @@ namespace BingoSync
         private static ToggleButton lockoutToggleButton;
 
 
-        public static bool HandMode { get; private set; } = false;
-        public static string selectedColor = "";
-        private static bool isBingoMenuUIVisible = true;
-
         public static void Setup()
         {
             Loader.Preload();
@@ -117,7 +111,7 @@ namespace BingoSync
             Sprite handModeSprite = Loader.GetTexture("BingoSync Hand Icon.png").ToSprite();
             Sprite nonHandModeSprite = Loader.GetTexture("BingoSync Eye Icon.png").ToSprite();
 
-            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, ToggleHandMode, "Hand Mode Toggle");
+            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, Controller.HandModeButtonClicked, "Hand Mode Toggle");
             Button handModeButton = new(layoutRoot, "handModeToggleButton")
             {
                 MinWidth = handModeButtonWidth,
@@ -151,7 +145,7 @@ namespace BingoSync
             Sprite lockoutSprite = Loader.GetTexture("BingoSync Lockout Icon.png").ToSprite();
             Sprite nonLockoutSprite = Loader.GetTexture("BingoSync Non-Lockout Icon.png").ToSprite();
 
-            lockoutToggleButton = new(layoutRoot, lockoutSprite, nonLockoutSprite, ToggleLockout, "Lockout Toggle");
+            lockoutToggleButton = new(layoutRoot, lockoutSprite, nonLockoutSprite, Controller.LockoutButtonClicked, "Lockout Toggle");
             Button lockoutButton = new(layoutRoot, "lockoutToggleButton")
             {
                 MinWidth = lockoutButtonWidth,
@@ -169,11 +163,11 @@ namespace BingoSync
             layoutRoot.VisibilityCondition = () => {
                 BingoSyncClient.Update();
                 Update();
-                return isBingoMenuUIVisible;
+                return Controller.MenuIsVisible;
             };
 
             layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.HideMenu, () => {
-                isBingoMenuUIVisible = !isBingoMenuUIVisible;
+                Controller.MenuIsVisible = !Controller.MenuIsVisible;
             });
         }
 
@@ -285,7 +279,7 @@ namespace BingoSync
 
         private static void SetupGenerationMenu()
         {
-            generateBoardButton.Click += GenerateButtonClicked;
+            generateBoardButton.Click += Controller.GenerateButtonClicked;
 
             StackLayout bottomRow = new(layoutRoot)
             {
@@ -359,10 +353,9 @@ namespace BingoSync
         {
             if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
             {
-                BingoSyncClient.room = SanitizeRoomCode(roomCodeInput.Text);
-                BingoSyncClient.nickname = nicknameInput.Text;
-                BingoSyncClient.password = passwordInput.Text;
-                BingoSyncClient.color = selectedColor;
+                Controller.RoomCode = SanitizeRoomCode(roomCodeInput.Text);
+                Controller.RoomNickname = nicknameInput.Text;
+                Controller.RoomPassword = passwordInput.Text;
                 BingoSyncClient.JoinRoom((ex) =>
                 {
                     Update();
@@ -379,48 +372,27 @@ namespace BingoSync
             }
         }
 
-        private static void GenerateButtonClicked(Button sender)
+        public static bool IsLockoutToggleButtonOn()
         {
-            GameModesManager.Generate();
-            Task resetBoardVisibility = new(() =>
-            {
-                Thread.Sleep(300);
-                BingoBoardUI.isBingoBoardVisible = true;
-            });
-            resetBoardVisibility.Start();
+            return lockoutToggleButton.IsOn;
         }
 
         private static void SelectColor(Button sender)
         {
-            Button previousSelectedColor = layoutRoot.GetElement<Button>(selectedColor);
+            Button previousSelectedColor = layoutRoot.GetElement<Button>(Controller.RoomColor);
             previousSelectedColor.BorderColor = previousSelectedColor.ContentColor;
-            selectedColor = sender.Name;
+            Controller.RoomColor = sender.Name;
             sender.BorderColor = Color.white;
-        }
-
-        public static void ToggleLockout(Button sender)
-        {
-            GameModesManager.SetLockout(lockoutToggleButton.IsOn);
-        }
-
-        public static void ToggleHandMode(Button sender)
-        {
-            HandMode = !HandMode;
         }
 
         public static void SelectGameMode(Button sender)
         {
-            GameModesManager.SetActiveGameMode(sender.Name);
+            Controller.ActiveGameMode = sender.Name;
             foreach (Button gameMode in gameModeButtons)
             {
                 gameMode.BorderColor = Color.white;
             }
             sender.BorderColor = Color.red;
-        }
-
-        public static void SetVisible(bool visible)
-        {
-            isBingoMenuUIVisible = visible;
         }
 
         public static void LoadDefaults()
@@ -429,10 +401,10 @@ namespace BingoSync
                 nicknameInput.Text = BingoSync.modSettings.DefaultNickname;
             if (passwordInput != null)
                 passwordInput.Text = BingoSync.modSettings.DefaultPassword;
-            selectedColor = BingoSync.modSettings.DefaultColor;
+            Controller.RoomColor = BingoSync.modSettings.DefaultColor;
             if (layoutRoot == null)
                 return;
-            Button selectedColorButton = layoutRoot.GetElement<Button>(selectedColor);
+            Button selectedColorButton = layoutRoot.GetElement<Button>(Controller.RoomColor);
             if (selectedColorButton != null)
             {
                 selectedColorButton.BorderColor = Color.white;

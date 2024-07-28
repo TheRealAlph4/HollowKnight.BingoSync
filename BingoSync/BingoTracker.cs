@@ -141,10 +141,10 @@ namespace BingoSync
             }
         }
 
-        public static bool IsBoardAvailable()
+        public static bool BoardIsPlayable()
         {
             BingoSyncClient.Update();
-            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
+            if (!Controller.BoardIsAvailable() || !Controller.BoardIsRevealed)
                 return false;
             if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
                 return false;
@@ -153,7 +153,7 @@ namespace BingoSync
 
         public static void ProcessBingo()
         {
-            if (!IsBoardAvailable()) return;
+            if (!BoardIsPlayable()) return;
             _allPossibleSquares.ForEach(square =>
             {
                 bool wasSolved = square.Condition.Solved;
@@ -240,7 +240,7 @@ namespace BingoSync
         {
             if (!BingoSync.modSettings.UnmarkGoals)
                 return;
-            bool marked = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.color);
+            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
             if (marked)
                 return;
             var square = _allPossibleSquares.Find(x => x.Name == goal);
@@ -253,13 +253,13 @@ namespace BingoSync
 
         public static void UpdateGoal(string goal, bool shouldUnmark)
         {
-            if (!IsBoardAvailable()) return;
-            var index = BingoSyncClient.board.FindIndex(x => x.Name == goal);
+            if (!BoardIsPlayable()) return;
+            var index = Controller.Board.FindIndex(x => x.Name == goal);
             if (index == -1)
                 return;
-            bool marked = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.color);
-            bool isBlank = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.BLANK_COLOR);
-            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!BingoSyncClient.isLockout || isBlank)))
+            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
+            bool isBlank = Controller.Board[index].Colors.Contains(Controller.BLANK_COLOR);
+            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
             {
                 Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
                 BingoSyncClient.SelectSquare(index + 1, () =>

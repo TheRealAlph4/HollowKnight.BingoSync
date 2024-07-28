@@ -130,7 +130,7 @@ namespace BingoSync
                             CancelAction = CancelAction,
                             SubmitAction = _ =>
                             {
-                                BingoSync.modSettings.DefaultColor = MenuUI.selectedColor;
+                                BingoSync.modSettings.DefaultColor = Controller.RoomColor;
                                 RefreshMenu();
                             }
                         }, out saveColorButton)

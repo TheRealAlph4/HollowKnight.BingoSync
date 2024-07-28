@@ -176,7 +176,7 @@ namespace BingoSync
         {
             if (cg.name == "MainMenuScreen")
             {
-                MenuUI.SetVisible(false);
+                Controller.MenuIsVisible = false;
             }
             return orig(self, cg);
         }
@@ -185,14 +185,14 @@ namespace BingoSync
         {
             if (cg.name == "MainMenuScreen")
             {
-                MenuUI.SetVisible(true);
+                Controller.MenuIsVisible = true;
             }
             return orig(self, cg);
         }
 
         private static void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
         {
-            MenuUI.SetVisible(false);
+            Controller.MenuIsVisible = false;
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
                 BingoSyncClient.RevealCard();
@@ -205,7 +205,7 @@ namespace BingoSync
 
         private static void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
         {
-            MenuUI.SetVisible(false);
+            Controller.MenuIsVisible = false;
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
                 BingoSyncClient.RevealCard();
