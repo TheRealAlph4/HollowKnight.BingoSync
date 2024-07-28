@@ -12,6 +12,7 @@ namespace BingoSync
         public static readonly string BLANK_COLOR = "blank";
 
         public static List<BoardSquare> Board { get; set; } = null;
+        public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
         public static bool BoardIsConfirmed { get; set; } = false;
         public static bool BoardIsRevealed { get; set; } = false;
@@ -19,7 +20,6 @@ namespace BingoSync
         public static bool MenuIsLockout { get; set; } = false;
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool HandMode { get; set; } = false;
-        public static bool MenuIsVisible { get; set; } = true;
 
         public static string RoomCode { get; set; } = string.Empty;
         public static string RoomPassword { get; set; } = string.Empty;
@@ -27,6 +27,7 @@ namespace BingoSync
         public static string RoomColor { get; set; } = string.Empty;
         public static bool RoomIsLockout { get; set; } = false;
 
+        public static readonly List<Action> OnBoardUpdate = [];
 
         private static Action<string> Log;
         private static readonly Stopwatch timer = new();
@@ -36,6 +37,11 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
+        }
+
+        public static void BoardUpdate()
+        {
+            OnBoardUpdate.ForEach(f => f());
         }
 
         public static bool BoardIsAvailable()
@@ -72,12 +78,12 @@ namespace BingoSync
 
         public static void LockoutButtonClicked(Button sender)
         {
-            MenuIsLockout = MenuUI.IsLockoutToggleButtonOn();
+            MenuIsLockout = MenuUI.IsLockout();
         }
 
         public static void HandModeButtonClicked(Button sender)
         {
-            HandMode = !HandMode;
+            HandMode = MenuUI.IsHandMode();
         }
 
         public static void GenerateButtonClicked(Button sender)
@@ -106,6 +112,12 @@ namespace BingoSync
             BingoSyncClient.ChatMessage(message);
         }
 
+        public static void RefreshInfoFromUI()
+        {
+            ConnectionMenuUI.ReadCurrentConnectionInfo();
+
+        }
+
         public static void UpdateBoardOpacity()
         {
             CurrentBoardID = (CurrentBoardID + 1) % BingoBoardUI.GetBoardCount();
@@ -130,6 +142,16 @@ namespace BingoSync
         public static bool ClientIsConnected()
         {
             return BingoSyncClient.GetState() == BingoSyncClient.State.Connected;
+        }
+
+        public static bool ClientIsConnecting()
+        {
+            return BingoSyncClient.GetState() == BingoSyncClient.State.Loading;
+        }
+
+        public static int GetCurrentSeed()
+        {
+            return MenuUI.GetSeed();
         }
     }
 }

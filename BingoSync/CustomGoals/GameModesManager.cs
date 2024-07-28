@@ -44,7 +44,7 @@ namespace BingoSync
 
         public static void Generate()
         {
-            int seed = MenuUI.GetSeed();
+            int seed = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             BingoSyncClient.ChatMessage($"{Controller.RoomNickname} is generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with seed {seed}");
             string customJSON = GameMode.GetErrorBoard();

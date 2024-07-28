@@ -31,8 +31,6 @@ namespace BingoSync
 
         private static bool shouldConnect = false;
 
-        public static List<Action> BoardUpdated;
-
         private static readonly int maxRetries = 20;
 
         public static void Setup(Action<string> log)
@@ -52,15 +50,13 @@ namespace BingoSync
             LoadCookie();
 
             webSocketClient = new ClientWebSocket();
-
-            BoardUpdated = [];
         }
 
         public static void Update()
         {
             if (webSocketClient.State == lastSocketState)
                 return;
-            BoardUpdated.ForEach(f => f());
+            Controller.BoardUpdate();
             forcedState = State.None;
             lastSocketState = webSocketClient.State;
         }
@@ -106,7 +102,7 @@ namespace BingoSync
         {
             Controller.Board = newBoard;
             BingoTracker.ClearFinishedGoals();
-            BoardUpdated.ForEach(f => f());
+            Controller.BoardUpdate();
         }
 
         public static void JoinRoom(Action<Exception> callback)
@@ -215,7 +211,7 @@ namespace BingoSync
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     Controller.BoardIsRevealed = true;
-                    BoardUpdated.ForEach(f => f());
+                    Controller.BoardUpdate();
                 });
             }, maxRetries, nameof(RevealCard));
         }
@@ -338,7 +334,7 @@ namespace BingoSync
                                     break;
                                 }
                             }
-                            BoardUpdated.ForEach(f => f());
+                            Controller.BoardUpdate();
                         }
                         else if (obj.Type == "new-card")
                         {
@@ -349,7 +345,7 @@ namespace BingoSync
                         else if (obj.Type == "revealed")
                         {
                             Controller.BoardIsRevealed = true;
-                            BoardUpdated.ForEach(f => f());
+                            Controller.BoardUpdate();
                         }
                     }
                 }
