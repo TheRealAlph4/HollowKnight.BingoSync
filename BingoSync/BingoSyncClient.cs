@@ -31,7 +31,7 @@ namespace BingoSync
 
         private static bool shouldConnect = false;
 
-        private static readonly int maxRetries = 20;
+        private static readonly int maxRetries = 30;
 
         public static void Setup(Action<string> log)
         {

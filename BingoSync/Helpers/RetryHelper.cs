@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 public static class RetryHelper
 {
-    private static readonly int delayMilliseconds = 10;
-    private static readonly int maxDelayMilliseconds = 1000;
+    private static readonly int delayMilliseconds = 100;
+    private static readonly int maxDelayMilliseconds = 2000;
     private static Action<string> Log;
 
     public static void Setup(Action<string> log) {

@@ -17,7 +17,7 @@ namespace BingoSync
         public static bool BoardIsConfirmed { get; set; } = false;
         public static bool BoardIsRevealed { get; set; } = false;
         public static int CurrentBoardID { get; set; } = BingoSync.modSettings.BoardID;
-        public static bool MenuIsLockout { get; set; } = false;
+        public static bool MenuIsLockout { get; set; } = true;
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool HandMode { get; set; } = false;
 
@@ -27,7 +27,7 @@ namespace BingoSync
         public static string RoomColor { get; set; } = string.Empty;
         public static bool RoomIsLockout { get; set; } = false;
 
-        public static readonly List<Action> OnBoardUpdate = [];
+        private static readonly List<Action> OnBoardUpdateList = [];
 
         private static Action<string> Log;
         private static readonly Stopwatch timer = new();
@@ -37,11 +37,18 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
+            OnBoardUpdate(BingoBoardUI.UpdateGrid);
+            OnBoardUpdate(ConfirmTopLeftOnReveal);
         }
 
         public static void BoardUpdate()
         {
-            OnBoardUpdate.ForEach(f => f());
+            OnBoardUpdateList.ForEach(f => f());
+        }
+
+        public static void OnBoardUpdate(Action func)
+        {
+            OnBoardUpdateList.Add(func);
         }
 
         public static bool BoardIsAvailable()

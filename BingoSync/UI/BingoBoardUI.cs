@@ -62,9 +62,6 @@ namespace BingoSync
             commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
             commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.CycleBoardOpacity, Controller.UpdateBoardOpacity);
-
-            BingoSyncClient.BoardUpdated.Add(UpdateGrid);
-            BingoSyncClient.BoardUpdated.Add(Controller.ConfirmTopLeftOnReveal);
         }
 
         public static void UpdateGrid()
