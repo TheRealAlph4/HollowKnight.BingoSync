@@ -106,7 +106,7 @@ namespace BingoSync
             BingoSyncClient.ChatMessage(message);
         }
 
-        public static void UpdateOpacity()
+        public static void UpdateBoardOpacity()
         {
             CurrentBoardID = (CurrentBoardID + 1) % BingoBoardUI.GetBoardCount();
             BingoSync.modSettings.BoardID = CurrentBoardID;
