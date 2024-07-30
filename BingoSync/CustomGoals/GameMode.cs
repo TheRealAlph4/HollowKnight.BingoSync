@@ -19,7 +19,7 @@ namespace BingoSync
             this.goals = goals;
         }
 
-        public string GetName()
+        virtual public string GetName()
         {
             return name;
         }
@@ -31,6 +31,11 @@ namespace BingoSync
             Random r = new(seed);
             while (board.Count < 25)
             {
+                if (availableGoals.Count == 0)
+                {
+                    Modding.Logger.Log("Could not generate board");
+                    return GetErrorBoard();
+                }
                 int index = r.Next(availableGoals.Count);
                 BingoGoal proposedGoal = availableGoals[index];
                 bool valid = true;
@@ -46,11 +51,6 @@ namespace BingoSync
                     board.Add(proposedGoal);
                 }
                 availableGoals.Remove(proposedGoal);
-                if (availableGoals.Count == 0)
-                {
-                    Modding.Logger.Log("Could not generate board");
-                    return GetErrorBoard();
-                }
             }
 
             return Jsonify(board);

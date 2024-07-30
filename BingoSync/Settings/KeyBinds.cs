@@ -1,6 +1,6 @@
 using InControl;
 
-namespace Settings
+namespace BingoSync.Settings
 {
     public class KeyBinds: PlayerActionSet {
         public PlayerAction ToggleBoard;

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Settings;
+using BingoSync.Settings;
 using System.Collections;
 
 namespace BingoSync

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Settings
+namespace BingoSync.Settings
 {
     public class SaveSettings
     {

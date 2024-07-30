@@ -1,7 +1,9 @@
-﻿using Modding.Converters;
+﻿using BingoSync;
+using Modding.Converters;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
-namespace Settings
+namespace BingoSync.Settings
 {
     public class ModSettings
     {
@@ -13,5 +15,7 @@ namespace Settings
         public string DefaultNickname = "";
         public string DefaultPassword = "";
         public string DefaultColor = "red";
+        public int CustomGameModeCount = 3;
+        public List<CustomGameMode> CustomGameModes = [];
     }
 }

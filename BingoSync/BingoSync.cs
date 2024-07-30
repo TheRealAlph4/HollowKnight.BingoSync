@@ -1,10 +1,8 @@
 ﻿using Modding;
-using Settings;
-using System.Collections.Generic;
-
+using BingoSync.Settings;
 namespace BingoSync
 {
-    public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
+    public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
 
@@ -25,6 +23,7 @@ namespace BingoSync
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
+            Log("Calling GameModesManager.Setup");
             GameModesManager.Setup(Log);
 
             ModHooks.FinishedLoadingModsHook += MenuUI.SetupGameModeButtons;
@@ -40,28 +39,12 @@ namespace BingoSync
             Controller.MenuIsVisible = false;
         }
 
-        public static void AddGameMode(GameMode gameMode)
-        {
-            GameModesManager.AddGameMode(gameMode);
-        }
-
-        public static void RegisterGoalsForCustom(string groupName, Dictionary<string, BingoGoal> goals)
-        {
-            GameModesManager.RegisterGoalsForCustom(groupName, goals);
-        }
-
-        public static Dictionary<string, BingoGoal> GetVanillaGoals()
-        {
-            return GameModesManager.GetVanillaGoals();
-        }
-
-
-        public void OnLoadLocal(Settings.SaveSettings s)
+        public void OnLoadLocal(SaveSettings s)
         {
             BingoTracker.Settings = s;
         }
 
-        public Settings.SaveSettings OnSaveLocal()
+        public SaveSettings OnSaveLocal()
         {
             return BingoTracker.Settings;
         }
@@ -69,7 +52,10 @@ namespace BingoSync
         public void OnLoadGlobal(ModSettings s)
         {
             modSettings = s;
+            Log(modSettings.CustomGameModes.Count);
             MenuUI.LoadDefaults();
+            Log("Calling GameModesManager.LoadCustomGameModes");
+            GameModesManager.LoadCustomGameModes();
             ModMenu.RefreshMenu();
         }
 
@@ -79,6 +65,7 @@ namespace BingoSync
         }
 
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) {
+            Log("GetMenuScreen called");
             var menu = ModMenu.CreateMenuScreen(modListMenu).Build();
             ModMenu.RefreshMenu();
             return menu;
