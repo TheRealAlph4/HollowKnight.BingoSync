@@ -1,5 +1,9 @@
 ﻿using Modding;
+using BingoSync.ModMenu;
 using BingoSync.Settings;
+using System.Collections.Generic;
+using System.Reflection;
+using MonoMod.Utils;
 namespace BingoSync
 {
     public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
@@ -23,7 +27,6 @@ namespace BingoSync
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
-            Log("Calling GameModesManager.Setup");
             GameModesManager.Setup(Log);
 
             ModHooks.FinishedLoadingModsHook += MenuUI.SetupGameModeButtons;
@@ -54,9 +57,8 @@ namespace BingoSync
             modSettings = s;
             Log(modSettings.CustomGameModes.Count);
             MenuUI.LoadDefaults();
-            Log("Calling GameModesManager.LoadCustomGameModes");
             GameModesManager.LoadCustomGameModes();
-            ModMenu.RefreshMenu();
+            MainMenu.RefreshMenu();
         }
 
         public ModSettings OnSaveGlobal()
@@ -65,9 +67,8 @@ namespace BingoSync
         }
 
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) {
-            Log("GetMenuScreen called");
-            var menu = ModMenu.CreateMenuScreen(modListMenu).Build();
-            ModMenu.RefreshMenu();
+            MenuScreen menu = MainMenu.CreateMenuScreen(modListMenu);
+            MainMenu.RefreshMenu();
             return menu;
         }
 

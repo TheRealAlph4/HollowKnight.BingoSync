@@ -26,7 +26,10 @@ public static class RetryHelper
         {
             if (task.Exception == null)
             {
-                Log($"{requestName} request was successful on try {retries}");
+                if (retries > 0)
+                {
+                    Log($"{requestName} request was successful on try {retries}");
+                }
                 return;
             }
             int delay = Math.Min((2 << retries) * delayMilliseconds, maxDelayMilliseconds);

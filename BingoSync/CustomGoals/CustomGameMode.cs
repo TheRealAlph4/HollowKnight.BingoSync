@@ -48,14 +48,9 @@ namespace BingoSync
             foreach (GoalGroup goalGroup in goalSettings)
             {
                 List<string> activeGoals = goalGroup.GetActiveGoals();
-                foreach (string activeGoal in activeGoals)
-                {
-                    Modding.Logger.Log($"{activeGoal} is effectively on: {goalGroup.GoalIsEffectivelyOn(activeGoal)}");
-                }
                 List<BingoGoal> activeBingoGoals = GameModesManager.GetGoalsFromNames(activeGoals);
                 foreach(BingoGoal goal in activeBingoGoals)
                 {
-                    Modding.Logger.Log(goal.name);
                     goals[goal.name] = goal;
                 }
             }
