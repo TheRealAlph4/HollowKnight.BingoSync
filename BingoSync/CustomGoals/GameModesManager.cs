@@ -28,6 +28,7 @@ namespace BingoSync
 
         public static void LoadCustomGameModes()
         {
+            gameModes.RemoveAll(gameMode => gameMode.GetType() == typeof(CustomGameMode));
             foreach (GameMode gameMode in BingoSync.modSettings.CustomGameModes)
             {
                 AddGameMode(gameMode);

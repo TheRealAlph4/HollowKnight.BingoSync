@@ -106,6 +106,7 @@ namespace BingoSync.ModMenu
             string next = BingoSync.modSettings.CustomGameModes.Count == 0 ? "No Profiles" : BingoSync.modSettings.CustomGameModes.ElementAt(nextIndex).Name;
             gameModeSelector.optionText.text = next;
             gameModeSelector.optionText.FontTextureChanged();
+            Controller.RegenerateGameModeButtons();
             RefreshMenu();
         }
 
@@ -123,6 +124,7 @@ namespace BingoSync.ModMenu
                 gameModeSelector.Select();
             }
             Modding.Logger.Log($"Added {name + nr}");
+            Controller.RegenerateGameModeButtons();
             RefreshMenu();
         }
     }

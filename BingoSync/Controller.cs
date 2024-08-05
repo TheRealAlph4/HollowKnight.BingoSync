@@ -160,5 +160,19 @@ namespace BingoSync
         {
             return MenuUI.GetSeed();
         }
+
+        public static void RegenerateGameModeButtons()
+        {
+            Log("RegenerateGameModeButtons");
+            GameModesManager.LoadCustomGameModes();
+            GenerationMenuUI.CreateGenerationMenu();
+            GenerationMenuUI.SetupGameModeButtons();
+        }
+
+        public static void AfterGoalPacksLoaded()
+        {
+            GameModesManager.LoadCustomGameModes();
+            MenuUI.SetupGameModeButtons();
+        }
     }
 }

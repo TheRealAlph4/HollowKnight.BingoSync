@@ -29,7 +29,7 @@ namespace BingoSync
             BingoBoardUI.Setup(Log);
             GameModesManager.Setup(Log);
 
-            ModHooks.FinishedLoadingModsHook += MenuUI.SetupGameModeButtons;
+            ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
         }
 
         public static void ShowMenu()
@@ -57,7 +57,6 @@ namespace BingoSync
             modSettings = s;
             Log(modSettings.CustomGameModes.Count);
             MenuUI.LoadDefaults();
-            GameModesManager.LoadCustomGameModes();
             MainMenu.RefreshMenu();
         }
 

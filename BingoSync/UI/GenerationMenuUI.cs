@@ -24,6 +24,12 @@ namespace BingoSync
         {
             Loader.Preload();
             GenerationMenuUI.layoutRoot = layoutRoot;
+            CreateGenerationMenu();
+        }
+
+        public static void CreateGenerationMenu()
+        {
+            generationMenu?.Children.Clear();
 
             generationMenu = new(layoutRoot)
             {
@@ -99,6 +105,12 @@ namespace BingoSync
                 Spacing = 10,
                 Orientation = Orientation.Horizontal,
             };
+
+            foreach (var button in gameModeButtons)
+            {
+                button.Destroy();
+            }
+            gameModeButtons.Clear();
 
             foreach (string gameMode in GameModesManager.GameModeNames())
             {
