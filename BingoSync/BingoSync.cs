@@ -1,9 +1,7 @@
 ﻿using Modding;
 using BingoSync.ModMenu;
 using BingoSync.Settings;
-using System.Collections.Generic;
-using System.Reflection;
-using MonoMod.Utils;
+
 namespace BingoSync
 {
     public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod

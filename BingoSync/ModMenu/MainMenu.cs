@@ -18,7 +18,10 @@ namespace BingoSync.ModMenu
             void GoToKeybinds(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_KeybindsScreen);
             void GoToToggles(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_TogglesScreen);
             void GoToDefaults(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_DefaultsScreen);
-            void GoToProfiles(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_ProfilesScreen);
+            void GoToProfiles(MenuSelectable _) {
+                ProfilesManagementMenu.RefreshMenu();
+                UIManager.instance.UIGoToDynamicMenu(_ProfilesScreen);
+            };
 
             MenuBuilder mainMenuBuilder = MenuUtils.CreateMenuBuilderWithBackButton("BingoSync", parentMenu, out _);
 

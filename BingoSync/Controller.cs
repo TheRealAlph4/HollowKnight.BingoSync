@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using MagicUI.Elements;
 using System.Threading;
+using BingoSync.ModMenu;
 
 namespace BingoSync
 {
@@ -119,10 +120,9 @@ namespace BingoSync
             BingoSyncClient.ChatMessage(message);
         }
 
-        public static void RefreshInfoFromUI()
+        public static void RefreshDefaultsFromUI()
         {
             ConnectionMenuUI.ReadCurrentConnectionInfo();
-
         }
 
         public static void UpdateBoardOpacity()
@@ -163,7 +163,6 @@ namespace BingoSync
 
         public static void RegenerateGameModeButtons()
         {
-            Log("RegenerateGameModeButtons");
             GameModesManager.LoadCustomGameModes();
             GenerationMenuUI.CreateGenerationMenu();
             GenerationMenuUI.SetupGameModeButtons();
@@ -173,6 +172,35 @@ namespace BingoSync
         {
             GameModesManager.LoadCustomGameModes();
             MenuUI.SetupGameModeButtons();
+        }
+
+        public static bool RenameActiveGameModeTo(string newName)
+        {
+            GameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
+            if(gameMode == null || gameMode.GetType() != typeof(CustomGameMode))
+            {
+                Log($"Cannot rename non-custom gamemode {ActiveGameMode}");
+                return false;
+            }
+            CustomGameMode customGameMode = (CustomGameMode)gameMode;
+            customGameMode.InternalName = newName;
+            ActiveGameMode = customGameMode.GetDisplayName();
+            return true;
+        }
+
+        public static bool IsCustomGameMode(string name)
+        {
+            return GameModesManager.FindGameModeByDisplayName(name).GetType() == typeof(CustomGameMode);
+        }
+
+        public static void SetGenerationButtonEnabled(bool enabled)
+        {
+            GenerationMenuUI.SetGenerationButtonEnabled(enabled);
+        }
+
+        public static void RefreshMenu()
+        {
+            MainMenu.RefreshMenu();
         }
     }
 }

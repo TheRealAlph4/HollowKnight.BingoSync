@@ -10,15 +10,15 @@ namespace BingoSync
     public class CustomGameMode : GameMode
     {
         [JsonProperty("GameModeName")]
-        public string Name
+        public string InternalName
         {
             get
             {
-                return base.GetName();
+                return base.GetDisplayName();
             }
-            private set
+            set
             {
-                Modding.Logger.Log("Attempting to set CustomGameMode.Name does nothing");
+                SetName(value);
             }
         }
         [JsonProperty("GoalGroups")]
@@ -63,9 +63,9 @@ namespace BingoSync
             return base.GenerateBoard(seed);
         }
 
-        public override string GetName()
+        public override string GetDisplayName()
         {
-            return base.GetName() + "*";
+            return base.GetDisplayName() + "*";
         }
     }
 }

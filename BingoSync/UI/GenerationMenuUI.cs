@@ -3,6 +3,7 @@ using MagicUI.Elements;
 using MagicUI.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace BingoSync
 
         private static LayoutRoot layoutRoot;
         private static StackLayout generationMenu;
+
+        private static TextInput profileNameInput;
+        private static Button acceptProfileNameButton;
 
         private static TextInput generationSeedInput;
         private static Button generateBoardButton;
@@ -39,6 +43,22 @@ namespace BingoSync
                 Orientation = Orientation.Vertical,
                 Padding = new Padding(0, 50, 20, 15),
             };
+
+            profileNameInput = new(layoutRoot, "profileName")
+            {
+                FontSize = MenuUI.fontSize,
+                MinWidth = MenuUI.profileNameFieldWidth,
+                Placeholder = "Profile Name",
+            };
+            acceptProfileNameButton = new(layoutRoot, "acceptProfileNameButton")
+            {
+                Content = "Set Name",
+                FontSize = 15,
+                Margin = 20,
+                MinWidth = MenuUI.acceptProfileNameButtonWidth,
+                MinHeight = 25,
+            };
+
             generationSeedInput = new(layoutRoot, "Seed")
             {
                 FontSize = MenuUI.fontSize,
@@ -66,10 +86,28 @@ namespace BingoSync
             lockoutToggleButton.SetButton(lockoutButton);
             lockoutToggleButton.Toggle(null);
 
-            SetupGenerationMenu();
+            SetupRenameProfileRow();
+            SetupGenerateRow();
         }
 
-        private static void SetupGenerationMenu()
+        private static void SetupRenameProfileRow()
+        {
+            acceptProfileNameButton.Click += AcceptProfileNameButtonClicked;
+
+            StackLayout profileRenameRow = new(layoutRoot)
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                Spacing = 10,
+                Orientation = Orientation.Horizontal,
+            };
+
+            profileRenameRow.Children.Add(profileNameInput);
+            profileRenameRow.Children.Add(acceptProfileNameButton);
+            generationMenu.Children.Add(profileRenameRow);
+        }
+
+        private static void SetupGenerateRow()
         {
             generateBoardButton.Click += Controller.GenerateButtonClicked;
 
@@ -167,14 +205,51 @@ namespace BingoSync
             return lockoutToggleButton.IsOn;
         }
 
-        public static void SelectGameMode(Button sender)
+        private static void SelectGameMode(Button sender)
         {
-            Controller.ActiveGameMode = sender.Name;
+            string gameModeName = sender.Content;
+            Controller.ActiveGameMode = gameModeName;
+            profileNameInput.Text = gameModeName;
+            if (gameModeName.EndsWith("*"))
+            {
+                profileNameInput.Text = gameModeName.Remove(gameModeName.Count() - 1, 1);
+            }
             foreach (Button gameMode in gameModeButtons)
             {
                 gameMode.BorderColor = Color.white;
             }
             sender.BorderColor = Color.red;
+            bool isCustom = Controller.IsCustomGameMode(gameModeName);
+            profileNameInput.Enabled = isCustom;
+            acceptProfileNameButton.Enabled = isCustom;
+        }
+
+        public static void SetGenerationButtonEnabled(bool enabled)
+        {
+            generateBoardButton.Enabled = enabled;
+        }
+
+        private static void AcceptProfileNameButtonClicked(Button _)
+        {
+            string rawName = profileNameInput.Text;
+            string displayName = rawName + "*";
+            if(rawName == string.Empty)
+            {
+                Modding.Logger.Log($"A name must be given to rename a gamemode");
+                return;
+            }
+            if (gameModeButtons.FindIndex(gameMode => gameMode.Content == displayName) != -1)
+            {
+                Modding.Logger.Log($"Cannot rename gamemode to {displayName}, that name already exists");
+                return;
+            }
+            string oldName = Controller.ActiveGameMode;
+            bool success = Controller.RenameActiveGameModeTo(rawName);
+            if (success)
+            {
+                gameModeButtons.Find(button => button.Content == oldName).Content = displayName;
+                Controller.RefreshMenu();
+            }
         }
     }
 }

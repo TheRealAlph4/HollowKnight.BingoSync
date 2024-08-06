@@ -6,7 +6,7 @@ namespace BingoSync
 {
     public class GameMode(string name, Dictionary<string, BingoGoal> goals)
     {
-        private readonly string name = name;
+        private string name = name;
         private Dictionary<string, BingoGoal> goals = goals;
 
         public Dictionary<string, BingoGoal> GetGoals()
@@ -19,9 +19,14 @@ namespace BingoSync
             this.goals = goals;
         }
 
-        virtual public string GetName()
+        virtual public string GetDisplayName()
         {
             return name;
+        }
+
+        protected void SetName(string newName)
+        {
+            name = newName;
         }
 
         virtual public string GenerateBoard(int seed)

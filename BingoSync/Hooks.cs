@@ -177,6 +177,7 @@ namespace BingoSync
             if (cg.name == "MainMenuScreen")
             {
                 Controller.MenuIsVisible = false;
+                Controller.SetGenerationButtonEnabled(false);
             }
             return orig(self, cg);
         }
@@ -186,6 +187,7 @@ namespace BingoSync
             if (cg.name == "MainMenuScreen")
             {
                 Controller.MenuIsVisible = true;
+                Controller.SetGenerationButtonEnabled(true);
             }
             return orig(self, cg);
         }

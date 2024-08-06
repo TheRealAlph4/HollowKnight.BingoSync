@@ -14,7 +14,7 @@
 		<AssemblyTitle>BingoSync</AssemblyTitle>
 		<Product>BingoSync</Product>
 		<Description>A Hollow Knight Mod</Description>
-		<Copyright>Copyright ©  2023</Copyright>
+		<Copyright>Copyright ©  2024</Copyright>
 		<AssemblyVersion>1.2.4.0</AssemblyVersion>
 		<FileVersion>1.2.4.0</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>

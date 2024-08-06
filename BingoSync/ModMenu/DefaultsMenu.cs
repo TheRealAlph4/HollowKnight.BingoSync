@@ -29,7 +29,7 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         SubmitAction = _ =>
                         {
-                            Controller.RefreshInfoFromUI();
+                            Controller.RefreshDefaultsFromUI();
                             BingoSync.modSettings.DefaultNickname = Controller.RoomNickname;
                             RefreshMenu();
                         }
@@ -44,7 +44,7 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         SubmitAction = _ =>
                         {
-                            Controller.RefreshInfoFromUI();
+                            Controller.RefreshDefaultsFromUI();
                             BingoSync.modSettings.DefaultPassword = Controller.RoomPassword;
                             RefreshMenu();
                         }

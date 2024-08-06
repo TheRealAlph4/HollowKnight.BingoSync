@@ -20,7 +20,7 @@ namespace BingoSync.ModMenu
             MenuBuilder builder = MenuUtils.CreateMenuBuilderWithBackButton("BingoSync", parentMenu, out _);
 
             List<CustomGameMode> gameModes = BingoSync.modSettings.CustomGameModes;
-            string[] gameModeNames = gameModes.Select(x => x.Name).ToArray();
+            string[] gameModeNames = gameModes.Select(x => x.InternalName).ToArray();
 
             builder.AddContent(
                 RegularGridLayout.CreateVerticalLayout(105f),
@@ -68,7 +68,7 @@ namespace BingoSync.ModMenu
         public static void RefreshMenu()
         {
             List<CustomGameMode> gameModes = BingoSync.modSettings.CustomGameModes;
-            string[] gameModeNames = gameModes?.Select(x => x.Name).ToArray();
+            string[] gameModeNames = gameModes?.Select(x => x.InternalName).ToArray();
             if (gameModeSelector == null) return;
             gameModeSelector.optionList = gameModeNames;
             if (BingoSync.modSettings.CustomGameModes.Count == 0)
@@ -103,7 +103,7 @@ namespace BingoSync.ModMenu
             BingoSync.modSettings.CustomGameModes.RemoveAt(currentIndex);
             int nextIndex = Math.Max(currentIndex - 1, 0);
             gameModeSelector.SetOptionTo(nextIndex);
-            string next = BingoSync.modSettings.CustomGameModes.Count == 0 ? "No Profiles" : BingoSync.modSettings.CustomGameModes.ElementAt(nextIndex).Name;
+            string next = BingoSync.modSettings.CustomGameModes.Count == 0 ? "No Profiles" : BingoSync.modSettings.CustomGameModes.ElementAt(nextIndex).InternalName;
             gameModeSelector.optionText.text = next;
             gameModeSelector.optionText.FontTextureChanged();
             Controller.RegenerateGameModeButtons();
@@ -112,7 +112,7 @@ namespace BingoSync.ModMenu
 
         private static void AddNewProfile(MenuButton _)
         {
-            List<string> gameModeNames = BingoSync.modSettings.CustomGameModes.Select(x => x.Name).ToList();
+            List<string> gameModeNames = BingoSync.modSettings.CustomGameModes.Select(x => x.InternalName).ToList();
             string name = "Profile ";
             int nr = 1;
             for (; gameModeNames.Contains(name + nr); ++nr) ;
@@ -120,7 +120,7 @@ namespace BingoSync.ModMenu
             if(BingoSync.modSettings.CustomGameModes.Count == 1)
             {
                 gameModeSelector.SetOptionTo(0);
-                gameModeSelector.optionText.text = BingoSync.modSettings.CustomGameModes.ElementAt(0).Name;
+                gameModeSelector.optionText.text = BingoSync.modSettings.CustomGameModes.ElementAt(0).InternalName;
                 gameModeSelector.Select();
             }
             Modding.Logger.Log($"Added {name + nr}");

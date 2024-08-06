@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BingoSync.Settings;
+using static Mono.Security.X509.X520;
 
 namespace BingoSync
 {
@@ -24,6 +25,11 @@ namespace BingoSync
         public static void AddGameMode(GameMode gameMode)
         {
             gameModes.Add(gameMode);
+        }
+
+        public static GameMode FindGameModeByDisplayName(string name)
+        {
+            return gameModes.Find(gameMode => gameMode.GetDisplayName() == name);
         }
 
         public static void LoadCustomGameModes()
@@ -61,7 +67,7 @@ namespace BingoSync
             List<string> names = [];
             foreach (GameMode gameMode in gameModes)
             {
-                names.Add(gameMode.GetName());
+                names.Add(gameMode.GetDisplayName());
             }
             return names;
         }
@@ -74,7 +80,7 @@ namespace BingoSync
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
-                customJSON = gameModes.Find(gameMode => gameMode.GetName() == Controller.ActiveGameMode).GenerateBoard(seed);
+                customJSON = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
             BingoSyncClient.NewCard(customJSON, Controller.MenuIsLockout);
         }

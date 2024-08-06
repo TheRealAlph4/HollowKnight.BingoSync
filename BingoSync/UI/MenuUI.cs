@@ -1,12 +1,4 @@
 ﻿using MagicUI.Core;
-using MagicUI.Elements;
-using MagicUI.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.Remoting.Messaging;
-using UnityEngine;
 
 namespace BingoSync
 {
@@ -20,6 +12,8 @@ namespace BingoSync
         public static readonly int gameModeButtonWidth = (textFieldWidth - 20) / 3;
         public static readonly int generateButtonWidth = (int)(1.5 * gameModeButtonWidth) + 10;
         public static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - lockoutButtonWidth - 20;
+        public static readonly int profileNameFieldWidth = (int)(0.75 * textFieldWidth);
+        public static readonly int acceptProfileNameButtonWidth = textFieldWidth - profileNameFieldWidth - 10;
         public static readonly int fontSize = 22;
 
 
