@@ -37,6 +37,11 @@ namespace BingoSync
             }
         }
 
+        public void AddGoalGroupToSettings(GoalGroup goalGroup)
+        {
+            goalSettings.Add(goalGroup);
+        }
+
         public List<GoalGroup> GetGoalSettings()
         {
             return goalSettings;
@@ -47,10 +52,20 @@ namespace BingoSync
             Dictionary<string, BingoGoal> goals = [];
             foreach (GoalGroup goalGroup in goalSettings)
             {
+                if (!GameModesManager.GoalGroupExists(goalGroup.Name))
+                {
+                    Modding.Logger.Log($"Group \"{goalGroup.Name}\" is not registered, skipping");
+                    continue;
+                }
                 List<string> activeGoals = goalGroup.GetActiveGoals();
                 List<BingoGoal> activeBingoGoals = GameModesManager.GetGoalsFromNames(activeGoals);
                 foreach(BingoGoal goal in activeBingoGoals)
                 {
+                    if(!GameModesManager.GoalExists(goal.name))
+                    {
+                        Modding.Logger.Log($"Goal \"{goal.name}\" is not registered, skipping");
+                        continue;
+                    }
                     goals[goal.name] = goal;
                 }
             }

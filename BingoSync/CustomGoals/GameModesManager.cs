@@ -35,9 +35,22 @@ namespace BingoSync
         public static void LoadCustomGameModes()
         {
             gameModes.RemoveAll(gameMode => gameMode.GetType() == typeof(CustomGameMode));
-            foreach (GameMode gameMode in BingoSync.modSettings.CustomGameModes)
+            foreach (CustomGameMode gameMode in BingoSync.modSettings.CustomGameModes)
             {
+                SychronizeGoalGroups(gameMode);
                 AddGameMode(gameMode);
+            }
+        }
+
+        private static void SychronizeGoalGroups(CustomGameMode gameMode)
+        {
+            foreach (var group in goalGroupDefinitions)
+            {
+                string groupName = group.Key;
+                if(gameMode.GetGoalSettings().FindIndex(goalGroup => goalGroup.Name == groupName) == -1)
+                {
+                    gameMode.AddGoalGroupToSettings(CreateDefaultSettingsForGroup(groupName));
+                }
             }
         }
 
@@ -57,9 +70,29 @@ namespace BingoSync
             List<GoalGroup> defaultSettings = [];
             foreach(var group in goalGroupDefinitions)
             {
-                defaultSettings.Add(new GoalGroup(group.Key, group.Value.Select(goal => goal.name).ToList()));
+                defaultSettings.Add(CreateDefaultSettingsForGroup(group.Key));
             }
             return defaultSettings;
+        }
+
+        private static GoalGroup CreateDefaultSettingsForGroup(string groupName)
+        {
+            if (!goalGroupDefinitions.ContainsKey(groupName))
+            {
+                Log($"Couldn't create default settings for unknown group \"{groupName}\"");
+                return new GoalGroup("Unknown Group", []);
+            }
+            return new GoalGroup(groupName, goalGroupDefinitions[groupName].Select(goal => goal.name).ToList());
+        }
+
+        public static bool GoalGroupExists(string groupName)
+        {
+            return goalGroupDefinitions.ContainsKey(groupName);
+        }
+
+        public static bool GoalExists(string goalName)
+        {
+            return allCustomGoals.Any(goal => goal.name == goalName);
         }
 
         public static List<string> GameModeNames()

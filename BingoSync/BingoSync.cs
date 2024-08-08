@@ -53,7 +53,6 @@ namespace BingoSync
         public void OnLoadGlobal(ModSettings s)
         {
             modSettings = s;
-            Log(modSettings.CustomGameModes.Count);
             MenuUI.LoadDefaults();
             MainMenu.RefreshMenu();
         }

@@ -195,6 +195,7 @@ namespace BingoSync
         private static void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
         {
             Controller.MenuIsVisible = false;
+            Controller.SetGenerationButtonEnabled(false);
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
                 BingoSyncClient.RevealCard();
@@ -208,6 +209,7 @@ namespace BingoSync
         private static void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
         {
             Controller.MenuIsVisible = false;
+            Controller.SetGenerationButtonEnabled(false);
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
                 BingoSyncClient.RevealCard();

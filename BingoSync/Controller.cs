@@ -127,6 +127,10 @@ namespace BingoSync
 
         public static void UpdateBoardOpacity()
         {
+            if (!BoardIsAvailable())
+            {
+                return;
+            }
             CurrentBoardID = (CurrentBoardID + 1) % BingoBoardUI.GetBoardCount();
             BingoSync.modSettings.BoardID = CurrentBoardID;
         }
