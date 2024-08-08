@@ -201,19 +201,21 @@ namespace BingoSync
             return button;
         }
 
-        public static int GetSeed()
+        public static (int, bool) GetSeed()
         {
             string inputStr = generationSeedInput.Text;
             int seed = unchecked(DateTime.Now.Ticks.GetHashCode());
+            bool isCustom = false;
             if (inputStr != string.Empty)
             {
+                isCustom = true;
                 bool isNumeric = int.TryParse(inputStr, out seed);
                 if (!isNumeric)
                 {
                     seed = inputStr.GetHashCode();
                 }
             }
-            return seed;
+            return (seed, isCustom);
         }
 
         public static bool LockoutToggleButtonIsOn()

@@ -59,7 +59,7 @@ namespace BingoSync
             return ConnectionMenuUI.HandModeToggleButtonIsOn();
         }
 
-        public static int GetSeed()
+        public static (int, bool) GetSeed()
         { 
             return GenerationMenuUI.GetSeed();
         }

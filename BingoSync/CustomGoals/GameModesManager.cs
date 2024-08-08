@@ -107,9 +107,10 @@ namespace BingoSync
 
         public static void Generate()
         {
-            int seed = Controller.GetCurrentSeed();
+            (int seed, bool isCustomSeed) = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
-            BingoSyncClient.ChatMessage($"{Controller.RoomNickname} is generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with seed {seed}");
+            string isCustomSeedString = isCustomSeed ? "set" : "random";
+            BingoSyncClient.ChatMessage($"{Controller.RoomNickname} is generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {

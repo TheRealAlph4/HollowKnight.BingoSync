@@ -160,7 +160,7 @@ namespace BingoSync
             return BingoSyncClient.GetState() == BingoSyncClient.State.Loading;
         }
 
-        public static int GetCurrentSeed()
+        public static (int, bool) GetCurrentSeed()
         {
             return MenuUI.GetSeed();
         }
