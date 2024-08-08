@@ -24,6 +24,8 @@ namespace BingoSync
         private static readonly List<Button> gameModeButtons = [];
         private static ToggleButton lockoutToggleButton;
 
+        public static bool TextBoxActive { get; private set; } = false;
+
         public static void Setup(LayoutRoot layoutRoot)
         {
             Loader.Preload();
@@ -50,6 +52,8 @@ namespace BingoSync
                 MinWidth = MenuUI.profileNameFieldWidth,
                 Placeholder = "Profile Name",
             };
+            profileNameInput.OnHover += HoverTextInput;
+            profileNameInput.OnUnhover += UnhoverTextInput;
             acceptProfileNameButton = new(layoutRoot, "acceptProfileNameButton")
             {
                 Content = "Set Name",
@@ -65,6 +69,8 @@ namespace BingoSync
                 MinWidth = MenuUI.seedFieldWidth,
                 Placeholder = "Seed",
             };
+            generationSeedInput.OnHover += HoverTextInput;
+            generationSeedInput.OnUnhover += UnhoverTextInput;
             generateBoardButton = new(layoutRoot, "generateBoardButton")
             {
                 Content = "Generate Board",
@@ -88,6 +94,16 @@ namespace BingoSync
 
             SetupRenameProfileRow();
             SetupGenerateRow();
+        }
+
+        private static void HoverTextInput(TextInput _)
+        {
+            TextBoxActive = true;
+        }
+        private static void UnhoverTextInput(TextInput _)
+        {
+            // note: this also gets called if the textbox becomes inactive by hiding the menu
+            TextBoxActive = false;
         }
 
         private static void SetupRenameProfileRow()

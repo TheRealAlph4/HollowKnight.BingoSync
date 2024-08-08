@@ -22,6 +22,8 @@ namespace BingoSync
         private static Button joinRoomButton;
         private static ToggleButton handModeToggleButton;
 
+        public static bool TextBoxActive { get; private set; } = false;
+
         public static void Setup(LayoutRoot layoutRoot)
         {
             Loader.Preload();
@@ -50,22 +52,38 @@ namespace BingoSync
                 MinWidth = MenuUI.textFieldWidth,
                 Placeholder = "Room Link",
             };
+            roomCodeInput.OnHover += HoverTextInput;
+            roomCodeInput.OnUnhover += UnhoverTextInput;
             nicknameInput = new(layoutRoot, "NickName")
             {
                 FontSize = MenuUI.fontSize,
                 MinWidth = MenuUI.textFieldWidth,
                 Placeholder = "Nickname",
             };
+            nicknameInput.OnHover += HoverTextInput;
+            nicknameInput.OnUnhover += UnhoverTextInput;
             passwordInput = new(layoutRoot, "Password")
             {
                 FontSize = MenuUI.fontSize,
                 MinWidth = MenuUI.textFieldWidth,
                 Placeholder = "Password",
             };
+            passwordInput.OnHover += HoverTextInput;
+            passwordInput.OnUnhover += UnhoverTextInput;
 
             connectionMenu.Children.Add(roomCodeInput);
             connectionMenu.Children.Add(nicknameInput);
             connectionMenu.Children.Add(passwordInput);
+        }
+
+        private static void HoverTextInput(TextInput _)
+        {
+            TextBoxActive = true;
+        }
+        private static void UnhoverTextInput(TextInput _)
+        {
+            // note: this also gets called if the textbox becomes inactive by hiding the menu
+            TextBoxActive = false;
         }
 
         private static void SetupColorButtons()

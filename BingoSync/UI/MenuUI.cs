@@ -36,6 +36,10 @@ namespace BingoSync
             };
 
             layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.HideMenu, () => {
+                if (GenerationMenuUI.TextBoxActive || ConnectionMenuUI.TextBoxActive)
+                {
+                    return;
+                }
                 Controller.MenuIsVisible = !Controller.MenuIsVisible;
             });
         }
