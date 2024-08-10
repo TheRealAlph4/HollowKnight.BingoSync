@@ -137,11 +137,20 @@ namespace BingoSync
 
         public static void RevealButtonClicked(Button sender)
         {
-            RevealKeybindClicked();
+            RevealCard();
         }
 
         public static void RevealKeybindClicked()
         {
+            RevealCard();
+        }
+
+        public static void RevealCard()
+        {
+            if (BoardIsRevealed)
+            {
+                return;
+            }
             BoardIsConfirmed = false;
             BingoSyncClient.RevealCard();
             if (HandMode)

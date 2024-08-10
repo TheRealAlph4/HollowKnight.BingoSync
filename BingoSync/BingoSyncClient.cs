@@ -338,13 +338,17 @@ namespace BingoSync
                         }
                         else if (obj.Type == "new-card")
                         {
+                            Log("Received a new card broadcast");
                             UpdateBoardAndBroadcast(null);
                             UpdateBoard(obj.HideCard);
                             UpdateSettings();
                         }
                         else if (obj.Type == "revealed")
                         {
-                            Controller.BoardIsRevealed = true;
+                            if (BingoSync.modSettings.RevealCardWhenOthersReveal)
+                            {
+                                Controller.RevealCard();
+                            }
                             Controller.BoardUpdate();
                         }
                     }

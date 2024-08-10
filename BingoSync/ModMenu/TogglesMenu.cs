@@ -7,6 +7,7 @@ namespace BingoSync.ModMenu
     internal static class TogglesMenu
     {
         private static MenuOptionHorizontal revealCardOnStartSelector;
+        private static MenuOptionHorizontal revealCardOnOthersRevealSelector;
         private static MenuOptionHorizontal unmarkGoalsSelector;
 
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu)
@@ -33,6 +34,25 @@ namespace BingoSync.ModMenu
                             menu.optionList.SetOptionTo(shouldRevealOnStart ? 1 : 0);
                         }
                     }, out revealCardOnStartSelector)
+                    .AddHorizontalOption("Reveal Card When Others Reveal", new HorizontalOptionConfig
+                    {
+                        Label = "Reveal With Others",
+                        Description = new DescriptionInfo
+                        {
+                            Text = "Reveal the card, when notified that another other player did"
+                        },
+                        Options = ["No", "Yes"],
+                        CancelAction = ExitMenu,
+                        ApplySetting = (menu, index) =>
+                        {
+                            BingoSync.modSettings.RevealCardWhenOthersReveal = (index == 1);
+                        },
+                        RefreshSetting = (menu, alsoApply) =>
+                        {
+                            var shouldUnmarkGoals = BingoSync.modSettings.RevealCardWhenOthersReveal;
+                            menu.optionList.SetOptionTo(shouldUnmarkGoals ? 1 : 0);
+                        }
+                    }, out revealCardOnOthersRevealSelector)
                     .AddHorizontalOption("Unmark Goals", new HorizontalOptionConfig
                     {
                         Label = "Unmark Goals",
@@ -51,17 +71,19 @@ namespace BingoSync.ModMenu
                             var shouldUnmarkGoals = BingoSync.modSettings.UnmarkGoals;
                             menu.optionList.SetOptionTo(shouldUnmarkGoals ? 1 : 0);
                         }
-                    }, out unmarkGoalsSelector);
+                    }, out unmarkGoalsSelector)
+;
 
                 }
             );
-
+            
             return builder.Build();
         }
 
         public static void RefreshMenu()
         {
             revealCardOnStartSelector?.menuSetting?.RefreshValueFromGameSettings();
+            revealCardOnOthersRevealSelector?.menuSetting?.RefreshValueFromGameSettings();
             unmarkGoalsSelector?.menuSetting?.RefreshValueFromGameSettings();
         }
     }

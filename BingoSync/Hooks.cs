@@ -198,7 +198,7 @@ namespace BingoSync
             Controller.SetGenerationButtonEnabled(false);
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
-                BingoSyncClient.RevealCard();
+                Controller.RevealCard();
             }
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();
@@ -212,7 +212,7 @@ namespace BingoSync
             Controller.SetGenerationButtonEnabled(false);
             if (BingoSync.modSettings.RevealCardOnGameStart)
             {
-                BingoSyncClient.RevealCard();
+                Controller.RevealCard();
             }
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();
