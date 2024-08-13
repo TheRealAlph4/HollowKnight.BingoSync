@@ -9,16 +9,17 @@ using System.Collections.Generic;
 
 namespace BingoSync.ModMenu
 {
-    internal static class GoalGroupMenu
+    internal class GoalGroupMenu
     {
-        private static readonly Dictionary<string, MenuOptionHorizontal> _GoalButtons = [];
-        private static Dictionary<string, bool> _GoalSettings;
+        private readonly Dictionary<string, MenuOptionHorizontal> _GoalButtons = [];
+        private GoalGroup _GoalGroup;
+        private MenuOptionHorizontal _ToggleAllButton;
 
-        public static MenuScreen CreateMenuScreen(MenuScreen parentMenu, GoalGroup goalGroup)
+        public MenuScreen CreateMenuScreen(MenuScreen parentMenu, GoalGroup goalGroup)
         {
             MenuButton backButton;
 
-            _GoalSettings = goalGroup.customSettings;
+            _GoalGroup = goalGroup;
 
             MenuBuilder builder = MenuUtils.CreateMenuBuilderWithBackButton("BingoSync", parentMenu, out backButton);
 
@@ -27,7 +28,7 @@ namespace BingoSync.ModMenu
             return builder.Build();
         }
 
-        private static Action<ContentArea> CreateScrollbarMenuWith(MenuScreen parentMenu, MenuButton backButton, GoalGroup goalGroup)
+        private Action<ContentArea> CreateScrollbarMenuWith(MenuScreen parentMenu, MenuButton backButton, GoalGroup goalGroup)
         {
             ScrollbarConfig scrollbar = new()
             {
@@ -48,18 +49,25 @@ namespace BingoSync.ModMenu
                     Offset = new Vector2(-310f, 0f)
                 }
             };
-            int entryCount = goalGroup.customSettings.Count;
+            int entryCount = goalGroup.customSettings.Count + 1;
             RelLength contentHeight = new(entryCount * 105f);
             return c => c.AddScrollPaneContent(scrollbar, contentHeight, RegularGridLayout.CreateVerticalLayout(105f), AddContent(parentMenu, goalGroup));
         }
 
-        private static Action<ContentArea> AddContent(MenuScreen parentMenu, GoalGroup goalGroup)
+        private Action<ContentArea> AddContent(MenuScreen parentMenu, GoalGroup goalGroup)
         {
             void ExitMenu(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(parentMenu);
             string[] onOff = ["On", "Off"];
             int lineCutoff = 30;
             return c =>
             {
+                c.AddHorizontalOption("Toggle all", new HorizontalOptionConfig()
+                {
+                    Label = "Toggle all",
+                    Options = onOff,
+                    CancelAction = ExitMenu,
+                    ApplySetting = ToggleAll,
+                }, out _ToggleAllButton);
                 foreach (var goalInfo in goalGroup.customSettings)
                 {
                     MenuOptionHorizontal option;
@@ -88,22 +96,34 @@ namespace BingoSync.ModMenu
             };
         }
 
-        private static MenuSetting.RefreshSetting GetGroupSettingsLoaderFor(string goalName)
+        private MenuSetting.RefreshSetting GetGroupSettingsLoaderFor(string goalName)
         {
             return (MenuSetting setting, bool alsoApplySetting) =>
             {
-                int settingIndex = _GoalSettings[goalName] ? 0 : 1;
+                int settingIndex = _GoalGroup.customSettings[goalName] ? 0 : 1;
                 _GoalButtons[goalName].SetOptionTo(settingIndex);
             };
         }
 
-        private static MenuSetting.ApplySetting GetGroupSettingsUpdaterFor(string goalName)
+        private MenuSetting.ApplySetting GetGroupSettingsUpdaterFor(string goalName)
         {
             return (MenuSetting setting, int settingIndex) =>
             {
-                _GoalSettings[goalName] = settingIndex == 0;
+                _GoalGroup.customSettings[goalName] = settingIndex == 0;
             };
         }
 
+        private void ToggleAll(MenuSetting setting, int settingIndex)
+        {
+            _ToggleAllButton.SetOptionTo(settingIndex);
+            foreach (MenuOptionHorizontal option in _GoalButtons.Values)
+            {
+                option.SetOptionTo(settingIndex);
+            }
+            foreach (string goal in _GoalGroup.customSettings.Keys.ToList())
+            {
+                _GoalGroup.customSettings[goal] = settingIndex == 0;
+            }
+        }
     }
 }

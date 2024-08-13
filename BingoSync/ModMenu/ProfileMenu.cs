@@ -126,7 +126,7 @@ namespace BingoSync.ModMenu
             {
                 if(!_GroupScreens.ContainsKey(goalGroup))
                 {
-                    _GroupScreens[goalGroup] = GoalGroupMenu.CreateMenuScreen(_ProfilesScreen, goalGroup);
+                    _GroupScreens[goalGroup] = new GoalGroupMenu().CreateMenuScreen(_ProfilesScreen, goalGroup);
                 }
                 UIManager.instance.UIGoToDynamicMenu(_GroupScreens[goalGroup]);
             };
