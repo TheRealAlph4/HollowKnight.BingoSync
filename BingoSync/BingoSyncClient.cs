@@ -111,14 +111,25 @@ namespace BingoSync
             {
                 return;
             }
+            string roomCode = Controller.RoomCode;
+            string roomNickname = Controller.RoomNickname;
+            string roomPassword = Controller.RoomPassword;
+
+            if (   roomCode == null     || roomCode == string.Empty
+                || roomNickname == null || roomNickname == string.Empty
+                || roomPassword == null || roomPassword == string.Empty)
+            {
+                return;
+            }
+
             forcedState = State.Loading;
             shouldConnect = true;
 
             var joinRoomInput = new JoinRoomInput
             {
-                Room = Controller.RoomCode,
-                Nickname = Controller.RoomNickname,
-                Password = Controller.RoomPassword,
+                Room = roomCode,
+                Nickname = roomNickname,
+                Password = roomPassword,
             };
             var payload = JsonConvert.SerializeObject(joinRoomInput);
             var content = new StringContent(payload, Encoding.UTF8, "application/json");
@@ -175,6 +186,7 @@ namespace BingoSync
 
         public static void NewCard(string customJSON, bool lockout = true, bool hideCard = true)
         {
+            if (GetState() != State.Connected) return;
             var newCard = new NewCard
             {
                 Room = Controller.RoomCode,
@@ -196,6 +208,7 @@ namespace BingoSync
 
         public static void RevealCard()
         {
+            if(GetState() != State.Connected) return;
             if (Controller.BoardIsRevealed) return;
             var revealInput = new RevealInput
             {
@@ -218,6 +231,7 @@ namespace BingoSync
 
         public static void ChatMessage(string text)
         {
+            if (GetState() != State.Connected) return;
             var setColorInput = new ChatMessage
             {
                 Room = Controller.RoomCode,
@@ -238,6 +252,7 @@ namespace BingoSync
 
         public static void SelectSquare(int square, Action errorCallback, bool clear = false)
         {
+            if (GetState() != State.Connected) return;
             var selectInput = new SelectInput
             {
                 Room = Controller.RoomCode,
@@ -260,6 +275,7 @@ namespace BingoSync
 
         public static void ExitRoom(Action callback)
         {
+            if (GetState() != State.Connected) return;
             shouldConnect = false;
             forcedState = State.Loading;
             RetryHelper.RetryWithExponentialBackoff(() =>
