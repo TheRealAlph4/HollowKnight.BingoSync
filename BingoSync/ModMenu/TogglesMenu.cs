@@ -26,11 +26,11 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         ApplySetting = (menu, index) =>
                         {
-                            BingoSync.modSettings.RevealCardOnGameStart = (index == 1);
+                            Controller.GlobalSettings.RevealCardOnGameStart = (index == 1);
                         },
                         RefreshSetting = (menu, alsoApply) =>
                         {
-                            var shouldRevealOnStart = BingoSync.modSettings.RevealCardOnGameStart;
+                            var shouldRevealOnStart = Controller.GlobalSettings.RevealCardOnGameStart;
                             menu.optionList.SetOptionTo(shouldRevealOnStart ? 1 : 0);
                         }
                     }, out revealCardOnStartSelector)
@@ -45,11 +45,11 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         ApplySetting = (menu, index) =>
                         {
-                            BingoSync.modSettings.RevealCardWhenOthersReveal = (index == 1);
+                            Controller.GlobalSettings.RevealCardWhenOthersReveal = (index == 1);
                         },
                         RefreshSetting = (menu, alsoApply) =>
                         {
-                            var shouldUnmarkGoals = BingoSync.modSettings.RevealCardWhenOthersReveal;
+                            var shouldUnmarkGoals = Controller.GlobalSettings.RevealCardWhenOthersReveal;
                             menu.optionList.SetOptionTo(shouldUnmarkGoals ? 1 : 0);
                         }
                     }, out revealCardOnOthersRevealSelector)
@@ -64,11 +64,11 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         ApplySetting = (menu, index) =>
                         {
-                            BingoSync.modSettings.UnmarkGoals = (index == 1);
+                            Controller.GlobalSettings.UnmarkGoals = (index == 1);
                         },
                         RefreshSetting = (menu, alsoApply) =>
                         {
-                            var shouldUnmarkGoals = BingoSync.modSettings.UnmarkGoals;
+                            var shouldUnmarkGoals = Controller.GlobalSettings.UnmarkGoals;
                             menu.optionList.SetOptionTo(shouldUnmarkGoals ? 1 : 0);
                         }
                     }, out unmarkGoalsSelector)

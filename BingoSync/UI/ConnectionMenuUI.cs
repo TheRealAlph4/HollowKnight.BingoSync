@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using MagicUI.Graphics;
 using System.Reflection;
 using System.Linq;
+using System;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
-    internal static class ConnectionMenuUI
+    static class ConnectionMenuUI
     {
+        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
         private static LayoutRoot layoutRoot;
@@ -24,8 +26,9 @@ namespace BingoSync
 
         public static bool TextBoxActive { get; private set; } = false;
 
-        public static void Setup(LayoutRoot layoutRoot)
+        public static void Setup(Action<string> log, LayoutRoot layoutRoot)
         {
+            Log = log;
             Loader.Preload();
             ConnectionMenuUI.layoutRoot = layoutRoot;
 
@@ -268,10 +271,10 @@ namespace BingoSync
         public static void LoadDefaults()
         {
             if (nicknameInput != null)
-                nicknameInput.Text = BingoSync.modSettings.DefaultNickname;
+                nicknameInput.Text = Controller.GlobalSettings.DefaultNickname;
             if (passwordInput != null)
-                passwordInput.Text = BingoSync.modSettings.DefaultPassword;
-            Controller.RoomColor = BingoSync.modSettings.DefaultColor;
+                passwordInput.Text = Controller.GlobalSettings.DefaultPassword;
+            Controller.RoomColor = Controller.GlobalSettings.DefaultColor;
             if (layoutRoot == null)
                 return;
             Button selectedColorButton = layoutRoot.GetElement<Button>(Controller.RoomColor);

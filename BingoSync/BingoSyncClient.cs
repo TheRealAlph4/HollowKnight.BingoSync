@@ -153,7 +153,7 @@ namespace BingoSync
             });
         }
 
-        public static void SetColor(string color)
+        private static void SetColor(string color)
         {
             var setColorInput = new SetColorInput
             {
@@ -298,7 +298,7 @@ namespace BingoSync
                         throw connectResponse.Exception;
                     }
 
-                    Log($"connected to the socket, sending socketJoin object");
+                    // Log($"connected to the socket, sending socketJoin object");
                     var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
                     var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
                     var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
@@ -338,14 +338,13 @@ namespace BingoSync
                         }
                         else if (obj.Type == "new-card")
                         {
-                            Log("Received a new card broadcast");
                             UpdateBoardAndBroadcast(null);
                             UpdateBoard(obj.HideCard);
                             UpdateSettings();
                         }
                         else if (obj.Type == "revealed")
                         {
-                            if (BingoSync.modSettings.RevealCardWhenOthersReveal)
+                            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
                             {
                                 Controller.RevealCard();
                             }
@@ -366,7 +365,7 @@ namespace BingoSync
             }
         }
 
-        public static void UpdateBoard(bool hideCard)
+        private static void UpdateBoard(bool hideCard)
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -382,13 +381,12 @@ namespace BingoSync
                         var newBoard = JsonConvert.DeserializeObject<List<BoardSquare>>(boardResponse.Result);
                         Controller.BoardIsRevealed = !hideCard;
                         UpdateBoardAndBroadcast(newBoard);
-                        Log("updated board");
                     });
                 });
             }, maxRetries, nameof(UpdateBoard));
         }
 
-        public static void UpdateSettings()
+        private static void UpdateSettings()
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -410,7 +408,7 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class SetColorInput
+    class SetColorInput
     {
         [JsonProperty("room")]
         public string Room;
@@ -419,14 +417,14 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class RevealInput
+    class RevealInput
     {
         [JsonProperty("room")]
         public string Room;
     }
 
     [DataContract]
-    internal class SelectInput
+    class SelectInput
     {
         [JsonProperty("room")]
         public string Room;
@@ -439,7 +437,7 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class JoinRoomInput
+    class JoinRoomInput
     {
         [JsonProperty("room")]
         public string Room;
@@ -450,7 +448,7 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class Broadcast
+    class Broadcast
     {
         [JsonProperty("type")]
         public string Type = string.Empty;
@@ -461,7 +459,7 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class BoardSquare
+    class BoardSquare
     {
         [JsonProperty("name")]
         public string Name = string.Empty;
@@ -472,28 +470,28 @@ namespace BingoSync
     }
 
     [DataContract]
-    internal class RoomSettingsResponse
+    class RoomSettingsResponse
     {
         [JsonProperty("settings")]
         public RoomSettings Settings = new RoomSettings();
     }
 
     [DataContract]
-    internal class RoomSettings
+    class RoomSettings
     {
         [JsonProperty("lockout_mode")]
         public string LockoutMode = string.Empty;
     }
 
     [DataContract]
-    internal class SocketJoin
+    class SocketJoin
     {
         [JsonProperty("socket_key")]
         public string SocketKey = string.Empty;
     }
 
     [DataContract]
-    internal class NewCard
+    class NewCard
     {
         [JsonProperty("room")]
         public string Room;
@@ -512,7 +510,7 @@ namespace BingoSync
     }
 
     [DataContract]
-    public class ChatMessage
+    class ChatMessage
     {
         [JsonProperty("room")]
         public string Room;

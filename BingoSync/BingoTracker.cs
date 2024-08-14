@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using BingoSync.Settings;
-using System.Collections;
+using BingoSync.CustomGoals;
 
 namespace BingoSync
 {
@@ -165,7 +165,7 @@ namespace BingoSync
 
         private static bool IsSolved(BingoSquare square)
         {
-            if (square.Condition.Solved && (!BingoSync.modSettings.UnmarkGoals || !square.CanUnmark))
+            if (square.Condition.Solved && (!Controller.GlobalSettings.UnmarkGoals || !square.CanUnmark))
                 return square.Condition.Solved;
             UpdateCondition(square.Condition);
             return square.Condition.Solved;
@@ -238,7 +238,7 @@ namespace BingoSync
 
         public static void GoalUpdated(string goal, int index)
         {
-            if (!BingoSync.modSettings.UnmarkGoals)
+            if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
             bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
             if (marked)
@@ -261,7 +261,7 @@ namespace BingoSync
             bool isBlank = Controller.Board[index].Colors.Contains(Controller.BLANK_COLOR);
             if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
             {
-                Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
+                //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
                 BingoSyncClient.SelectSquare(index + 1, () =>
                 {
                     UpdateGoal(goal, shouldUnmark);
@@ -270,14 +270,14 @@ namespace BingoSync
         }
     }
 
-    internal class BingoSquare
+    class BingoSquare
     {
         public string Name = string.Empty;
         public Condition Condition = new();
         public bool CanUnmark = false;
     }
 
-    internal class Condition
+    class Condition
     {
         public ConditionType Type = ConditionType.And;
         public int Amount = 0;

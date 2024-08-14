@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using GridLayout = MagicUI.Elements.GridLayout;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
-    internal class Board
+    class Board
     {
         internal class SquareLayoutObjects
         {

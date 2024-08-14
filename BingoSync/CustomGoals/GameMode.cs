@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BingoSync
+namespace BingoSync.CustomGoals
 {
     public class GameMode(string name, Dictionary<string, BingoGoal> goals)
     {

@@ -4,9 +4,8 @@ using UnityEngine.UI;
 
 namespace BingoSync.ModMenu
 {
-    public static class MainMenu
+    internal static class MainMenu
     {
-
         private static MenuScreen _MainMenuScreen;
         private static MenuScreen _KeybindsScreen;
         private static MenuScreen _TogglesScreen;

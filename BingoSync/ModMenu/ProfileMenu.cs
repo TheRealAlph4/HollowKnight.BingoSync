@@ -5,10 +5,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
+using BingoSync.CustomGoals;
 
 namespace BingoSync.ModMenu
 {
-    internal static class ProfileMenu
+    static class ProfileMenu
     {
         private static MenuScreen _ProfilesScreen;
         private static readonly Dictionary<GoalGroup, MenuScreen> _GroupScreens = [];

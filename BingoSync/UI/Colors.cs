@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
     public static class Colors
     {

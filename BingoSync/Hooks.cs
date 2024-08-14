@@ -196,7 +196,7 @@ namespace BingoSync
         {
             Controller.MenuIsVisible = false;
             Controller.SetGenerationButtonEnabled(false);
-            if (BingoSync.modSettings.RevealCardOnGameStart)
+            if (Controller.GlobalSettings.RevealCardOnGameStart)
             {
                 Controller.RevealCard();
             }
@@ -210,7 +210,7 @@ namespace BingoSync
         {
             Controller.MenuIsVisible = false;
             Controller.SetGenerationButtonEnabled(false);
-            if (BingoSync.modSettings.RevealCardOnGameStart)
+            if (Controller.GlobalSettings.RevealCardOnGameStart)
             {
                 Controller.RevealCard();
             }

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using BingoSync.Settings;
-using static Mono.Security.X509.X520;
 
-namespace BingoSync
+namespace BingoSync.CustomGoals
 {
     internal static class GameModesManager
     {
@@ -35,7 +34,7 @@ namespace BingoSync
         public static void LoadCustomGameModes()
         {
             gameModes.RemoveAll(gameMode => gameMode.GetType() == typeof(CustomGameMode));
-            foreach (CustomGameMode gameMode in BingoSync.modSettings.CustomGameModes)
+            foreach (CustomGameMode gameMode in Controller.GlobalSettings.CustomGameModes)
             {
                 SychronizeGoalGroups(gameMode);
                 AddGameMode(gameMode);
@@ -110,7 +109,7 @@ namespace BingoSync
             (int seed, bool isCustomSeed) = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
-            BingoSyncClient.ChatMessage($"{Controller.RoomNickname} is generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
+            BingoSyncClient.ChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {

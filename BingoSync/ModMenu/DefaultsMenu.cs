@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 namespace BingoSync.ModMenu
 {
-    internal static class DefaultsMenu
+    static class DefaultsMenu
     {
         private static MenuButton saveNicknameButton;
         private static MenuButton savePasswordButton;
@@ -30,7 +30,7 @@ namespace BingoSync.ModMenu
                         SubmitAction = _ =>
                         {
                             Controller.RefreshDefaultsFromUI();
-                            BingoSync.modSettings.DefaultNickname = Controller.RoomNickname;
+                            Controller.GlobalSettings.DefaultNickname = Controller.RoomNickname;
                             RefreshMenu();
                         }
                     }, out saveNicknameButton)
@@ -45,7 +45,7 @@ namespace BingoSync.ModMenu
                         SubmitAction = _ =>
                         {
                             Controller.RefreshDefaultsFromUI();
-                            BingoSync.modSettings.DefaultPassword = Controller.RoomPassword;
+                            Controller.GlobalSettings.DefaultPassword = Controller.RoomPassword;
                             RefreshMenu();
                         }
                     }, out savePasswordButton)
@@ -59,7 +59,7 @@ namespace BingoSync.ModMenu
                         CancelAction = ExitMenu,
                         SubmitAction = _ =>
                         {
-                            BingoSync.modSettings.DefaultColor = Controller.RoomColor;
+                            Controller.GlobalSettings.DefaultColor = Controller.RoomColor;
                             RefreshMenu();
                         }
                     }, out saveColorButton);
@@ -91,17 +91,17 @@ namespace BingoSync.ModMenu
         }
         private static string GetSaveNicknameDescriptionText()
         {
-            return $"Save current nickname as default. Current default: {BingoSync.modSettings.DefaultNickname}";
+            return $"Save current nickname as default. Current default: {Controller.GlobalSettings.DefaultNickname}";
         }
 
         private static string GetSavePasswordDescriptionText()
         {
-            return $"Save current password as default. Current default: {BingoSync.modSettings.DefaultPassword}";
+            return $"Save current password as default. Current default: {Controller.GlobalSettings.DefaultPassword}";
         }
 
         private static string GetSaveColorDescriptionText()
         {
-            return $"Save current selected color as default. Current default: {BingoSync.modSettings.DefaultColor}";
+            return $"Save current selected color as default. Current default: {Controller.GlobalSettings.DefaultColor}";
         }
     }
 }

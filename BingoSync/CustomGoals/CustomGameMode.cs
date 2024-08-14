@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 
-namespace BingoSync
+namespace BingoSync.CustomGoals
 {
     [Serializable]
     [JsonObject("CustomGameMode")]

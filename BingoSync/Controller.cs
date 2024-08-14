@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 using MagicUI.Elements;
 using System.Threading;
 using BingoSync.ModMenu;
+using BingoSync.Settings;
+using BingoSync.CustomGoals;
+using BingoSync.GameUI;
 
 namespace BingoSync
 {
@@ -12,12 +15,14 @@ namespace BingoSync
     {
         public static readonly string BLANK_COLOR = "blank";
 
+        public static ModSettings GlobalSettings { get; set; } = new ModSettings();
+
         public static List<BoardSquare> Board { get; set; } = null;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
         public static bool BoardIsConfirmed { get; set; } = false;
         public static bool BoardIsRevealed { get; set; } = false;
-        public static int CurrentBoardID { get; set; } = BingoSync.modSettings.BoardID;
+        public static int CurrentBoardID { get; set; } = GlobalSettings.BoardID;
         public static bool MenuIsLockout { get; set; } = true;
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool HandMode { get; set; } = false;
@@ -116,7 +121,7 @@ namespace BingoSync
                 return;
             }
             BoardIsConfirmed = true;
-            string message = $"{RoomNickname} revealed their card in hand-mode, their top-left goal is \"{Board[0].Name}\"";
+            string message = $"Revealed my card in hand-mode, my top-left goal is \"{Board[0].Name}\"";
             BingoSyncClient.ChatMessage(message);
         }
 
@@ -132,7 +137,7 @@ namespace BingoSync
                 return;
             }
             CurrentBoardID = (CurrentBoardID + 1) % BingoBoardUI.GetBoardCount();
-            BingoSync.modSettings.BoardID = CurrentBoardID;
+            GlobalSettings.BoardID = CurrentBoardID;
         }
 
         public static void RevealButtonClicked(Button sender)

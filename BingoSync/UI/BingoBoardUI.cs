@@ -7,9 +7,9 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
-    public static class BingoBoardUI
+    internal static class BingoBoardUI
     {
         private static readonly List<Board> boards = [];
 
@@ -59,9 +59,9 @@ namespace BingoSync
             boards.Add(new Board(Loader.GetTexture("BingoSync Opaque Background.png").ToSprite()));
             boards.Add(new Board(Loader.GetTexture("BingoSync Solid Background.png").ToSprite()));
 
-            commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
-            commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
-            commonRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.CycleBoardOpacity, Controller.UpdateBoardOpacity);
+            commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
+            commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
+            commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.CycleBoardOpacity, Controller.UpdateBoardOpacity);
         }
 
         public static void UpdateGrid()

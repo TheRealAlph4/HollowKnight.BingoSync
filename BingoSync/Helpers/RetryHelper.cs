@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-public static class RetryHelper
+internal static class RetryHelper
 {
     private static readonly int delayMilliseconds = 100;
     private static readonly int maxDelayMilliseconds = 2000;

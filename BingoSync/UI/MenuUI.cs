@@ -1,9 +1,12 @@
 ﻿using MagicUI.Core;
+using System;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
-    public static class MenuUI
+    internal static class MenuUI
     {
+        private static Action<string> Log;
+
         public static readonly int colorButtonWidth = 100;
         public static readonly int lockoutButtonWidth = 50;
         public static readonly int handModeButtonWidth = 43;
@@ -23,10 +26,12 @@ namespace BingoSync
             VisibilityCondition = () => false,
         };
 
-        public static void Setup()
+        public static void Setup(Action<string> log)
         {
-            ConnectionMenuUI.Setup(layoutRoot);
-            GenerationMenuUI.Setup(layoutRoot);
+            Log = log;
+
+            ConnectionMenuUI.Setup(Log, layoutRoot);
+            GenerationMenuUI.Setup(Log, layoutRoot);
 
 
             layoutRoot.VisibilityCondition = () => {
@@ -35,7 +40,7 @@ namespace BingoSync
                 return Controller.MenuIsVisible;
             };
 
-            layoutRoot.ListenForPlayerAction(BingoSync.modSettings.Keybinds.HideMenu, () => {
+            layoutRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.HideMenu, () => {
                 if (GenerationMenuUI.TextBoxActive || ConnectionMenuUI.TextBoxActive)
                 {
                     return;

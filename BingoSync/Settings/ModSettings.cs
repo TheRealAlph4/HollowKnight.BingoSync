@@ -1,4 +1,4 @@
-﻿using BingoSync;
+﻿using BingoSync.CustomGoals;
 using Modding.Converters;
 using Newtonsoft.Json;
 using System.Collections.Generic;

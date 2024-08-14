@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using BingoSync.CustomGoals;
 
-namespace BingoSync
+namespace BingoSync.GameUI
 {
-    internal static class GenerationMenuUI
+    static class GenerationMenuUI
     {
+        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
         private static LayoutRoot layoutRoot;
@@ -26,8 +28,9 @@ namespace BingoSync
 
         public static bool TextBoxActive { get; private set; } = false;
 
-        public static void Setup(LayoutRoot layoutRoot)
+        public static void Setup(Action<string> log, LayoutRoot layoutRoot)
         {
+            Log = log;
             Loader.Preload();
             GenerationMenuUI.layoutRoot = layoutRoot;
             CreateGenerationMenu();
@@ -253,12 +256,12 @@ namespace BingoSync
             string displayName = rawName + "*";
             if(rawName == string.Empty)
             {
-                Modding.Logger.Log($"A name must be given to rename a gamemode");
+                Log($"A name must be given to rename a gamemode");
                 return;
             }
             if (gameModeButtons.FindIndex(gameMode => gameMode.Content == displayName) != -1)
             {
-                Modding.Logger.Log($"Cannot rename gamemode to {displayName}, that name already exists");
+                Log($"Cannot rename gamemode to {displayName}, that name already exists");
                 return;
             }
             string oldName = Controller.ActiveGameMode;

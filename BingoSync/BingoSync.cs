@@ -1,6 +1,8 @@
 ﻿using Modding;
 using BingoSync.ModMenu;
 using BingoSync.Settings;
+using BingoSync.CustomGoals;
+using BingoSync.GameUI;
 
 namespace BingoSync
 {
@@ -13,15 +15,13 @@ namespace BingoSync
 
         public override int LoadPriority() => 0;
 
-        public static ModSettings modSettings { get; set; } = new ModSettings();
-
         public override void Initialize()
         {
             Controller.Setup(Log);
             Variables.Setup(Log);
             Hooks.Setup();
             RetryHelper.Setup(Log);
-            MenuUI.Setup();
+            MenuUI.Setup(Log);
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
@@ -52,14 +52,14 @@ namespace BingoSync
 
         public void OnLoadGlobal(ModSettings s)
         {
-            modSettings = s;
+            Controller.GlobalSettings = s;
             MenuUI.LoadDefaults();
             MainMenu.RefreshMenu();
         }
 
         public ModSettings OnSaveGlobal()
         {
-            return modSettings;
+            return Controller.GlobalSettings;
         }
 
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) {

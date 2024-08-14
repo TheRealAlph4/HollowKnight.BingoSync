@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace BingoSync.ModMenu
 {
-    internal class GoalGroupMenu
+    class GoalGroupMenu
     {
         private readonly Dictionary<string, MenuOptionHorizontal> _GoalButtons = [];
         private GoalGroup _GoalGroup;
