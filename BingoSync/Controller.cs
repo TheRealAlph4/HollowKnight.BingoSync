@@ -22,7 +22,6 @@ namespace BingoSync
         public static bool BoardIsVisible { get; set; } = true;
         public static bool BoardIsConfirmed { get; set; } = false;
         public static bool BoardIsRevealed { get; set; } = false;
-        public static int CurrentBoardID { get; set; } = GlobalSettings.BoardID;
         public static bool MenuIsLockout { get; set; } = true;
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool HandMode { get; set; } = false;
@@ -136,8 +135,7 @@ namespace BingoSync
             {
                 return;
             }
-            CurrentBoardID = (CurrentBoardID + 1) % BingoBoardUI.GetBoardCount();
-            GlobalSettings.BoardID = CurrentBoardID;
+            GlobalSettings.BoardID = (GlobalSettings.BoardID + 1) % BingoBoardUI.GetBoardCount();
         }
 
         public static void RevealButtonClicked(Button sender)
