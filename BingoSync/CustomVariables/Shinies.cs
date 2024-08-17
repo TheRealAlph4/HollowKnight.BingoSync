@@ -17,6 +17,7 @@ namespace BingoSync.CustomVariables
         {
             orig(self);
             if (self == null || self.FsmName != fsmName) return;
+            if(self.GetState(trinketStateName) == null) return;
             self.AddCustomAction(trinketStateName, () => {
                 var trinketNum = self.FsmVariables.GetFsmInt("Trinket Num").Value;
                 var variableName = GetVariableName(trinketNum);
