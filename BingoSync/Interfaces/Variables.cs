@@ -50,6 +50,7 @@ namespace BingoSync
         /// Sets the value of a variable of type int from the goal-progress-tracker.
         /// </summary>
         /// <param name="variableName"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
         public static void UpdateInteger(string variableName, int value)
         {

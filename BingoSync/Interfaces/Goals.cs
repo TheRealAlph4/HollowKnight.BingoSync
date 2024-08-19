@@ -29,11 +29,19 @@ namespace BingoSync
         /// <summary>
         /// Returns all the vanilla goals (with their exclusions set to be identiacal to bingosync.com) for use in custom gamemodes.
         /// </summary>
-        /// <param name="goalstream"></param>
         /// <returns></returns>
         public static Dictionary<string, BingoGoal> GetVanillaGoals()
         {
             return GameModesManager.GetVanillaGoals();
+        }
+
+        /// <summary>
+        /// Returns all the item rando goals (with their exclusions set to be identiacal to bingosync.com) for use in custom gamemodes.
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, BingoGoal> GetItemRandoGoals()
+        {
+            return GameModesManager.GetItemRandoGoals();
         }
 
         /// <summary>
