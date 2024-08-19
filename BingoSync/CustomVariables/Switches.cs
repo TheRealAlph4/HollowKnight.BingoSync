@@ -11,6 +11,7 @@ namespace BingoSync.CustomVariables
         {
             orig(self);
             if (self == null || self.FsmName != fsmName) return;
+            if (self.GetState(openStateName) == null) return;
             self.AddCustomAction(openStateName, () => {
                 string variableName = $"switchOpen_{GameManager.instance.GetSceneNameString()}";
                 BingoTracker.UpdateBoolean(variableName, true);

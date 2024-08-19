@@ -153,7 +153,7 @@ namespace BingoSync.GameUI
             Sprite handModeSprite = Loader.GetTexture("BingoSync Hand Icon.png").ToSprite();
             Sprite nonHandModeSprite = Loader.GetTexture("BingoSync Eye Icon.png").ToSprite();
 
-            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, Controller.HandModeButtonClicked, "Hand Mode Toggle");
+            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, _ => { }, "Hand Mode Toggle");
             Button handModeButton = new(layoutRoot, "handModeToggleButton")
             {
                 MinWidth = MenuUI.handModeButtonWidth,

@@ -66,7 +66,7 @@ namespace BingoSync.GameUI
 
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (!Controller.BoardIsAvailable()) ? Visibility.Visible : Visibility.Hidden;
+            loadingText.Visibility = (!Controller.BoardIsAvailable() && Controller.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
             revealCardButton.Visibility = (Controller.ClientIsConnected() && Controller.BoardIsAvailable() && !Controller.BoardIsRevealed) ? Visibility.Visible : Visibility.Hidden;
             boards.ForEach(board => board.gridLayout.Visibility = (Controller.BoardIsAvailable() && Controller.BoardIsRevealed) ? Visibility.Visible : Visibility.Hidden);
 

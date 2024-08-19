@@ -86,14 +86,13 @@ namespace BingoSync.GameUI
             Sprite lockoutSprite = Loader.GetTexture("BingoSync Lockout Icon.png").ToSprite();
             Sprite nonLockoutSprite = Loader.GetTexture("BingoSync Non-Lockout Icon.png").ToSprite();
 
-            lockoutToggleButton = new(layoutRoot, lockoutSprite, nonLockoutSprite, Controller.LockoutButtonClicked, "Lockout Toggle");
+            lockoutToggleButton = new(layoutRoot, lockoutSprite, nonLockoutSprite, _ => { }, "Lockout Toggle");
             Button lockoutButton = new(layoutRoot, "lockoutToggleButton")
             {
                 MinWidth = MenuUI.lockoutButtonWidth,
                 MinHeight = MenuUI.lockoutButtonWidth,
             };
             lockoutToggleButton.SetButton(lockoutButton);
-            lockoutToggleButton.Toggle(null);
 
             SetupRenameProfileRow();
             SetupGenerateRow();

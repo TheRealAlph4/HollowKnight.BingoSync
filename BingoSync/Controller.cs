@@ -22,9 +22,23 @@ namespace BingoSync
         public static bool BoardIsVisible { get; set; } = true;
         public static bool BoardIsConfirmed { get; set; } = false;
         public static bool BoardIsRevealed { get; set; } = false;
-        public static bool MenuIsLockout { get; set; } = true;
         public static string ActiveGameMode { get; set; } = string.Empty;
-        public static bool HandMode { get; set; } = false;
+        public static bool MenuIsLockout
+        {
+            get
+            {
+                return MenuUI.IsLockout();
+            }
+            private set { }
+        }
+        public static bool HandMode
+        {
+            get
+            {
+                return MenuUI.IsHandMode();
+            }
+            private set { }
+        }
 
         public static string RoomCode { get; set; } = string.Empty;
         public static string RoomPassword { get; set; } = string.Empty;
@@ -86,16 +100,6 @@ namespace BingoSync
                 BoardIsVisible = !BoardIsVisible;
             }
             timer.Restart();
-        }
-
-        public static void LockoutButtonClicked(Button sender)
-        {
-            MenuIsLockout = MenuUI.IsLockout();
-        }
-
-        public static void HandModeButtonClicked(Button sender)
-        {
-            HandMode = MenuUI.IsHandMode();
         }
 
         public static void GenerateButtonClicked(Button sender)
