@@ -35,6 +35,29 @@ namespace BingoSync.CustomGoals
             return gameModes.Find(gameMode => gameMode.GetDisplayName() == name);
         }
 
+        public static Dictionary<string, BingoGoal> GetGoalsByGroupName(string groupName)
+        {
+            Dictionary<string, BingoGoal> goals = [];
+            if (goalGroupDefinitions.ContainsKey(groupName))
+            {
+                foreach(BingoGoal goal in goalGroupDefinitions[groupName])
+                {
+                    goals[goal.name] = goal;
+                }
+            }
+            return goals;
+        }
+
+        public static Dictionary<string, BingoGoal> GetVanillaGoals()
+        {
+            return GetGoalsByGroupName("Vanilla");
+        }
+
+        public static Dictionary<string, BingoGoal> GetItemRandoGoals()
+        {
+            return GetGoalsByGroupName("Item Rando");
+        }
+
         public static void LoadCustomGameModes()
         {
             gameModes.RemoveAll(gameMode => gameMode.GetType() == typeof(CustomGameMode));
@@ -252,16 +275,6 @@ namespace BingoSync.CustomGoals
             itemRandoGoals["Defeat White Defender"].exclusions = ["Defeat Dung Defender", "Interact with Mr. Mushroom once (Does not require Spore Shroom)"];
             itemRandoGoals["Dream Nail White Lady"].exclusions = ["Defeat Traitor Lord", "Complete either ending of the Cloth questline"];
             itemRandoGoals["Sit down in Hidden Station"].exclusions = ["Ride the stag to Hidden Station"];
-        }
-
-        public static Dictionary<string, BingoGoal> GetVanillaGoals()
-        {
-            return vanillaGoals;
-        }
-
-        public static Dictionary<string, BingoGoal> GetItemRandoGoals()
-        {
-            return itemRandoGoals;
         }
 
         private static string Anify(string word)

@@ -45,6 +45,15 @@ namespace BingoSync
         }
 
         /// <summary>
+        /// Returns the goals in the given goal group if it exists, an empty dictionary otherwise.
+        /// </summary>
+        /// <param name="groupName"></param>
+        public static Dictionary<string, BingoGoal> GetGoalsByGroupName(string groupName)
+        {
+            return GameModesManager.GetGoalsByGroupName(groupName);
+        }
+
+        /// <summary>
         /// Allows players to select goals from this list for custom profiles.
         /// </summary>
         /// <param name="groupName">The name under which the goal group shows up in the settings</param>
