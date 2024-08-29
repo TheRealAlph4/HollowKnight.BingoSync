@@ -3,6 +3,8 @@ using BingoSync.ModMenu;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
+using UnityEngine;
+using BingoSync.Helpers;
 
 namespace BingoSync
 {
@@ -28,7 +30,9 @@ namespace BingoSync
             GameModesManager.Setup(Log);
 
             ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
-        }
+            // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
+            GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
+       }
 
         public static void ShowMenu()
         {

@@ -16,7 +16,7 @@ namespace BingoSync.Settings
         public string DefaultNickname = "";
         public string DefaultPassword = "";
         public string DefaultColor = "red";
-        public int CustomGameModeCount = 3;
         public List<CustomGameMode> CustomGameModes = [];
+        public bool DebugMode = false;
     }
 }

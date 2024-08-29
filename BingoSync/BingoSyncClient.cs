@@ -33,6 +33,14 @@ namespace BingoSync
 
         private static readonly int maxRetries = 30;
 
+        public static void DumpDebugInfo()
+        {
+            Log($"Client");
+            Log($"\tActualClientState = {webSocketClient?.State}");
+            Log($"\tForcedClientState = {forcedState}");
+            Log($"\tClientShouldConnect = {shouldConnect}");
+        }
+
         public static void Setup(Action<string> log)
         {
             Log = log;

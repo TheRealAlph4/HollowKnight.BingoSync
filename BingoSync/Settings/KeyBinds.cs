@@ -7,6 +7,8 @@ namespace BingoSync.Settings
         public PlayerAction CycleBoardOpacity;
         public PlayerAction HideMenu;
         public PlayerAction RevealCard;
+        public PlayerAction DumpDebugInfo;
+
         public KeyBinds() {
             ToggleBoard = CreatePlayerAction("ToggleBingoSyncBoard");
             ToggleBoard.AddDefaultBinding(Key.B);
@@ -16,6 +18,8 @@ namespace BingoSync.Settings
             HideMenu.AddDefaultBinding(Key.H);
             RevealCard = CreatePlayerAction("RevealBingoSyncCard");
             RevealCard.AddDefaultBinding(Key.R);
+            DumpDebugInfo = CreatePlayerAction("DumpDebugInfo");
+            DumpDebugInfo.AddDefaultBinding(Key.LeftControl);
         }
     };
 }

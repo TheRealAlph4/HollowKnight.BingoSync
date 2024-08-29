@@ -8,6 +8,7 @@ using BingoSync.ModMenu;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
+using System.Linq;
 
 namespace BingoSync
 {
@@ -45,6 +46,15 @@ namespace BingoSync
         public static string RoomNickname { get; set; } = string.Empty;
         public static string RoomColor { get; set; } = string.Empty;
         public static bool RoomIsLockout { get; set; } = false;
+
+        public static bool IsDebugMode
+        {
+            get
+            {
+                return GlobalSettings.DebugMode;
+            }
+            private set { }
+        }
 
         private static readonly List<Action> OnBoardUpdateList = [];
 
@@ -194,7 +204,51 @@ namespace BingoSync
             MenuUI.SetupGameModeButtons();
         }
 
-        public static bool RenameActiveGameModeTo(string newName)
+        public static void DumpDebugInfo()
+        {
+            Log("----------------------------------------------------------------");
+            Log("-------------------                          -------------------");
+            Log("-------------------   BingoSync Debug Dump   -------------------");
+            Log("-------------------                          -------------------");
+            Log("----------------------------------------------------------------");
+
+            Log("Controller");
+            Log($"\tBoard");
+            foreach (string goalname in Board.Select(square => square.Name))
+            {
+                Log($"\t\tGoal \"{goalname}\"");
+            };
+            Log($"\tMenuIsVisible = {MenuIsVisible}");
+            Log($"\tBoardIsVisible = {BoardIsVisible}");
+            Log($"\tBoardIsConfirmed = {BoardIsConfirmed}");
+            Log($"\tBoardIsRevealed = {BoardIsRevealed}");
+            Log($"\tActiveGameMode = {ActiveGameMode}");
+            Log($"\tRoomCode = {RoomCode}");
+            Log($"\tRoomPassword = {RoomPassword}");
+            Log($"\tRoomNickname = {RoomNickname}");
+            Log($"\tRoomColor = {RoomColor}");
+            Log($"\tRoomIsLockout = {RoomIsLockout}");
+
+
+            BingoSyncClient.DumpDebugInfo();
+
+            GameModesManager.DumpDebugInfo();
+
+            Log($"GlobalSettings");
+            Log($"\tBoardID = {GlobalSettings.BoardID}");
+            Log($"\tRevealCardOnGameStart = {GlobalSettings.RevealCardOnGameStart}");
+            Log($"\tRevealCardWhenOthersReveal = {GlobalSettings.RevealCardWhenOthersReveal}");
+            Log($"\tUnmarkGoals = {GlobalSettings.UnmarkGoals}");
+            Log($"\tDefaultNickname = {GlobalSettings.DefaultNickname}");
+            Log($"\tDefaultPassword = {GlobalSettings.DefaultPassword}");
+            Log($"\tDefaultColor = {GlobalSettings.DefaultColor}");
+            foreach (string gamemode in GlobalSettings.CustomGameModes.Select(gameMode => gameMode.GetDisplayName()))
+            {
+                Log($"\tCustomGameMode \"{gamemode}\"");
+            };
+    }
+
+    public static bool RenameActiveGameModeTo(string newName)
         {
             GameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
             if(gameMode == null || gameMode.GetType() != typeof(CustomGameMode))

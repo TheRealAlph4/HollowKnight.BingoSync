@@ -14,6 +14,19 @@ namespace BingoSync.CustomGoals
         private static readonly Dictionary<string, List<BingoGoal>> goalGroupDefinitions = [];
         private static readonly List<BingoGoal> allCustomGoals = [];
 
+        public static void DumpDebugInfo()
+        {
+            Log($"GameModesManager");
+            foreach (string groupname in goalGroupDefinitions.Select(group => group.Key))
+            {
+                Log($"\tGoalGroup \"{groupname}\"");
+            };
+            foreach (string gamemode in gameModes.Select(gamemode => gamemode.GetDisplayName()))
+            {
+                Log($"\tGameMode \"{gamemode}\"");
+            };
+        }
+
         public static void Setup(Action<string> log)
         {
             Log = log;
