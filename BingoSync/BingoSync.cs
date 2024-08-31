@@ -1,275 +1,74 @@
 ﻿using Modding;
-using MonoMod.RuntimeDetour;
-using MonoMod.Utils;
-using System.Collections;
-using System.Reflection;
-using BingoSync.CustomVariables;
-using BingoSync.CustomVariables.Rando;
-using Settings;
+using BingoSync.ModMenu;
+using BingoSync.Settings;
+using BingoSync.CustomGoals;
+using BingoSync.GameUI;
 using UnityEngine;
-using ItemChanger;
-using System.Threading.Tasks;
+using BingoSync.Helpers;
 
 namespace BingoSync
 {
-    public class BingoSync : Mod, ILocalSettings<Settings.SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
+    public class BingoSync : Mod, ILocalSettings<SaveSettings>, IGlobalSettings<ModSettings>, ICustomMenuMod
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.2.4.0";
+        public static string version = "1.3.0.0";
         public override string GetVersion() => version;
 
-        const bool Debug = false;
-
-        public static ModSettings modSettings { get; set; } = new ModSettings();
+        public override int LoadPriority() => 0;
 
         public override void Initialize()
         {
-            // Check bingo objectives every frame
-            ModHooks.HeroUpdateHook += HeroUpdate;
-
-            // General
-            ModHooks.SetPlayerBoolHook += UpdateBoolInternal;
-            ModHooks.SetPlayerIntHook += UpdateIntInternal;
-
-            // GeoSpent
-            On.GeoCounter.TakeGeo += GeoSpent.UpdateGeoSpent;
-            On.GeoCounter.Update += GeoSpent.UpdateGeoText;
-
-            // Tolls
-            On.GeoCounter.TakeGeo += Tolls.UpdateTolls;
-
-            // Grubs
-            ModHooks.SetPlayerIntHook += Grubs.CheckIfGrubWasSaved;
-
-            // Myla
-            ModHooks.SetPlayerIntHook += Myla.CheckIfMylaWasKilled;
-
-            // Revek
-            On.HeroController.NailParry += Revek.CheckParry;
-            On.HeroController.EnterScene += Revek.EnterRoom;
-
-            // Lifts
-            ModHooks.SetPlayerBoolHook += Lifts.CheckIfLiftWasUsed;
-
-            // Jiji
-            ModHooks.SetPlayerBoolHook += Jiji.CheckIfKilledShadeInJijis;
-
-            // Dialogue
-            On.DialogueBox.StartConversation += Dialogue.StartConversation;
-
-            // Hot Springs
-            ModHooks.SetPlayerIntHook += HotSprings.CheckBath;
-
-            // Hive Shard
-            ModHooks.SetPlayerBoolHook += HiveShard.CheckIfHiveShardWasCollected;
-
-            // Tram
-            ModHooks.SetPlayerIntHook += Tram.CheckIfStationWasVisited;
-
-            // Unique Enemies
-            ModHooks.OnReceiveDeathEventHook += UniqueEnemies.CheckIfUniqueEnemyWasKilled;
-            On.ScuttlerControl.Hit += UniqueEnemies.HitLightseed;
-            On.HealthManager.TakeDamage += UniqueEnemies.KillGulkaWithSpikeBall;
-            On.HealthManager.TakeDamage += UniqueEnemies.OomasKilledWithMinions_GlowingWomb;
-            On.SetHP.OnEnter += UniqueEnemies.OomasKilledWithMinions_Weaversong_Grimmchild;
-
-            // Giant Geo Egg
-            On.PlayMakerFSM.OnEnable += GiantGeoEgg.CreateGiantGeoRockTrigger;
-
-            // Marissa
-            On.PlayMakerFSM.OnEnable += Marissa.CreateMarissaKilledTrigger;
-
-            // Stag
-            On.PlayMakerFSM.OnEnable += Stag.CreateStagTravelTrigger;
-
-            // BreakableFloors
-            On.PlayMakerFSM.OnEnable += BreakableFloors.CreateBreakableFloorsTrigger;
-
-            // Oro Training Dummy
-            On.PlayMakerFSM.OnEnable += OroTrainingDummy.CreateOroTrainingDummyTrigger;
-
-            // Millibelle
-            On.PlayMakerFSM.OnEnable += Millibelle.CreateMillibelleHitTrigger;
-
-            // Chests
-            On.PlayMakerFSM.OnEnable += Chests.CreateChestOpenTrigger;
-
-            // Switches
-            On.PlayMakerFSM.OnEnable += Switches.CreateSwitchOpenTrigger;
-
-            // Benches
-            On.PlayMakerFSM.OnEnable += Benches.CreateBenchTrigger;
-
-            // Tiso
-            On.PlayMakerFSM.OnEnable += Tiso.CreateTisoShieldTrigger;
-
-            // Telescope
-            On.PlayMakerFSM.OnEnable += Telescope.CreateTelescopeTrigger;
-
-            // Shade Gates
-            On.PlayMakerFSM.OnEnable += ShadeGates.CreateShadeGateTrigger;
-
-            // Dream Nail Dialogue
-            On.PlayMakerFSM.OnEnable += DreamNailDialogue.CreateDreamNailDialogueTrigger;
-
-            // Lore Tablets
-            On.PlayMakerFSM.OnEnable += LoreTablets.CreateLoreTabletTrigger;
-
-            // Nail Arts
-            On.PlayMakerFSM.OnEnable += NailArts.CreateNailArtsTrigger;
-
-            // Spa Gladiator
-            On.PlayMakerFSM.OnEnable += SpaGladiator.CreateSplashedTrigger;
-
-            // Eternal Ordeal
-            On.PlayMakerFSM.OnEnable += EternalOrdeal.CreateCounterTrigger;
-
-            // Void Pool
-            On.PlayMakerFSM.OnEnable += VoidPool.CreateVoidPoolTrigger;
-
-            // Shinies
-            On.PlayMakerFSM.OnEnable += Shinies.CreateTrinketTrigger;
-
-            // City Gate
-            On.PlayMakerFSM.OnEnable += CityGate.CreateCityGateOpenedTrigger;
-
-            // Scenes
-            On.HeroController.EnterScene += Scenes.EnterRoom;
-            
-            // Charms
-            ModHooks.SetPlayerBoolHook += Charms.CheckEquippedCharms;
-
-            // Bow
-            ModHooks.HeroUpdateHook += Bow.BowToNPC;
-
-            // NailHit
-            ModHooks.SlashHitHook += NailHit.ProcessNailHit;
-
-            // Rando
-            AbstractItem.AfterGiveGlobal += Checks.AfterGiveItem;
-            AbstractPlacement.OnVisitStateChangedGlobal += Checks.PlacementStateChange;
-
-            // Menu
-            On.UIManager.ContinueGame += ContinueGame;
-            On.UIManager.StartNewGame += StartNewGame;
-            On.UIManager.FadeInCanvasGroup += FadeIn;
-            On.UIManager.FadeOutCanvasGroup += FadeOut;
-
-            var _hook = new ILHook
-            (
-                typeof(DreamPlant).GetMethod("CheckOrbs", BindingFlags.NonPublic | BindingFlags.Instance).GetStateMachineTarget(),
-                DreamTrees.TrackDreamTrees
-            );
-
+            Controller.Setup(Log);
+            Variables.Setup(Log);
+            Hooks.Setup();
             RetryHelper.Setup(Log);
-            MenuUI.Setup();
+            MenuUI.Setup(Log);
             BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
+            GameModesManager.Setup(Log);
+
+            ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
+            // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
+            GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
+       }
+
+        public static void ShowMenu()
+        {
+            Controller.MenuIsVisible = true;
         }
 
-        private void ShowMenu()
+        public static void HideMenu()
         {
-            MenuUI.SetVisible(true);
+            Controller.MenuIsVisible = false;
         }
 
-        private void HideMenu()
+        public void OnLoadLocal(SaveSettings s)
         {
-            MenuUI.SetVisible(false);
+            BingoTracker.Settings = s;
         }
 
-        private IEnumerator FadeOut(On.UIManager.orig_FadeOutCanvasGroup orig, UIManager self, CanvasGroup cg)
+        public SaveSettings OnSaveLocal()
         {
-            if (cg.name == "MainMenuScreen")
-            {
-                HideMenu();
-            }
-            return orig(self, cg);
-        }
-
-        private IEnumerator FadeIn(On.UIManager.orig_FadeInCanvasGroup orig, UIManager self, CanvasGroup cg)
-        {
-            if (cg.name == "MainMenuScreen")
-            {
-                ShowMenu();
-            }
-            return orig(self, cg);
-        }
-
-        private void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
-        {
-            HideMenu();
-            ConfigureBingoSyncOnGameStart();
-            Task.Run(() => {
-                Checks.GetRandomizedPlacements();
-            });
-            orig(self);
-        }
-
-        private void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
-        {
-            HideMenu();
-            ConfigureBingoSyncOnGameStart();
-            Task.Run(() => {
-                Checks.GetRandomizedPlacements();
-            });
-            orig(self, permaDeath, bossRush);
-        }
-
-        private void ConfigureBingoSyncOnGameStart()
-        {
-            if (!modSettings.RevealCardOnGameStart) return;
-            BingoSyncClient.RevealCard();
-        }
-
-        private void HeroUpdate()
-        {
-            BingoTracker.ProcessBingo();
-        }
-
-        private bool UpdateBoolInternal(string name, bool orig)
-        {
-            BingoTracker.UpdateBoolean(name, orig);
-            if (Debug)
-                Log($"bool: {name} {orig} {GameManager.instance.GetSceneNameString()}");
-            return orig;
-        }
-
-        private int UpdateIntInternal(string name, int current)
-        {
-            var previous = PlayerData.instance.GetIntInternal(name);
-            BingoTracker.UpdateInteger(name, previous, current);
-            if (Debug)
-                Log($"int: {name} {previous} {current} {GameManager.instance.GetSceneNameString()}");
-            return current;
-        }
-
-        public void OnLoadLocal(Settings.SaveSettings s)
-        {
-            BingoTracker.settings = s;
-        }
-
-        public Settings.SaveSettings OnSaveLocal()
-        {
-            return BingoTracker.settings;
+            return BingoTracker.Settings;
         }
 
         public void OnLoadGlobal(ModSettings s)
         {
-            modSettings = s;
+            Controller.GlobalSettings = s;
             MenuUI.LoadDefaults();
-            ModMenu.RefreshMenu();
+            MainMenu.RefreshMenu();
         }
 
         public ModSettings OnSaveGlobal()
         {
-            return modSettings;
+            return Controller.GlobalSettings;
         }
 
         public MenuScreen GetMenuScreen(MenuScreen modListMenu, ModToggleDelegates? toggleDelegates) {
-            var menu = ModMenu.CreateMenuScreen(modListMenu).Build();
-            ModMenu.RefreshMenu();
+            MenuScreen menu = MainMenu.CreateMenuScreen(modListMenu);
+            MainMenu.RefreshMenu();
             return menu;
         }
 

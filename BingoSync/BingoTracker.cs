@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Settings;
+using BingoSync.Settings;
+using BingoSync.CustomGoals;
 
 namespace BingoSync
 {
@@ -12,11 +13,11 @@ namespace BingoSync
     {
         private static List<BingoSquare> _allPossibleSquares;
         private static Action<string> Log;
-        public static SaveSettings settings { get; set; }
+        public static SaveSettings Settings { get; set; }
 
         public static void Setup(Action<string> log)
         {
-            _allPossibleSquares = new List<BingoSquare>();
+            _allPossibleSquares = [];
 
             Log = log;
 
@@ -28,25 +29,49 @@ namespace BingoSync
                     continue;
                 }
                 Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resource);
-                using (StreamReader reader = new StreamReader(s))
-                using (JsonTextReader jsonReader = new JsonTextReader(reader))
-                {
-                    JsonSerializer ser = new JsonSerializer();
-                    var squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
-                    _allPossibleSquares.AddRange(squares);
-                }
+                using StreamReader reader = new(s);
+                using JsonTextReader jsonReader = new(reader);
+                JsonSerializer ser = new();
+                var squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                _allPossibleSquares.AddRange(squares);
             }
+        }
+
+        public static Dictionary<string, BingoGoal> ProcessGoalsFile(string filepath)
+        {
+            using FileStream filestream = File.Open(filepath, FileMode.Open);
+            return ProcessGoalsStream(filestream);
+        }
+
+        public static Dictionary<string, BingoGoal> ProcessGoalsStream(Stream goalstream)
+        {
+            Dictionary<string, BingoGoal> goals = [];
+            List<BingoSquare> squares = [];
+
+            using (StreamReader reader = new(goalstream))
+            using (JsonTextReader jsonReader = new(reader))
+            {
+                JsonSerializer ser = new();
+                var squaresSer = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                squares.AddRange(squaresSer);
+            }
+
+            foreach (BingoSquare square in squares)
+            {
+                goals.Add(square.Name, new BingoGoal(square.Name, []));
+                _allPossibleSquares.Add(square);
+            }
+            return goals;
         }
 
         public static bool GetBoolean(string name)
         {
-            if (settings == null)
+            if (Settings == null)
             {
                 return false;
             }
 
-            bool current;
-            if (settings.Booleans.TryGetValue(name, out current))
+            if (Settings.Booleans.TryGetValue(name, out bool current))
             {
                 return current;
             }
@@ -55,25 +80,24 @@ namespace BingoSync
 
         public static void UpdateBoolean(string name, bool value)
         {
-            if (settings.Booleans.ContainsKey(name))
+            if (Settings.Booleans.ContainsKey(name))
             {
-                settings.Booleans[name] = value;
+                Settings.Booleans[name] = value;
             }
             else
             {
-                settings.Booleans.Add(name, value);
+                Settings.Booleans.Add(name, value);
             }
         }
 
         public static int GetInteger(string name)
         {
-            if (settings == null)
+            if (Settings == null)
             {
                 return 0;
             }
 
-            int current;
-            if (settings.Integers.TryGetValue(name, out current))
+            if (Settings.Integers.TryGetValue(name, out int current))
             {
                 return current;
             }
@@ -82,13 +106,12 @@ namespace BingoSync
 
         public static void UpdateInteger(string name, int current)
         {
-            if (settings == null)
+            if (Settings == null)
             {
                 return;
             }
 
-            int previous;
-            if (!settings.Integers.TryGetValue(name, out previous))
+            if (!Settings.Integers.TryGetValue(name, out int previous))
             {
                 previous = 0;
             }
@@ -97,31 +120,31 @@ namespace BingoSync
 
         public static void UpdateInteger(string name, int previous, int current)
         {
-            if (settings == null)
+            if (Settings == null)
             {
                 return;
             }
 
             var added = Math.Max(0, current - previous);
             var removed = Math.Max(0, previous - current);
-            if (!settings.Integers.ContainsKey(name))
+            if (!Settings.Integers.ContainsKey(name))
             {
-                settings.Integers.Add(name, current);
-                settings.IntegersTotalAdded.Add(name, added);
-                settings.IntegersTotalRemoved.Add(name, removed);
+                Settings.Integers.Add(name, current);
+                Settings.IntegersTotalAdded.Add(name, added);
+                Settings.IntegersTotalRemoved.Add(name, removed);
             }
             else
             {
-                settings.Integers[name] = current;
-                settings.IntegersTotalAdded[name] += added;
-                settings.IntegersTotalRemoved[name] += removed;
+                Settings.Integers[name] = current;
+                Settings.IntegersTotalAdded[name] += added;
+                Settings.IntegersTotalRemoved[name] += removed;
             }
         }
 
-        public static bool IsBoardAvailable()
+        public static bool BoardIsPlayable()
         {
             BingoSyncClient.Update();
-            if (BingoSyncClient.board == null || BingoSyncClient.isHidden)
+            if (!Controller.BoardIsAvailable() || !Controller.BoardIsRevealed)
                 return false;
             if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
                 return false;
@@ -130,7 +153,7 @@ namespace BingoSync
 
         public static void ProcessBingo()
         {
-            if (!IsBoardAvailable()) return;
+            if (!BoardIsPlayable()) return;
             _allPossibleSquares.ForEach(square =>
             {
                 bool wasSolved = square.Condition.Solved;
@@ -142,7 +165,7 @@ namespace BingoSync
 
         private static bool IsSolved(BingoSquare square)
         {
-            if (square.Condition.Solved && (!BingoSync.modSettings.UnmarkGoals || !square.CanUnmark))
+            if (square.Condition.Solved && (!Controller.GlobalSettings.UnmarkGoals || !square.CanUnmark))
                 return square.Condition.Solved;
             UpdateCondition(square.Condition);
             return square.Condition.Solved;
@@ -153,7 +176,7 @@ namespace BingoSync
             condition.Solved = false;
             if (condition.Type == ConditionType.Bool)
             {
-                settings.Booleans.TryGetValue(condition.VariableName, out var value);
+                Settings.Booleans.TryGetValue(condition.VariableName, out var value);
                 if (value == condition.ExpectedValue)
                 {
                     condition.Solved = true;
@@ -162,10 +185,12 @@ namespace BingoSync
             else if (condition.Type == ConditionType.Int)
             {
                 int quantity = 0;
-                int current, added, removed;
-                if (!settings.Integers.TryGetValue(condition.VariableName, out current)
-                    || !settings.IntegersTotalAdded.TryGetValue(condition.VariableName, out added)
-                    || !settings.IntegersTotalRemoved.TryGetValue(condition.VariableName, out removed))
+                int current = -1;
+                int added = -1;
+                int removed = -1;
+                if (!Settings.Integers.TryGetValue(condition.VariableName, out current)
+                    || !Settings.IntegersTotalAdded.TryGetValue(condition.VariableName, out added)
+                    || !Settings.IntegersTotalRemoved.TryGetValue(condition.VariableName, out removed))
                 {
                     return;
                 }
@@ -213,9 +238,9 @@ namespace BingoSync
 
         public static void GoalUpdated(string goal, int index)
         {
-            if (!BingoSync.modSettings.UnmarkGoals)
+            if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
-            bool marked = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.color);
+            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
             if (marked)
                 return;
             var square = _allPossibleSquares.Find(x => x.Name == goal);
@@ -228,15 +253,15 @@ namespace BingoSync
 
         public static void UpdateGoal(string goal, bool shouldUnmark)
         {
-            if (!IsBoardAvailable()) return;
-            var index = BingoSyncClient.board.FindIndex(x => x.Name == goal);
+            if (!BoardIsPlayable()) return;
+            var index = Controller.Board.FindIndex(x => x.Name == goal);
             if (index == -1)
                 return;
-            bool marked = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.color);
-            bool isBlank = BingoSyncClient.board[index].Colors.Contains(BingoSyncClient.BLANK_COLOR);
-            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!BingoSyncClient.isLockout || isBlank)))
+            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
+            bool isBlank = Controller.Board[index].Colors.Contains(Controller.BLANK_COLOR);
+            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
             {
-                Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
+                //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
                 BingoSyncClient.SelectSquare(index + 1, () =>
                 {
                     UpdateGoal(goal, shouldUnmark);
@@ -245,14 +270,14 @@ namespace BingoSync
         }
     }
 
-    internal class BingoSquare
+    class BingoSquare
     {
         public string Name = string.Empty;
-        public Condition Condition = new Condition();
+        public Condition Condition = new();
         public bool CanUnmark = false;
     }
 
-    internal class Condition
+    class Condition
     {
         public ConditionType Type = ConditionType.And;
         public int Amount = 0;
@@ -261,7 +286,7 @@ namespace BingoSync
         public BingoRequirementState State = BingoRequirementState.Current;
         public int ExpectedQuantity = 0;
         public bool ExpectedValue = false;
-        public List<Condition> Conditions = new List<Condition>();
+        public List<Condition> Conditions = [];
     }
 
     enum ConditionType
