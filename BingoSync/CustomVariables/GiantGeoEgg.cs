@@ -5,15 +5,15 @@ namespace BingoSync.CustomVariables
 {
     internal static class GiantGeoEgg
     {
-        private static string variableName = "destroyedGiantGeoEgg";
-        private static string objectName = "Giant Geo Egg";
-        private static string fsmName = "Geo Rock";
-        private static string destroyedStateName = "Destroy";
+        private static readonly string variableName = "destroyedGiantGeoEgg";
+        private static readonly string objectName = "Giant Geo Egg";
+        private static readonly string fsmName = "Geo Rock";
+        private static readonly string destroyedStateName = "Destroy";
 
         public static void CreateGiantGeoRockTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName) return;
+            if (self == null || self.FsmName != fsmName || !self.HasState(destroyedStateName)) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
             self.AddCustomAction(destroyedStateName, () => BingoTracker.UpdateBoolean(variableName, true));
         }

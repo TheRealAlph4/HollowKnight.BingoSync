@@ -5,7 +5,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class NailHit
     {
-        private static List<NailTarget> NailTargets = new List<NailTarget>
+        private static readonly List<NailTarget> NailTargets = new List<NailTarget>
         {
             new NailTarget
             {

@@ -4,8 +4,8 @@ namespace BingoSync.CustomVariables
 {
     internal static class Revek
     {
-        private static string variableName = "parryRevekConsecutive";
-        private static string revekScene = "RestingGrounds_08";
+        private static readonly string variableName = "parryRevekConsecutive";
+        private static readonly string revekScene = "RestingGrounds_08";
 
         public static IEnumerator EnterRoom(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {

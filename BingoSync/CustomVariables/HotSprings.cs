@@ -5,7 +5,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class HotSprings
     {
-        private static int SpaEnvironmentType = 3;
+        private static readonly int SpaEnvironmentType = 3;
         private static string GetHotSpringVariableName(MapZone zone)
         {
             return $"hotSpringBath_{zone}";

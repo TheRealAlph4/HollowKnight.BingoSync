@@ -5,7 +5,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class Bow
     {
-        private static List<BowInfo> BowInfos = new List<BowInfo>()
+        private static readonly List<BowInfo> BowInfos = new List<BowInfo>()
         {
             new BowInfo
             {

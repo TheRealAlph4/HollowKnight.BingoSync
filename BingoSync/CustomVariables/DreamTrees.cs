@@ -7,7 +7,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class DreamTrees
     {
-        private static string variableName = "dreamTreesCompleted";
+        private static readonly string variableName = "dreamTreesCompleted";
 
         public static void TrackDreamTrees(ILContext il)
         {

@@ -5,8 +5,8 @@ namespace BingoSync.CustomVariables
 {
     internal static class Scenes
     {
-        private static string overgrownMoundRoomName = "Room_Fungus_Shaman";
-        private static string lifebloodCoreRoomName = "Abyss_08";
+        private static readonly string overgrownMoundRoomName = "Room_Fungus_Shaman";
+        private static readonly string lifebloodCoreRoomName = "Abyss_08";
 
         public static IEnumerator EnterRoom(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
