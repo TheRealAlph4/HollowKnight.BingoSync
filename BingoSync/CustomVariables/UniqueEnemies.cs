@@ -24,6 +24,7 @@ namespace BingoSync.CustomVariables
         public static void HitLightseed(On.ScuttlerControl.orig_Hit orig, ScuttlerControl self, HitInstance damageInstance)
         {
             orig(self, damageInstance);
+            if (!self.name.StartsWith("Orange Scuttler")) return;
             BingoTracker.UpdateBoolean("killedLightseed", true);
         }
 
