@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!-- Change this to the path of your modded HK installation -->
-		<HollowKnightRefs>Z:\Games\Hollow Knight\Hollow Knight_Data\Managed</HollowKnightRefs>
-		<!-- Change this to the path where you want the ready-to-upload exports to be -->
+		<HollowKnightRefs>HollowKnightRefs not set</HollowKnightRefs>
+		<HollowKnightRefs Condition="Exists('C:\GOG Games\Hollow Knight\Hollow Knight_Data\Managed')">C:\GOG Games\Hollow Knight\Hollow Knight_Data\Managed</HollowKnightRefs>
+		<HollowKnightRefs Condition="Exists('Z:\Games\Hollow Knight\Hollow Knight_Data\Managed')">Z:\Games\Hollow Knight\Hollow Knight_Data\Managed</HollowKnightRefs>
 		<ExportDir>C:/Hollow Knight Mods/__Exports</ExportDir>
-		<!-- Uncomment this to generate a documentation file to be included with the mod -->
-		<!--<DocumentationFile>$(OutputPath)/$(AssemblyTitle).xml</DocumentationFile>-->
 	</PropertyGroup>
 	<PropertyGroup>
 		<RootNamespace>BingoSync</RootNamespace>
@@ -96,7 +94,7 @@
 			<HintPath>$(HollowKnightRefs)/PlayMaker.dll</HintPath>
 		</Reference>
 		<Reference Include="RandomizerMod">
-		  <HintPath>Z:\Games\Hollow Knight\Hollow Knight_Data\Managed\Mods\Randomizer 4\RandomizerMod.dll</HintPath>
+			<HintPath>$(HollowKnightRefs)/Mods/Randomizer 4/RandomizerMod.dll</HintPath>
 		</Reference>
 		<Reference Include="System.ComponentModel.Composition">
 			<HintPath>$(HollowKnightRefs)/System.ComponentModel.Composition.dll</HintPath>
