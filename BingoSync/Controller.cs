@@ -193,6 +193,7 @@ namespace BingoSync
 
         public static void RegenerateGameModeButtons()
         {
+            GenerationMenuUI.SetupProfileSelection();
             GameModesManager.LoadCustomGameModes();
             GenerationMenuUI.CreateGenerationMenu();
             GenerationMenuUI.SetupGameModeButtons();

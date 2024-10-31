@@ -15,8 +15,9 @@ namespace BingoSync.GameUI
         public static readonly int gameModeButtonWidth = (textFieldWidth - 20) / 3;
         public static readonly int generateButtonWidth = (int)(1.5 * gameModeButtonWidth) + 10;
         public static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - lockoutButtonWidth - 20;
-        public static readonly int profileNameFieldWidth = (int)(0.75 * textFieldWidth);
-        public static readonly int acceptProfileNameButtonWidth = textFieldWidth - profileNameFieldWidth - 10;
+        public static readonly int profileScreenArrowButtonWidth = 35;
+        public static readonly int acceptProfileNameButtonWidth = 120;
+        public static readonly int profileNameFieldWidth = textFieldWidth - 2*profileScreenArrowButtonWidth - acceptProfileNameButtonWidth - 30;
         public static readonly int fontSize = 22;
 
 

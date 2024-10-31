@@ -20,6 +20,10 @@ namespace BingoSync.GameUI
 
         private static TextInput profileNameInput;
         private static Button acceptProfileNameButton;
+        private static int currentProfileScreen = 0;
+        private static readonly int profilesPerScreen = 15;
+        private static Button previousProfileButton;
+        private static Button nextProfileButton;
 
         private static TextInput generationSeedInput;
         private static Button generateBoardButton;
@@ -122,6 +126,41 @@ namespace BingoSync.GameUI
 
             profileRenameRow.Children.Add(profileNameInput);
             profileRenameRow.Children.Add(acceptProfileNameButton);
+
+            Sprite leftArrowSprite = Loader.GetTexture("BingoSync Left Arrow.png").ToSprite();
+            Sprite rightArrowSprite = Loader.GetTexture("BingoSync Right Arrow.png").ToSprite();
+
+            Panel leftArrowPanel = new(layoutRoot, leftArrowSprite, "leftArrowPanel")
+            {
+                MinHeight = MenuUI.profileScreenArrowButtonWidth,
+                MinWidth = MenuUI.profileScreenArrowButtonWidth,
+            };
+            Panel rightArrowPanel = new(layoutRoot, rightArrowSprite, "rightArrowPanel")
+            {
+                MinHeight = MenuUI.profileScreenArrowButtonWidth,
+                MinWidth = MenuUI.profileScreenArrowButtonWidth,
+            };
+
+            previousProfileButton = new(layoutRoot, "leftArrowButton")
+            {
+                MinHeight = MenuUI.profileScreenArrowButtonWidth,
+                MinWidth = MenuUI.profileScreenArrowButtonWidth,
+            };
+            nextProfileButton = new(layoutRoot, "rightArrowButton")
+            {
+                MinHeight = MenuUI.profileScreenArrowButtonWidth,
+                MinWidth = MenuUI.profileScreenArrowButtonWidth,
+            };
+
+            previousProfileButton.Click += PreviousProfileButtonClicked;
+            nextProfileButton.Click += NextProfileButtonClicked;
+
+            leftArrowPanel.Child = previousProfileButton;
+            rightArrowPanel.Child = nextProfileButton;
+
+            profileRenameRow.Children.Add(leftArrowPanel);
+            profileRenameRow.Children.Add(rightArrowPanel);
+
             generationMenu.Children.Add(profileRenameRow);
         }
 
@@ -146,6 +185,8 @@ namespace BingoSync.GameUI
 
         public static void SetupGameModeButtons()
         {
+            SetupProfileSelection();
+
             StackLayout buttonLayout = new(layoutRoot)
             {
                 HorizontalAlignment = HorizontalAlignment.Right,
@@ -168,7 +209,11 @@ namespace BingoSync.GameUI
             }
             gameModeButtons.Clear();
 
-            foreach (string gameMode in GameModesManager.GameModeNames())
+            List<string> gameModes = GameModesManager.GameModeNames();
+            int gameModeCountOnScreen = Math.Min(profilesPerScreen, gameModes.Count - currentProfileScreen*profilesPerScreen);
+            List<string> gameModesOnScreen = gameModes.GetRange(currentProfileScreen * profilesPerScreen, gameModeCountOnScreen);
+
+            foreach (string gameMode in gameModesOnScreen)
             {
                 if (row.Children.Count >= 3)
                 {
@@ -269,6 +314,30 @@ namespace BingoSync.GameUI
             {
                 gameModeButtons.Find(button => button.Content == oldName).Content = displayName;
                 Controller.RefreshMenu();
+            }
+        }
+
+        private static void PreviousProfileButtonClicked(Button _)
+        {
+            if (currentProfileScreen > 0) --currentProfileScreen;
+            Controller.RegenerateGameModeButtons();
+        }
+
+        private static void NextProfileButtonClicked(Button _)
+        {
+            int profilesCount = GameModesManager.GameModeNames().Count;
+            if (currentProfileScreen < (profilesCount / profilesPerScreen)) ++currentProfileScreen;
+            Controller.RegenerateGameModeButtons();
+        }
+
+        public static void SetupProfileSelection()
+        {
+            int profilesCount = GameModesManager.GameModeNames().Count;
+            previousProfileButton.Enabled = (currentProfileScreen > 0);
+            nextProfileButton.Enabled = (profilesCount > profilesPerScreen * (currentProfileScreen+1));
+            while(profilesCount < profilesPerScreen * currentProfileScreen + 1)
+            {
+                --currentProfileScreen;
             }
         }
     }
