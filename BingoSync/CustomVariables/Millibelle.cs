@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateMillibelleHitTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(slashStateName)) return;
+            bool hasSlashState = self.TryGetState(slashStateName, out FsmState slashState);
+            if (self == null || self.FsmName != fsmName || !hasSlashState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(slashStateName, () => {
+            slashState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

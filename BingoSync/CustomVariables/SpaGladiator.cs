@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateSplashedTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(splashedStateName)) return;
+            bool hasSplashedState = self.TryGetState(splashedStateName, out FsmState splashedState);
+            if (self == null || self.FsmName != fsmName || !hasSplashedState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(splashedStateName, () => {
+            splashedState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

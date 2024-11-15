@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -13,10 +14,11 @@ namespace BingoSync.CustomVariables
         public static void CreateMarissaKilledTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(killedStateName)) return;
+            bool hasKilledState = self.TryGetState(killedStateName, out FsmState killedState);
+            if (self == null || self.FsmName != fsmName || !hasKilledState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
             if (self.gameObject.scene.name != roomName) return;
-            self.AddCustomAction(killedStateName, () => BingoTracker.UpdateBoolean(variableName, true));
+            killedState.AddCustomAction(() => BingoTracker.UpdateBoolean(variableName, true));
         }
     }
 }

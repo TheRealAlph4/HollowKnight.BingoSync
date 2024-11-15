@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 using UnityEngine;
 
 namespace BingoSync.CustomVariables
@@ -13,9 +14,10 @@ namespace BingoSync.CustomVariables
         public static void CreateGiantGeoRockTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(destroyedStateName)) return;
+            bool hasDestroyedState = self.TryGetState(destroyedStateName, out FsmState destroyedState);
+            if (self == null || self.FsmName != fsmName || !hasDestroyedState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(destroyedStateName, () => BingoTracker.UpdateBoolean(variableName, true));
+            destroyedState.AddCustomAction(() => BingoTracker.UpdateBoolean(variableName, true));
         }
     }
 }

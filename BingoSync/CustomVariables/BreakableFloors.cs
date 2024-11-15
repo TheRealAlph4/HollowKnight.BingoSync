@@ -1,4 +1,5 @@
 ﻿using Satchel;
+using HutongGames.PlayMaker;
 
 namespace BingoSync.CustomVariables
 {
@@ -11,8 +12,9 @@ namespace BingoSync.CustomVariables
         public static void CreateBreakableFloorsTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || self.gameObject == null || !self.HasState(breakStateName)) return;
-            self.AddCustomAction(breakStateName, () => {
+            bool hasBreakState = self.TryGetState(breakStateName, out FsmState breakState);
+            if (self == null || self.FsmName != fsmName || self.gameObject == null || !hasBreakState) return;
+            breakState.AddCustomAction(() => {
                 var floorsBroken = BingoTracker.GetInteger(variableName);
                 BingoTracker.UpdateInteger(variableName, floorsBroken + 1);
             });

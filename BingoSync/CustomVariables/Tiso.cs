@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateTisoShieldTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(hitStateName)) return;
+            bool hasHitState = self.TryGetState(hitStateName, out FsmState hitState);
+            if (self == null || self.FsmName != fsmName || !hasHitState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(hitStateName, () => {
+            hitState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

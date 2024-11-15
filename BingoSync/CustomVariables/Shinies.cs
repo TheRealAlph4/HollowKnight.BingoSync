@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -16,8 +17,9 @@ namespace BingoSync.CustomVariables
         public static void CreateTrinketTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(trinketStateName)) return;
-            self.AddCustomAction(trinketStateName, () =>
+            bool hasTrinketState = self.TryGetState(trinketStateName, out FsmState trinketState);
+            if (self == null || self.FsmName != fsmName || !hasTrinketState) return;
+            trinketState.AddCustomAction(() =>
             {
                 var trinketNum = self.FsmVariables.GetFsmInt("Trinket Num").Value;
                 var variableName = GetVariableName(trinketNum);

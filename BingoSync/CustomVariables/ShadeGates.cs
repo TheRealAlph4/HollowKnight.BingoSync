@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateShadeGateTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(hitStateName)) return;
+            bool hasHitStateName = self.TryGetState(hitStateName, out FsmState hitState);
+            if (self == null || self.FsmName != fsmName || !hasHitStateName) return;
             if (self.gameObject == null || !self.gameObject.name.StartsWith(objectName)) return;
-            self.AddCustomAction(hitStateName, () => {
+            hitState.AddCustomAction(() => {
                 string uniqueVariableName = $"hitShadeGate_{self.gameObject.scene.name}_{self.gameObject.GetPath()}";
                 var alreadyHit = BingoTracker.GetBoolean(uniqueVariableName);
                 if (alreadyHit)

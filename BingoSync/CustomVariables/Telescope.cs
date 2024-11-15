@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateTelescopeTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(interactStateName)) return;
+            bool hasInteractState = self.TryGetState(interactStateName, out FsmState interactState);
+            if (self == null || self.FsmName != fsmName || !hasInteractState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(interactStateName, () => {
+            interactState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

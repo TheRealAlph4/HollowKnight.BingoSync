@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -10,8 +11,9 @@ namespace BingoSync.CustomVariables
         public static void CreateChestOpenTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(openStateName)) return;
-            self.AddCustomAction(openStateName, () => {
+            bool hasOpenState = self.TryGetState(openStateName, out FsmState openState);
+            if (self == null || self.FsmName != fsmName || !hasOpenState) return;
+            openState.AddCustomAction(() => {
                 string variableName = $"chestOpen_{GameManager.instance.GetSceneNameString()}";
                 BingoTracker.UpdateBoolean(variableName, true);
             });

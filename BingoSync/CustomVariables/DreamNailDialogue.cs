@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -10,8 +11,9 @@ namespace BingoSync.CustomVariables
         public static void CreateDreamNailDialogueTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || self.gameObject == null || !self.HasState(hitStateName)) return;
-            self.AddCustomAction(hitStateName, () => {
+            bool hasHitState = self.TryGetState(hitStateName, out FsmState hitState);
+            if (self == null || self.FsmName != fsmName || self.gameObject == null || !hasHitState) return;
+            hitState.AddCustomAction(() => {
                 string variableName = $"dreamDialogue_{self.gameObject.scene.name}_{self.gameObject.name}";
                 BingoTracker.UpdateBoolean(variableName, true);
             });

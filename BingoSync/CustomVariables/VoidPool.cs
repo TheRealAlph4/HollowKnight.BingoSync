@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -12,9 +13,10 @@ namespace BingoSync.CustomVariables
         public static void CreateVoidPoolTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(poolEnterStateName)) return;
+            bool hasPoolEnterState = self.TryGetState(poolEnterStateName, out FsmState poolEnterState);
+            if (self == null || self.FsmName != fsmName || !hasPoolEnterState) return;
             if (self.gameObject == null || !self.gameObject.scene.name.StartsWith(sceneNamePrefix)) return;
-            self.AddCustomAction(poolEnterStateName, () => {
+            poolEnterState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

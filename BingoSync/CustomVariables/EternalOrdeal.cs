@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -14,9 +15,10 @@ namespace BingoSync.CustomVariables
         public static void CreateCounterTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != incrementFsmName || !self.HasState(incrementStateName)) return;
+            bool hasIncrementStateName = self.TryGetState(incrementStateName, out FsmState incrementState);
+            if (self == null || self.FsmName != incrementFsmName || !hasIncrementStateName) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(incrementStateName, () => {
+            incrementState.AddCustomAction(() => {
                 var controlFsm = self.gameObject.LocateMyFSM(controlFsmName);
                 if (controlFsm == null) return;
                 var killCount = controlFsm.FsmVariables.GetFsmInt(fsmVariableName).Value;

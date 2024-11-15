@@ -1,4 +1,5 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
@@ -13,9 +14,10 @@ namespace BingoSync.CustomVariables
         public static void CreateCityGateOpenedTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName || !self.HasState(openStateName)) return;
+            bool hasOpenState = self.TryGetState(openStateName, out FsmState openState);
+            if (self == null || self.FsmName != fsmName || !hasOpenState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(openStateName, () => {
+            openState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }
