@@ -5,6 +5,7 @@ using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using UnityEngine;
 using BingoSync.Helpers;
+using BingoSync.Clients;
 
 namespace BingoSync
 {
@@ -12,7 +13,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.0.2";
+        public static string version = "1.3.1.0";
         public override string GetVersion() => version;
 
         public override int LoadPriority() => 0;
@@ -24,7 +25,6 @@ namespace BingoSync
             Hooks.Setup();
             RetryHelper.Setup(Log);
             MenuUI.Setup(Log);
-            BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
             GameModesManager.Setup(Log);

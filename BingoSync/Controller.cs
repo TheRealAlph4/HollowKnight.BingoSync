@@ -9,6 +9,7 @@ using BingoSync.Settings;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using System.Linq;
+using BingoSync.Clients;
 
 namespace BingoSync
 {
@@ -18,7 +19,9 @@ namespace BingoSync
 
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
-        public static List<BoardSquare> Board { get; set; } = null;
+        public static IRemoteClient Client { get; set; }
+        private static event EventHandler<ChatMessage> ChatMessageReceived;
+        public static List<NetworkObjectBoardSquare> Board { get; set; } = null;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
         public static bool BoardIsConfirmed { get; set; } = false;
@@ -66,6 +69,7 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
+            Client = new BingoSyncClient(log);
             OnBoardUpdate(BingoBoardUI.UpdateGrid);
             OnBoardUpdate(ConfirmTopLeftOnReveal);
         }
@@ -135,7 +139,7 @@ namespace BingoSync
             }
             BoardIsConfirmed = true;
             string message = $"Revealed my card in hand-mode, my top-left goal is \"{Board[0].Name}\"";
-            BingoSyncClient.ChatMessage(message);
+            Client.SendChatMessage(message);
         }
 
         public static void RefreshDefaultsFromUI()
@@ -169,7 +173,7 @@ namespace BingoSync
                 return;
             }
             BoardIsConfirmed = false;
-            BingoSyncClient.RevealCard();
+            Client.RevealCard();
             if (HandMode)
             {
                 BoardIsVisible = false;
@@ -178,12 +182,12 @@ namespace BingoSync
 
         public static bool ClientIsConnected()
         {
-            return BingoSyncClient.GetState() == BingoSyncClient.State.Connected;
+            return Client.GetState() == ClientState.Connected;
         }
 
         public static bool ClientIsConnecting()
         {
-            return BingoSyncClient.GetState() == BingoSyncClient.State.Loading;
+            return Client.GetState() == ClientState.Loading;
         }
 
         public static (int, bool) GetCurrentSeed()
@@ -231,7 +235,7 @@ namespace BingoSync
             Log($"\tRoomIsLockout = {RoomIsLockout}");
 
 
-            BingoSyncClient.DumpDebugInfo();
+            Client.DumpDebugInfo();
 
             GameModesManager.DumpDebugInfo();
 

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
+using BingoSync.Clients;
 
 namespace BingoSync
 {
@@ -143,10 +144,10 @@ namespace BingoSync
 
         public static bool BoardIsPlayable()
         {
-            BingoSyncClient.Update();
+            Controller.Client.Update();
             if (!Controller.BoardIsAvailable() || !Controller.BoardIsRevealed)
                 return false;
-            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
+            if (!Controller.ClientIsConnected())
                 return false;
             return true;
         }
@@ -262,7 +263,7 @@ namespace BingoSync
             if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
             {
                 //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
-                BingoSyncClient.SelectSquare(index + 1, () =>
+                Controller.Client.SelectSquare(index + 1, () =>
                 {
                     UpdateGoal(goal, shouldUnmark);
                 }, shouldUnmark);

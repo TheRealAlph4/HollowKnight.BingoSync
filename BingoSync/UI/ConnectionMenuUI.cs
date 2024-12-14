@@ -6,6 +6,7 @@ using MagicUI.Graphics;
 using System.Reflection;
 using System.Linq;
 using System;
+using BingoSync.Clients;
 
 namespace BingoSync.GameUI
 {
@@ -216,10 +217,10 @@ namespace BingoSync.GameUI
 
         private static void JoinRoomButtonClicked(Button sender)
         {
-            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
+            if (!Controller.ClientIsConnected())
             {
                 ReadCurrentConnectionInfo();
-                BingoSyncClient.JoinRoom((ex) =>
+                Controller.Client.JoinRoom((ex) =>
                 {
                     Update();
                 });
@@ -227,7 +228,7 @@ namespace BingoSync.GameUI
             }
             else
             {
-                BingoSyncClient.ExitRoom(() =>
+                Controller.Client.ExitRoom(() =>
                 {
                     Update();
                 });

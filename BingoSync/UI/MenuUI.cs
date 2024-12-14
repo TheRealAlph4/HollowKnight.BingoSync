@@ -1,4 +1,5 @@
-﻿using MagicUI.Core;
+﻿using BingoSync.Clients;
+using MagicUI.Core;
 using System;
 
 namespace BingoSync.GameUI
@@ -36,7 +37,7 @@ namespace BingoSync.GameUI
 
 
             layoutRoot.VisibilityCondition = () => {
-                BingoSyncClient.Update();
+                Controller.Client.Update();
                 ConnectionMenuUI.Update();
                 return Controller.MenuIsVisible;
             };

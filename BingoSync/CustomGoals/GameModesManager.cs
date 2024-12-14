@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using BingoSync.Clients;
 using BingoSync.Settings;
 
 namespace BingoSync.CustomGoals
@@ -149,13 +150,13 @@ namespace BingoSync.CustomGoals
             (int seed, bool isCustomSeed) = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
-            BingoSyncClient.ChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
+            Controller.Client.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
                 customJSON = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            BingoSyncClient.NewCard(customJSON, Controller.MenuIsLockout);
+            Controller.Client.NewCard(customJSON, Controller.MenuIsLockout);
         }
 
         private static void SetupVanillaGoals()
