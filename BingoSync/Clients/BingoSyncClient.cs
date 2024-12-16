@@ -130,7 +130,7 @@ namespace BingoSync.Clients
             forcedState = ClientState.Loading;
             shouldConnect = true;
 
-            var joinRoomInput = new NetworkObjectJoinRoomInput
+            var joinRoomInput = new NetworkObjectJoinRoomRequest
             {
                 Room = roomCode,
                 Nickname = roomNickname,
@@ -149,7 +149,7 @@ namespace BingoSync.Clients
                     var readTask = response.Content.ReadAsStringAsync();
                     readTask.ContinueWith(joinRoomResponse =>
                     {
-                        var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoin>(joinRoomResponse.Result);
+                        var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result);
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
                         UpdateSettings();
@@ -171,7 +171,7 @@ namespace BingoSync.Clients
 
         private void SetColor(string color)
         {
-            var setColorInput = new NetworkObjectSetColorInput
+            var setColorInput = new NetworkObjectSetColorRequest
             {
                 Room = Controller.RoomCode,
                 Color = color,
@@ -192,7 +192,7 @@ namespace BingoSync.Clients
         public void NewCard(string customJSON, bool lockout = true, bool hideCard = true)
         {
             if (GetState() != ClientState.Connected) return;
-            var newCard = new NetworkObjectNewCard
+            var newCard = new NetworkObjectNewCardRequest
             {
                 Room = Controller.RoomCode,
                 Game = 18, // this is supposed to be custom alread
@@ -215,7 +215,7 @@ namespace BingoSync.Clients
         {
             if (GetState() != ClientState.Connected) return;
             if (Controller.BoardIsRevealed) return;
-            var revealInput = new NetworkObjectRevealInput
+            var revealInput = new NetworkObjectRevealRequest
             {
                 Room = Controller.RoomCode,
             };
@@ -237,7 +237,7 @@ namespace BingoSync.Clients
         public void SendChatMessage(string text)
         {
             if (GetState() != ClientState.Connected) return;
-            var setColorInput = new NetworkObjectChatMessage
+            var setColorInput = new NetworkObjectChatMessageRequest
             {
                 Room = Controller.RoomCode,
                 Text = text,
@@ -258,7 +258,7 @@ namespace BingoSync.Clients
         public void SelectSquare(int square, Action errorCallback, bool clear = false)
         {
             if (GetState() != ClientState.Connected) return;
-            var selectInput = new NetworkObjectSelectInput
+            var selectInput = new NetworkObjectSelectRequest
             {
                 Room = Controller.RoomCode,
                 Slot = square,
@@ -304,7 +304,7 @@ namespace BingoSync.Clients
             });
         }
 
-        private void ConnectToBroadcastSocket(NetworkObjectSocketJoin socketJoin)
+        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -331,7 +331,7 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(ConnectToBroadcastSocket));
         }
 
-        private async void ListenForBoardUpdates(NetworkObjectSocketJoin socketJoin)
+        private async void ListenForBoardUpdates(NetworkObjectSocketJoinRequest socketJoin)
         {
             var buffer = new byte[1024];
             while (webSocketClient.State == WebSocketState.Open)
@@ -339,38 +339,22 @@ namespace BingoSync.Clients
                 try
                 {
                     var response = await webSocketClient.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                    if (response.MessageType == WebSocketMessageType.Text)
+                    if (response.MessageType != WebSocketMessageType.Text)
                     {
-                        var json = Encoding.UTF8.GetString(buffer, 0, response.Count);
-                        var obj = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json);
-                        if (!Controller.BoardIsAvailable()) return;
-                        if (obj.Type == "goal")
-                        {
-                            for (int i = 0; i < Controller.Board.Count; i++)
-                            {
-                                if (Controller.Board[i].Slot == obj.Square.Slot)
-                                {
-                                    Controller.Board[i] = obj.Square;
-                                    BingoTracker.GoalUpdated(Controller.Board[i].Name, i);
-                                    break;
-                                }
-                            }
-                            Controller.BoardUpdate();
-                        }
-                        else if (obj.Type == "new-card")
-                        {
-                            UpdateBoardAndBroadcast(null);
-                            UpdateBoard(obj.HideCard);
-                            UpdateSettings();
-                        }
-                        else if (obj.Type == "revealed")
-                        {
-                            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
-                            {
-                                Controller.RevealCard();
-                            }
-                            Controller.BoardUpdate();
-                        }
+                        continue;
+                    }
+                    if (!Controller.BoardIsAvailable()) return;
+                    string json = Encoding.UTF8.GetString(buffer, 0, response.Count);
+                    NetworkObjectBroadcast broadcast = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json);
+                    switch(broadcast.Type)
+                    {
+                        case "chat": HandleChatBroadcast(json); break;
+                        case "new-card": HandleNewCardBroadcast(json); break;
+                        case "goal": HandleGoalBroadcast(json); break;
+                        case "color": HandleColorBroadcast(json); break;
+                        case "revealed": HandleRevealedBroadcast(json); break;
+                        case "connection": HandleConnectionBroadcast(json); break;
+                        default: Log($"Received unknown broadcast type \"{broadcast.Type}\""); break;
                     }
                 }
                 catch (Exception ex)
@@ -384,6 +368,54 @@ namespace BingoSync.Clients
                 ConnectToBroadcastSocket(socketJoin);
                 return;
             }
+        }
+
+        private void HandleChatBroadcast(string json)
+        {
+            NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json);
+        }
+
+        private void HandleNewCardBroadcast(string json)
+        {
+            NetworkObjectNewCardBroadcast newCardBroadcast = JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(json);
+            UpdateBoardAndBroadcast(null);
+            UpdateBoard(newCardBroadcast.HideCard);
+            UpdateSettings();
+        }
+
+        private void HandleGoalBroadcast(string json)
+        {
+            NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json);
+            for (int i = 0; i < Controller.Board.Count; i++)
+            {
+                if (Controller.Board[i].Slot == goalBroadcast.Square.Slot)
+                {
+                    Controller.Board[i] = goalBroadcast.Square;
+                    BingoTracker.GoalUpdated(Controller.Board[i].Name, i);
+                    break;
+                }
+            }
+            Controller.BoardUpdate();
+        }
+
+        private void HandleColorBroadcast(string json)
+        {
+            NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json);
+        }
+
+        private void HandleRevealedBroadcast(string json)
+        {
+            NetworkObjectRevealedBroadcast revealedBroadcast = JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(json);
+            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
+            {
+                Controller.RevealCard();
+            }
+            Controller.BoardUpdate();
+        }
+
+        private void HandleConnectionBroadcast(string json)
+        {
+            NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json);
         }
 
         private void UpdateBoard(bool hideCard)
@@ -433,8 +465,10 @@ namespace BingoSync.Clients
         }
     }
 
+    #region Request objects
+
     [DataContract]
-    class NetworkObjectSetColorInput
+    class NetworkObjectSetColorRequest
     {
         [JsonProperty("room")]
         public string Room;
@@ -443,14 +477,14 @@ namespace BingoSync.Clients
     }
 
     [DataContract]
-    class NetworkObjectRevealInput
+    class NetworkObjectRevealRequest
     {
         [JsonProperty("room")]
         public string Room;
     }
 
     [DataContract]
-    class NetworkObjectSelectInput
+    class NetworkObjectSelectRequest
     {
         [JsonProperty("room")]
         public string Room;
@@ -463,7 +497,7 @@ namespace BingoSync.Clients
     }
 
     [DataContract]
-    class NetworkObjectJoinRoomInput
+    class NetworkObjectJoinRoomRequest
     {
         [JsonProperty("room")]
         public string Room;
@@ -474,15 +508,152 @@ namespace BingoSync.Clients
     }
 
     [DataContract]
+    class NetworkObjectSocketJoinRequest
+    {
+        [JsonProperty("socket_key")]
+        public string SocketKey = string.Empty;
+    }
+
+    [DataContract]
+    class NetworkObjectNewCardRequest
+    {
+        [JsonProperty("room")]
+        public string Room;
+        [JsonProperty("game_type")]
+        public int Game;
+        [JsonProperty("variant_type")]
+        public int Variant;
+        [JsonProperty("custom_json")]
+        public string CustomJSON;
+        [JsonProperty("lockout_mode")]
+        public bool Lockout;
+        [JsonProperty("seed")]
+        public string Seed;
+        [JsonProperty("hide_card")]
+        public bool HideCard;
+    }
+
+    [DataContract]
+    class NetworkObjectChatMessageRequest
+    {
+        [JsonProperty("room")]
+        public string Room;
+        [JsonProperty("text")]
+        public string Text;
+    }
+
+    #endregion
+
+    #region Broadcast objects
+
+    [DataContract]
     class NetworkObjectBroadcast
     {
         [JsonProperty("type")]
         public string Type = string.Empty;
-        [JsonProperty("square")]
-        public NetworkObjectBoardSquare Square = new NetworkObjectBoardSquare();
+    }
+
+    [DataContract]
+    class NetworkObjectChatBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("player_color")]
+        public string Color = string.Empty;
+        [JsonProperty("text")]
+        public string Text = string.Empty;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
+    }
+
+    [DataContract]
+    class NetworkObjectNewCardBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("player_color")]
+        public string PlayerColor = string.Empty;
+        [JsonProperty("game")]
+        public string Game = string.Empty;
+        [JsonProperty("seed")]
+        public string Seed = string.Empty;
         [JsonProperty("hide_card")]
         public bool HideCard = false;
+        [JsonProperty("is_current")]
+        public bool IsCurrent = false;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
     }
+
+    [DataContract]
+    class NetworkObjectGoalBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("square")]
+        public NetworkObjectBoardSquare Square = new();
+        [JsonProperty("player_color")]
+        public string PlayerColor = string.Empty;
+        [JsonProperty("color")]
+        public string Color = string.Empty;
+        [JsonProperty("remove")]
+        public bool Remove = false;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
+    }
+
+    [DataContract]
+    class NetworkObjectColorBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("player_color")]
+        public string PlayerColor = string.Empty;
+        [JsonProperty("color")]
+        public string Color = string.Empty;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
+    }
+
+    [DataContract]
+    class NetworkObjectRevealedBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("player_color")]
+        public string PlayerColor = string.Empty;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
+    }
+
+    [DataContract]
+    class NetworkObjectConnectionBroadcast
+    {
+        [JsonProperty("type")]
+        public string Type = string.Empty;
+        [JsonProperty("event_type")]
+        public string EventType = string.Empty;
+        [JsonProperty("player")]
+        public NetworkObjectPlayer Player = new();
+        [JsonProperty("player_color")]
+        public string PlayerColor = string.Empty;
+        [JsonProperty("timestamp")]
+        public string Timestamp = string.Empty;
+    }
+
+    #endregion
+
+    #region Common network objects
 
     [DataContract]
     class NetworkObjectBoardSquare
@@ -510,37 +681,17 @@ namespace BingoSync.Clients
     }
 
     [DataContract]
-    class NetworkObjectSocketJoin
+    class NetworkObjectPlayer
     {
-        [JsonProperty("socket_key")]
-        public string SocketKey = string.Empty;
+        [JsonProperty("uuid")]
+        public string UUID = string.Empty;
+        [JsonProperty("name")]
+        public string Name = string.Empty;
+        [JsonProperty("color")]
+        public string Color = string.Empty;
+        [JsonProperty("is_spectator")]
+        public bool IsSpectator = false;
     }
 
-    [DataContract]
-    class NetworkObjectNewCard
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("game_type")]
-        public int Game;
-        [JsonProperty("variant_type")]
-        public int Variant;
-        [JsonProperty("custom_json")]
-        public string CustomJSON;
-        [JsonProperty("lockout_mode")]
-        public bool Lockout;
-        [JsonProperty("seed")]
-        public string Seed;
-        [JsonProperty("hide_card")]
-        public bool HideCard;
-    }
-
-    [DataContract]
-    class NetworkObjectChatMessage
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("text")]
-        public string Text;
-    }
+    #endregion
 }
