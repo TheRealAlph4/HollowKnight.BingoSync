@@ -85,6 +85,7 @@ namespace BingoSync.GameUI
                 Margin = 20,
                 MinWidth = MenuUI.generateButtonWidth,
                 MinHeight = 50,
+                Enabled = false,
             };
 
             Sprite lockoutSprite = Loader.GetTexture("BingoSync Lockout Icon.png").ToSprite();

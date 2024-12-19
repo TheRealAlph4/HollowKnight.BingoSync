@@ -19,6 +19,7 @@ namespace BingoSync
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
         public static ConnectionSession Session { get; set; }
+        public static bool IsOnMainMenu { get; set; } = true;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
         public static string ActiveGameMode { get; set; } = string.Empty;
@@ -160,11 +161,17 @@ namespace BingoSync
         {
             if (!Session.ClientIsConnected())
             {
-                Session.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) => { ConnectionMenuUI.Update(); });
+                Session.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) => {
+                    ConnectionMenuUI.Update();
+                    RefreshGenerationButtonEnabled();
+                });
             }
             else
             {
-                Session.ExitRoom(() => { ConnectionMenuUI.Update(); });
+                Session.ExitRoom(() => {
+                    ConnectionMenuUI.Update();
+                    RefreshGenerationButtonEnabled();
+                });
             }
         }
 
@@ -267,6 +274,11 @@ namespace BingoSync
         public static void SetGenerationButtonEnabled(bool enabled)
         {
             GenerationMenuUI.SetGenerationButtonEnabled(enabled);
+        }
+
+        public static void RefreshGenerationButtonEnabled()
+        {
+            SetGenerationButtonEnabled((Session.ClientIsConnected() || Session.ClientIsConnecting()) && IsOnMainMenu);
         }
 
         public static void RefreshMenu()
