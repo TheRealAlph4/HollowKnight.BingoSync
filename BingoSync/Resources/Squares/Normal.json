@@ -527,7 +527,7 @@
         "name": "Obtain fountain vessel fragment",
         "condition": {
             "type": "Bool",
-            "variableName": "fountainVesselSummoned",
+            "variableName": "vesselFragmentCollected",
             "expectedValue": true
         }
     },
