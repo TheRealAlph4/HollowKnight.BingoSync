@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using BingoSync.Sessions;
+using HutongGames.PlayMaker.Actions;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.WebSockets;
@@ -17,6 +20,8 @@ namespace BingoSync.Clients
 
         private Action<string> Log;
 
+        private string currentRoomID = string.Empty;
+
         private CookieContainer cookieContainer = null;
         private HttpClientHandler handler = null;
         private HttpClient client = null;
@@ -27,7 +32,19 @@ namespace BingoSync.Clients
 
         private bool shouldConnect = false;
 
-
+        private event EventHandler<ChatMessage> ChatMessageReceived;
+        public event EventHandler<ChatMessage> OnChatMessageReceived
+        {
+            add
+            {
+                ChatMessageReceived += value;
+            }
+            remove
+            {
+                ChatMessageReceived -= value;
+            }
+        }
+        private BingoBoard Board;
 
         public void DumpDebugInfo()
         {
@@ -40,7 +57,6 @@ namespace BingoSync.Clients
         public BingoSyncClient(Action<string> log)
         {
             Log = log;
-
 
             cookieContainer = new CookieContainer();
             handler = new HttpClientHandler
@@ -55,6 +71,11 @@ namespace BingoSync.Clients
             LoadCookie();
 
             webSocketClient = new ClientWebSocket();
+        }
+
+        public void SetBoard(BingoBoard board)
+        {
+            Board = board;
         }
 
         public void Update()
@@ -105,36 +126,43 @@ namespace BingoSync.Clients
 
         private void UpdateBoardAndBroadcast(List<NetworkObjectBoardSquare> newBoard)
         {
-            Controller.Board = newBoard;
+            if (newBoard != null)
+            {
+                List<Square> squares = [];
+                foreach (NetworkObjectBoardSquare networkSquare in newBoard)
+                {
+                    HashSet<Colors> colors = [];
+                    foreach (string color in networkSquare.Colors.Split(' '))
+                    {
+                        colors.Add(ColorExtensions.FromName(color));
+                    }
+                    squares.Add(new Square() {
+                        Name = networkSquare.Name,
+                        MarkedBy = colors,
+                        GoalNr = int.Parse(networkSquare.Slot.Substring(4))-1,
+                    });
+                }
+                Board.SetSquares(squares);
+            }
             BingoTracker.ClearFinishedGoals();
             Controller.BoardUpdate();
         }
 
-        public void JoinRoom(Action<Exception> callback)
+        public void JoinRoom(string roomID, string nickname, string password, Action<Exception> callback)
         {
             if (GetState() == ClientState.Loading)
             {
                 return;
             }
-            string roomCode = Controller.RoomCode;
-            string roomNickname = Controller.RoomNickname;
-            string roomPassword = Controller.RoomPassword;
-
-            if (roomCode == null || roomCode == string.Empty
-                || roomNickname == null || roomNickname == string.Empty
-                || roomPassword == null || roomPassword == string.Empty)
-            {
-                return;
-            }
-
             forcedState = ClientState.Loading;
             shouldConnect = true;
+            currentRoomID = roomID;
 
             var joinRoomInput = new NetworkObjectJoinRoomRequest
             {
-                Room = roomCode,
-                Nickname = roomNickname,
-                Password = roomPassword,
+                Room = roomID,
+                Nickname = nickname,
+                Password = password,
             };
             var payload = JsonConvert.SerializeObject(joinRoomInput);
             var content = new StringContent(payload, Encoding.UTF8, "application/json");
@@ -173,7 +201,7 @@ namespace BingoSync.Clients
         {
             var setColorInput = new NetworkObjectSetColorRequest
             {
-                Room = Controller.RoomCode,
+                Room = currentRoomID,
                 Color = color,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -194,7 +222,7 @@ namespace BingoSync.Clients
             if (GetState() != ClientState.Connected) return;
             var newCard = new NetworkObjectNewCardRequest
             {
-                Room = Controller.RoomCode,
+                Room = currentRoomID,
                 Game = 18, // this is supposed to be custom alread
                 Variant = 18, // but this is also required for custom ???
                 CustomJSON = customJSON,
@@ -214,10 +242,10 @@ namespace BingoSync.Clients
         public void RevealCard()
         {
             if (GetState() != ClientState.Connected) return;
-            if (Controller.BoardIsRevealed) return;
+            if (Board.IsRevealed) return;
             var revealInput = new NetworkObjectRevealRequest
             {
-                Room = Controller.RoomCode,
+                Room = currentRoomID,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -228,7 +256,7 @@ namespace BingoSync.Clients
                 {
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
-                    Controller.BoardIsRevealed = true;
+                    Board.IsRevealed = true;
                     Controller.BoardUpdate();
                 });
             }, maxRetries, nameof(RevealCard));
@@ -239,7 +267,7 @@ namespace BingoSync.Clients
             if (GetState() != ClientState.Connected) return;
             var setColorInput = new NetworkObjectChatMessageRequest
             {
-                Room = Controller.RoomCode,
+                Room = currentRoomID,
                 Text = text,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -260,7 +288,7 @@ namespace BingoSync.Clients
             if (GetState() != ClientState.Connected) return;
             var selectInput = new NetworkObjectSelectRequest
             {
-                Room = Controller.RoomCode,
+                Room = currentRoomID,
                 Slot = square,
                 Color = Controller.RoomColor,
                 RemoveColor = clear,
@@ -283,6 +311,7 @@ namespace BingoSync.Clients
             if (GetState() != ClientState.Connected) return;
             shouldConnect = false;
             forcedState = ClientState.Loading;
+            currentRoomID = string.Empty;
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
                 return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
@@ -343,7 +372,7 @@ namespace BingoSync.Clients
                     {
                         continue;
                     }
-                    if (!Controller.BoardIsAvailable()) return;
+                    if (!Board.IsAvailable()) return;
                     string json = Encoding.UTF8.GetString(buffer, 0, response.Count);
                     NetworkObjectBroadcast broadcast = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json);
                     switch(broadcast.Type)
@@ -373,6 +402,11 @@ namespace BingoSync.Clients
         private void HandleChatBroadcast(string json)
         {
             NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json);
+            ChatMessageReceived(this, new ChatMessage()
+            {
+                Text = chatBroadcast.Text,
+                Sender = chatBroadcast.Player.Name,
+            });
         }
 
         private void HandleNewCardBroadcast(string json)
@@ -386,12 +420,17 @@ namespace BingoSync.Clients
         private void HandleGoalBroadcast(string json)
         {
             NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json);
-            for (int i = 0; i < Controller.Board.Count; i++)
+            foreach (Square square in Board)
             {
-                if (Controller.Board[i].Slot == goalBroadcast.Square.Slot)
+                if ("slot" + (square.GoalNr + 1) == goalBroadcast.Square.Slot)
                 {
-                    Controller.Board[i] = goalBroadcast.Square;
-                    BingoTracker.GoalUpdated(Controller.Board[i].Name, i);
+                    square.MarkedBy.Clear();
+                    foreach (string color in goalBroadcast.Square.Colors.Split(' '))
+                    {
+//                        if (color == "blank") continue;
+                        square.MarkedBy.Add(ColorExtensions.FromName(color));
+                    }
+                    BingoTracker.GoalUpdated(square.Name, square.GoalNr);
                     break;
                 }
             }
@@ -422,7 +461,7 @@ namespace BingoSync.Clients
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{Controller.RoomCode}/board");
+                var task = client.GetAsync($"room/{currentRoomID}/board");
                 return task.ContinueWith(responseTask =>
                 {
                     HttpResponseMessage response = null;
@@ -432,7 +471,7 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(boardResponse =>
                     {
                         var newBoard = JsonConvert.DeserializeObject<List<NetworkObjectBoardSquare>>(boardResponse.Result);
-                        Controller.BoardIsRevealed = !hideCard;
+                        Board.IsRevealed = !hideCard;
                         UpdateBoardAndBroadcast(newBoard);
                     });
                 });
@@ -443,7 +482,7 @@ namespace BingoSync.Clients
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{Controller.RoomCode}/room-settings");
+                var task = client.GetAsync($"room/{currentRoomID}/room-settings");
                 return task.ContinueWith(responseTask =>
                 {
                     HttpResponseMessage response = null;

@@ -1,0 +1,11 @@
+﻿using System.Collections.Generic;
+
+namespace BingoSync.Sessions
+{
+    public class Square
+    {
+        public string Name { get; set; }
+        public HashSet<Colors> MarkedBy { get; set; }
+        public int GoalNr { get; set; }
+    }
+}

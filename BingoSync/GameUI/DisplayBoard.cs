@@ -7,7 +7,7 @@ using GridLayout = MagicUI.Elements.GridLayout;
 
 namespace BingoSync.GameUI
 {
-    class Board
+    class DisplayBoard
     {
         internal class SquareLayoutObjects
         {
@@ -22,19 +22,19 @@ namespace BingoSync.GameUI
         private static readonly Dictionary<string, Color> BingoColors = new()
         {
                 { "blank", Color.black },
-                { "orange", Colors.Orange },
-                { "red", Colors.Red },
-                { "blue", Colors.Blue },
-                { "green", Colors.Green },
-                { "purple", Colors.Purple },
-                { "navy", Colors.Navy },
-                { "teal", Colors.Teal },
-                { "brown", Colors.Brown },
-                { "pink", Colors.Pink },
-                { "yellow", Colors.Yellow },
+                { "orange", Colors.Orange.GetColor() },
+                { "red", Colors.Red.GetColor() },
+                { "blue", Colors.Blue.GetColor() },
+                { "green", Colors.Green.GetColor() },
+                { "purple", Colors.Purple.GetColor() },
+                { "navy", Colors.Navy.GetColor() },
+                { "teal", Colors.Teal.GetColor() },
+                { "brown", Colors.Brown.GetColor() },
+                { "pink", Colors.Pink.GetColor() },
+                { "yellow", Colors.Yellow.GetColor() },
             };
 
-        public Board(Sprite sprite)
+        public DisplayBoard(Sprite sprite)
         {
             id = BingoBoardUI.GetBoardCount();
             layoutRoot = new(true, "Persistent layout");
@@ -67,7 +67,7 @@ namespace BingoSync.GameUI
             CreateBaseLayout(sprite);
 
             layoutRoot.VisibilityCondition = () => {
-                return (Controller.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
+                return (Controller.Session.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
             };
 
         }

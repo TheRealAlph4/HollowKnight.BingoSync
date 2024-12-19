@@ -10,22 +10,17 @@ using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using System.Linq;
 using BingoSync.Clients;
+using BingoSync.Sessions;
 
 namespace BingoSync
 {
     internal static class Controller
     {
-        public static readonly string BLANK_COLOR = "blank";
-
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
-        public static IRemoteClient Client { get; set; }
-        private static event EventHandler<ChatMessage> ChatMessageReceived;
-        public static List<NetworkObjectBoardSquare> Board { get; set; } = null;
+        public static ConnectionSession Session { get; set; }
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
-        public static bool BoardIsConfirmed { get; set; } = false;
-        public static bool BoardIsRevealed { get; set; } = false;
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool MenuIsLockout
         {
@@ -69,7 +64,7 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            Client = new BingoSyncClient(log);
+            Session = new ConnectionSession(new BingoSyncClient(log), true);
             OnBoardUpdate(BingoBoardUI.UpdateGrid);
             OnBoardUpdate(ConfirmTopLeftOnReveal);
         }
@@ -84,14 +79,9 @@ namespace BingoSync
             OnBoardUpdateList.Add(func);
         }
 
-        public static bool BoardIsAvailable()
-        {
-            return !(Board == null);
-        }
-
         public static void ToggleBoardKeybindClicked()
         {
-            if (!BoardIsAvailable())
+            if (!Session.Board.IsAvailable())
             {
                 return;
             }
@@ -133,13 +123,13 @@ namespace BingoSync
             {
                 return;
             }
-            if (!BoardIsAvailable() || !BoardIsRevealed || BoardIsConfirmed)
+            if (!Session.Board.IsAvailable() || !Session.Board.IsRevealed || Session.Board.IsConfirmed)
             {
                 return;
             }
-            BoardIsConfirmed = true;
-            string message = $"Revealed my card in hand-mode, my top-left goal is \"{Board[0].Name}\"";
-            Client.SendChatMessage(message);
+            Session.Board.IsConfirmed = true;
+            string message = $"Revealed my card in hand-mode, my top-left goal is \"{Session.Board.GetSlot(0).Name}\"";
+            Session.SendChatMessage(message);
         }
 
         public static void RefreshDefaultsFromUI()
@@ -149,7 +139,7 @@ namespace BingoSync
 
         public static void UpdateBoardOpacity()
         {
-            if (!BoardIsAvailable())
+            if (!Session.Board.IsAvailable())
             {
                 return;
             }
@@ -166,28 +156,30 @@ namespace BingoSync
             RevealCard();
         }
 
+        public static void JoinRoomButtonClicked(Button _)
+        {
+            if (!Session.ClientIsConnected())
+            {
+                Session.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) => { ConnectionMenuUI.Update(); });
+            }
+            else
+            {
+                Session.ExitRoom(() => { ConnectionMenuUI.Update(); });
+            }
+        }
+
         public static void RevealCard()
         {
-            if (BoardIsRevealed)
+            if (Session.Board.IsRevealed)
             {
                 return;
             }
-            BoardIsConfirmed = false;
-            Client.RevealCard();
+            Session.Board.IsConfirmed = false;
+            Session.RevealCard();
             if (HandMode)
             {
                 BoardIsVisible = false;
             }
-        }
-
-        public static bool ClientIsConnected()
-        {
-            return Client.GetState() == ClientState.Connected;
-        }
-
-        public static bool ClientIsConnecting()
-        {
-            return Client.GetState() == ClientState.Loading;
         }
 
         public static (int, bool) GetCurrentSeed()
@@ -219,14 +211,14 @@ namespace BingoSync
 
             Log("Controller");
             Log($"\tBoard");
-            foreach (string goalname in Board.Select(square => square.Name))
+            foreach (string goalname in Session.Board.Select(square => square.Name))
             {
                 Log($"\t\tGoal \"{goalname}\"");
             };
             Log($"\tMenuIsVisible = {MenuIsVisible}");
             Log($"\tBoardIsVisible = {BoardIsVisible}");
-            Log($"\tBoardIsConfirmed = {BoardIsConfirmed}");
-            Log($"\tBoardIsRevealed = {BoardIsRevealed}");
+            Log($"\tBoardIsConfirmed = {Session.Board.IsConfirmed}");
+            Log($"\tBoardIsRevealed = {Session.Board.IsRevealed}");
             Log($"\tActiveGameMode = {ActiveGameMode}");
             Log($"\tRoomCode = {RoomCode}");
             Log($"\tRoomPassword = {RoomPassword}");
@@ -235,7 +227,7 @@ namespace BingoSync
             Log($"\tRoomIsLockout = {RoomIsLockout}");
 
 
-            Client.DumpDebugInfo();
+            Session.DumpDebugInfo();
 
             GameModesManager.DumpDebugInfo();
 

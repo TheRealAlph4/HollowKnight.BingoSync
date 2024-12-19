@@ -333,7 +333,7 @@
 		<Reference Include="MagicUI">
 			<HintPath>$(HollowKnightRefs)/Mods/MagicUI/MagicUI.dll</HintPath>
 		</Reference>
-		<Reference Include="MagicUI">
+		<Reference Include="Satchel">
 			<HintPath>$(HollowKnightRefs)/Mods/Satchel/Satchel.dll</HintPath>
 		</Reference>
 		<Reference Include="ItemChanger">

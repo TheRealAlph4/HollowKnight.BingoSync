@@ -7,6 +7,7 @@ using System.Reflection;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
 using BingoSync.Clients;
+using BingoSync.Sessions;
 
 namespace BingoSync
 {
@@ -144,10 +145,10 @@ namespace BingoSync
 
         public static bool BoardIsPlayable()
         {
-            Controller.Client.Update();
-            if (!Controller.BoardIsAvailable() || !Controller.BoardIsRevealed)
+            Controller.Session.Update();
+            if (!Controller.Session.Board.IsAvailable() || !Controller.Session.Board.IsRevealed)
                 return false;
-            if (!Controller.ClientIsConnected())
+            if (!Controller.Session.ClientIsConnected())
                 return false;
             return true;
         }
@@ -241,7 +242,7 @@ namespace BingoSync
         {
             if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
-            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
+            bool marked = Controller.Session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(Controller.RoomColor));
             if (marked)
                 return;
             var square = _allPossibleSquares.Find(x => x.Name == goal);
@@ -255,15 +256,23 @@ namespace BingoSync
         public static void UpdateGoal(string goal, bool shouldUnmark)
         {
             if (!BoardIsPlayable()) return;
-            var index = Controller.Board.FindIndex(x => x.Name == goal);
+            int index = -1;
+            foreach(Square square in Controller.Session.Board)
+            {
+                if(square.Name == goal)
+                {
+                    index = square.GoalNr;
+                    break;
+                }
+            }
             if (index == -1)
                 return;
-            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
-            bool isBlank = Controller.Board[index].Colors.Contains(Controller.BLANK_COLOR);
+            bool marked = Controller.Session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(Controller.RoomColor));
+            bool isBlank = Controller.Session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
             if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
             {
                 //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
-                Controller.Client.SelectSquare(index + 1, () =>
+                Controller.Session.SelectSquare(index + 1, () =>
                 {
                     UpdateGoal(goal, shouldUnmark);
                 }, shouldUnmark);

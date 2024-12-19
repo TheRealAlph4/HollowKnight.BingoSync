@@ -1,4 +1,5 @@
-﻿using MagicUI.Core;
+﻿using BingoSync.Sessions;
+using MagicUI.Core;
 using MagicUI.Elements;
 using MagicUI.Graphics;
 using System;
@@ -11,7 +12,7 @@ namespace BingoSync.GameUI
 {
     internal static class BingoBoardUI
     {
-        private static readonly List<Board> boards = [];
+        private static readonly List<DisplayBoard> boards = [];
 
         private static readonly LayoutRoot commonRoot = new(true, "Persistent layout")
         {
@@ -55,9 +56,9 @@ namespace BingoSync.GameUI
 
             Loader.Preload();
 
-            boards.Add(new Board(Loader.GetTexture("BingoSync Transparent Background.png").ToSprite()));
-            boards.Add(new Board(Loader.GetTexture("BingoSync Opaque Background.png").ToSprite()));
-            boards.Add(new Board(Loader.GetTexture("BingoSync Solid Background.png").ToSprite()));
+            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Transparent Background.png").ToSprite()));
+            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Opaque Background.png").ToSprite()));
+            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Solid Background.png").ToSprite()));
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
@@ -66,27 +67,25 @@ namespace BingoSync.GameUI
 
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (!Controller.BoardIsAvailable() && Controller.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
-            revealCardButton.Visibility = (Controller.ClientIsConnected() && Controller.BoardIsAvailable() && !Controller.BoardIsRevealed) ? Visibility.Visible : Visibility.Hidden;
-            boards.ForEach(board => board.gridLayout.Visibility = (Controller.BoardIsAvailable() && Controller.BoardIsRevealed) ? Visibility.Visible : Visibility.Hidden);
+            loadingText.Visibility = (!Controller.Session.Board.IsAvailable() && Controller.Session.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
+            revealCardButton.Visibility = (Controller.Session.ClientIsConnected() && Controller.Session.Board.IsAvailable() && !Controller.Session.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
+            boards.ForEach(board => board.gridLayout.Visibility = (Controller.Session.Board.IsAvailable() && Controller.Session.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden);
 
-            if (!Controller.BoardIsAvailable())
+            if (!Controller.Session.Board.IsAvailable())
             {
                 return;
             }
 
-            for (var position = 0; position < Controller.Board.Count; position++)
+            foreach (Square square in Controller.Session.Board)
             {
-                boards.ForEach(board => board.bingoLayout[position].Text.Text = Controller.Board[position].Name);
-                var colors = Controller.Board[position].Colors.Split(' ').ToList();
-                boards.ForEach(board => board.bingoLayout[position].BackgroundColors.Keys.ToList().ForEach(color =>
-                {
-                    board.bingoLayout[position].BackgroundColors[color].Height = 0;
-                }));
-                boards.ForEach(board => colors.ForEach(color =>
-                {
-                    board.bingoLayout[position].BackgroundColors[color].Height = 110 / colors.Count;
-                }));
+                boards.ForEach(board => board.bingoLayout[square.GoalNr].Text.Text = square.Name);
+                boards.ForEach(board => board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0));
+                boards.ForEach(board => {
+                    foreach (Colors color in square.MarkedBy)
+                    {
+                        board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
+                    }
+                });
             }
         }
 
