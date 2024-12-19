@@ -6,7 +6,9 @@ namespace BingoSync.Clients
 {
     public interface IRemoteClient
     {
-        public event EventHandler<ChatMessage> OnChatMessageReceived;
+        public event EventHandler<ChatMessage> ChatMessageReceived;
+        public event EventHandler<Square> GoalUpdateReceived;
+        public event EventHandler<bool> RoomSettingsReceived;
         public void SetBoard(BingoBoard board);
         public void DumpDebugInfo();
         public void Update();

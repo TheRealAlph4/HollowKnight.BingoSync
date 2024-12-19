@@ -150,13 +150,13 @@ namespace BingoSync.CustomGoals
             (int seed, bool isCustomSeed) = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
-            Controller.Session.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
+            Controller.ActiveSession.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
                 customJSON = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            Controller.Session.NewCard(customJSON, Controller.MenuIsLockout);
+            Controller.ActiveSession.NewCard(customJSON, Controller.MenuIsLockout);
         }
 
         private static void SetupVanillaGoals()

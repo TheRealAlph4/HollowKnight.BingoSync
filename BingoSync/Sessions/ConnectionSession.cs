@@ -8,17 +8,18 @@ namespace BingoSync.Sessions
     {
         private readonly IRemoteClient _client;
         private readonly bool _markingClient;
+        public bool RoomIsLockout { get; set; } = false;
         public BingoBoard Board { get; set; } = new();
 
         public event EventHandler<ChatMessage> OnChatMessageReceived
         {
             add
             {
-                _client.OnChatMessageReceived += value;
+                _client.ChatMessageReceived += value;
             }
             remove
             {
-                _client.OnChatMessageReceived -= value;
+                _client.ChatMessageReceived -= value;
             }
         }
 
@@ -27,6 +28,28 @@ namespace BingoSync.Sessions
             _client = client;
             _markingClient = markingClient;
             _client.SetBoard(Board);
+            _client.GoalUpdateReceived += GoalUpdateFromServer;
+            _client.RoomSettingsReceived += ConsumeRoomSettings;
+        }
+
+        private void ConsumeRoomSettings(object sender, bool isLockout)
+        {
+            RoomIsLockout = isLockout;
+        }
+
+        private void GoalUpdateFromServer(object sender, Square square)
+        {
+            BingoTracker.GoalUpdated(this, square.Name, square.GoalNr);
+        }
+
+        public bool IsPlayable()
+        {
+            Update();
+            if (!Board.IsAvailable() || !Board.IsRevealed)
+                return false;
+            if (!ClientIsConnected())
+                return false;
+            return true;
         }
 
         public bool ClientIsConnected()

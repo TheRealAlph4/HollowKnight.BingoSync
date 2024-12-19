@@ -218,13 +218,13 @@ namespace BingoSync.GameUI
 
         public static void Update(Button _ = null)
         {
-            if (Controller.Session.ClientIsConnected())
+            if (Controller.ActiveSession.ClientIsConnected())
             {
                 joinRoomButton.Content = "Exit Room";
                 joinRoomButton.Enabled = true;
                 SetEnabled(false);
             }
-            else if (Controller.Session.ClientIsConnecting())
+            else if (Controller.ActiveSession.ClientIsConnecting())
             {
                 joinRoomButton.Content = "Loading...";
                 joinRoomButton.Enabled = false;

@@ -67,7 +67,7 @@ namespace BingoSync.GameUI
             CreateBaseLayout(sprite);
 
             layoutRoot.VisibilityCondition = () => {
-                return (Controller.Session.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
+                return (Controller.ActiveSession.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
             };
 
         }

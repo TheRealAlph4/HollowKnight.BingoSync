@@ -67,16 +67,16 @@ namespace BingoSync.GameUI
 
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (!Controller.Session.Board.IsAvailable() && Controller.Session.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
-            revealCardButton.Visibility = (Controller.Session.ClientIsConnected() && Controller.Session.Board.IsAvailable() && !Controller.Session.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
-            boards.ForEach(board => board.gridLayout.Visibility = (Controller.Session.Board.IsAvailable() && Controller.Session.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden);
+            loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
+            revealCardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.Board.IsAvailable() && !Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
+            boards.ForEach(board => board.gridLayout.Visibility = (Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden);
 
-            if (!Controller.Session.Board.IsAvailable())
+            if (!Controller.ActiveSession.Board.IsAvailable())
             {
                 return;
             }
 
-            foreach (Square square in Controller.Session.Board)
+            foreach (Square square in Controller.ActiveSession.Board)
             {
                 boards.ForEach(board => board.bingoLayout[square.GoalNr].Text.Text = square.Name);
                 boards.ForEach(board => board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0));

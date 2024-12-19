@@ -18,7 +18,8 @@ namespace BingoSync
     {
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
-        public static ConnectionSession Session { get; set; }
+        public static ConnectionSession DefaultSession { get; set; }
+        public static ConnectionSession ActiveSession { get; set; }
         public static bool IsOnMainMenu { get; set; } = true;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
@@ -44,7 +45,6 @@ namespace BingoSync
         public static string RoomPassword { get; set; } = string.Empty;
         public static string RoomNickname { get; set; } = string.Empty;
         public static string RoomColor { get; set; } = string.Empty;
-        public static bool RoomIsLockout { get; set; } = false;
 
         public static bool IsDebugMode
         {
@@ -65,7 +65,8 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            Session = new ConnectionSession(new BingoSyncClient(log), true);
+            DefaultSession = new ConnectionSession(new BingoSyncClient(log), true);
+            ActiveSession = DefaultSession;
             OnBoardUpdate(BingoBoardUI.UpdateGrid);
             OnBoardUpdate(ConfirmTopLeftOnReveal);
         }
@@ -82,7 +83,7 @@ namespace BingoSync
 
         public static void ToggleBoardKeybindClicked()
         {
-            if (!Session.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable())
             {
                 return;
             }
@@ -107,7 +108,7 @@ namespace BingoSync
             timer.Restart();
         }
 
-        public static void GenerateButtonClicked(Button sender)
+        public static void GenerateButtonClicked(Button _)
         {
             GameModesManager.Generate();
             Task resetBoardVisibility = new(() =>
@@ -124,13 +125,13 @@ namespace BingoSync
             {
                 return;
             }
-            if (!Session.Board.IsAvailable() || !Session.Board.IsRevealed || Session.Board.IsConfirmed)
+            if (!ActiveSession.Board.IsAvailable() || !ActiveSession.Board.IsRevealed || ActiveSession.Board.IsConfirmed)
             {
                 return;
             }
-            Session.Board.IsConfirmed = true;
-            string message = $"Revealed my card in hand-mode, my top-left goal is \"{Session.Board.GetSlot(0).Name}\"";
-            Session.SendChatMessage(message);
+            ActiveSession.Board.IsConfirmed = true;
+            string message = $"Revealed my card in hand-mode, my top-left goal is \"{ActiveSession.Board.GetSlot(0).Name}\"";
+            ActiveSession.SendChatMessage(message);
         }
 
         public static void RefreshDefaultsFromUI()
@@ -140,14 +141,14 @@ namespace BingoSync
 
         public static void UpdateBoardOpacity()
         {
-            if (!Session.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable())
             {
                 return;
             }
             GlobalSettings.BoardID = (GlobalSettings.BoardID + 1) % BingoBoardUI.GetBoardCount();
         }
 
-        public static void RevealButtonClicked(Button sender)
+        public static void RevealButtonClicked(Button _)
         {
             RevealCard();
         }
@@ -159,16 +160,16 @@ namespace BingoSync
 
         public static void JoinRoomButtonClicked(Button _)
         {
-            if (!Session.ClientIsConnected())
+            if (!ActiveSession.ClientIsConnected())
             {
-                Session.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) => {
+                ActiveSession.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) => {
                     ConnectionMenuUI.Update();
                     RefreshGenerationButtonEnabled();
                 });
             }
             else
             {
-                Session.ExitRoom(() => {
+                ActiveSession.ExitRoom(() => {
                     ConnectionMenuUI.Update();
                     RefreshGenerationButtonEnabled();
                 });
@@ -177,12 +178,12 @@ namespace BingoSync
 
         public static void RevealCard()
         {
-            if (Session.Board.IsRevealed)
+            if (ActiveSession.Board.IsRevealed)
             {
                 return;
             }
-            Session.Board.IsConfirmed = false;
-            Session.RevealCard();
+            ActiveSession.Board.IsConfirmed = false;
+            ActiveSession.RevealCard();
             if (HandMode)
             {
                 BoardIsVisible = false;
@@ -218,23 +219,23 @@ namespace BingoSync
 
             Log("Controller");
             Log($"\tBoard");
-            foreach (string goalname in Session.Board.Select(square => square.Name))
+            foreach (string goalname in ActiveSession.Board.Select(square => square.Name))
             {
                 Log($"\t\tGoal \"{goalname}\"");
             };
             Log($"\tMenuIsVisible = {MenuIsVisible}");
             Log($"\tBoardIsVisible = {BoardIsVisible}");
-            Log($"\tBoardIsConfirmed = {Session.Board.IsConfirmed}");
-            Log($"\tBoardIsRevealed = {Session.Board.IsRevealed}");
+            Log($"\tBoardIsConfirmed = {ActiveSession.Board.IsConfirmed}");
+            Log($"\tBoardIsRevealed = {ActiveSession.Board.IsRevealed}");
             Log($"\tActiveGameMode = {ActiveGameMode}");
             Log($"\tRoomCode = {RoomCode}");
             Log($"\tRoomPassword = {RoomPassword}");
             Log($"\tRoomNickname = {RoomNickname}");
             Log($"\tRoomColor = {RoomColor}");
-            Log($"\tRoomIsLockout = {RoomIsLockout}");
+            Log($"\tRoomIsLockout = {ActiveSession.RoomIsLockout}");
 
 
-            Session.DumpDebugInfo();
+            ActiveSession.DumpDebugInfo();
 
             GameModesManager.DumpDebugInfo();
 
@@ -278,7 +279,7 @@ namespace BingoSync
 
         public static void RefreshGenerationButtonEnabled()
         {
-            SetGenerationButtonEnabled((Session.ClientIsConnected() || Session.ClientIsConnecting()) && IsOnMainMenu);
+            SetGenerationButtonEnabled((ActiveSession.ClientIsConnected() || ActiveSession.ClientIsConnecting()) && IsOnMainMenu);
         }
 
         public static void RefreshMenu()

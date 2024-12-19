@@ -37,7 +37,7 @@ namespace BingoSync.GameUI
 
 
             layoutRoot.VisibilityCondition = () => {
-                Controller.Session.Update();
+                Controller.ActiveSession.Update();
                 ConnectionMenuUI.Update();
                 return Controller.MenuIsVisible;
             };

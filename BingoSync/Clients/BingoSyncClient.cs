@@ -18,13 +18,13 @@ namespace BingoSync.Clients
         private static readonly string LOCKOUT_MODE = "Lockout";
         private static readonly int maxRetries = 30;
 
-        private Action<string> Log;
+        private readonly Action<string> Log;
 
         private string currentRoomID = string.Empty;
 
-        private CookieContainer cookieContainer = null;
-        private HttpClientHandler handler = null;
-        private HttpClient client = null;
+        private readonly CookieContainer cookieContainer = null;
+        private readonly HttpClientHandler handler = null;
+        private readonly HttpClient client = null;
         private ClientWebSocket webSocketClient = null;
 
         private ClientState forcedState = ClientState.None;
@@ -32,18 +32,10 @@ namespace BingoSync.Clients
 
         private bool shouldConnect = false;
 
-        private event EventHandler<ChatMessage> ChatMessageReceived;
-        public event EventHandler<ChatMessage> OnChatMessageReceived
-        {
-            add
-            {
-                ChatMessageReceived += value;
-            }
-            remove
-            {
-                ChatMessageReceived -= value;
-            }
-        }
+        public event EventHandler<ChatMessage> ChatMessageReceived;
+        public event EventHandler<Square> GoalUpdateReceived;
+        public event EventHandler<bool> RoomSettingsReceived;
+
         private BingoBoard Board;
 
         public void DumpDebugInfo()
@@ -116,7 +108,7 @@ namespace BingoSync.Clients
                             string cookieName = cookieParts[0].Split('=')[0];
                             string cookieValue = cookieParts[0].Split('=')[1];
 
-                            Cookie cookie = new Cookie(cookieName.Trim(), cookieValue.Trim(), "/", response.RequestMessage.RequestUri.Host);
+                            Cookie cookie = new(cookieName.Trim(), cookieValue.Trim(), "/", response.RequestMessage.RequestUri.Host);
                             cookieContainer.Add(response.RequestMessage.RequestUri, cookie);
                         }
                     }
@@ -430,7 +422,7 @@ namespace BingoSync.Clients
 //                        if (color == "blank") continue;
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    BingoTracker.GoalUpdated(square.Name, square.GoalNr);
+                    GoalUpdateReceived(this, square);
                     break;
                 }
             }
@@ -492,7 +484,7 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(settingsResponse =>
                     {
                         var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result);
-                        Controller.RoomIsLockout = settings.Settings.LockoutMode == LOCKOUT_MODE;
+                        RoomSettingsReceived(this, settings.Settings.LockoutMode == LOCKOUT_MODE);
                     });
                 });
             }, maxRetries, nameof(UpdateSettings));
@@ -709,7 +701,7 @@ namespace BingoSync.Clients
     class NetworkObjectRoomSettingsResponse
     {
         [JsonProperty("settings")]
-        public NetworkObjectRoomSettings Settings = new NetworkObjectRoomSettings();
+        public NetworkObjectRoomSettings Settings = new();
     }
 
     [DataContract]

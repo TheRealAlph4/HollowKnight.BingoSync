@@ -156,7 +156,7 @@ namespace BingoSync
 
         private static void HeroUpdate()
         {
-            BingoTracker.ProcessBingo();
+            BingoTracker.ProcessBingo(Controller.ActiveSession);
         }
 
         private static bool UpdateBoolInternal(string name, bool orig)
