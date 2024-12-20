@@ -7,7 +7,7 @@ namespace BingoSync.Sessions
     public class ConnectionSession
     {
         private readonly IRemoteClient _client;
-        private readonly bool _markingClient;
+        private bool IsMarking { get; set; }
         public bool RoomIsLockout { get; set; } = false;
         public BingoBoard Board { get; set; } = new();
 
@@ -26,7 +26,7 @@ namespace BingoSync.Sessions
         public ConnectionSession(IRemoteClient client, bool markingClient)
         {
             _client = client;
-            _markingClient = markingClient;
+            IsMarking = markingClient;
             _client.SetBoard(Board);
             _client.GoalUpdateReceived += GoalUpdateFromServer;
             _client.RoomSettingsReceived += ConsumeRoomSettings;
@@ -106,7 +106,7 @@ namespace BingoSync.Sessions
 
         public void SelectSquare(int square, Action errorCallback, bool clear = false)
         {
-            if(_markingClient)
+            if(IsMarking)
             {
                 _client.SelectSquare(square, errorCallback, clear);
             }
