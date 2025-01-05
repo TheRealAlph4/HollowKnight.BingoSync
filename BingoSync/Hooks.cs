@@ -22,6 +22,9 @@ namespace BingoSync
             ModHooks.SetPlayerBoolHook += UpdateBoolInternal;
             ModHooks.SetPlayerIntHook += UpdateIntInternal;
 
+            // Fountain Fragment
+            ModHooks.SetPlayerIntHook += FountainFragment.CheckCollected;
+
             // GeoSpent
             On.GeoCounter.TakeGeo += GeoSpent.UpdateGeoSpent;
             On.GeoCounter.Update += GeoSpent.UpdateGeoText;
