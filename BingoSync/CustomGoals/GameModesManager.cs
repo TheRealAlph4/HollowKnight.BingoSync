@@ -13,7 +13,6 @@ namespace BingoSync.CustomGoals
         private static readonly Dictionary<string, BingoGoal> vanillaGoals = [];
         private static readonly Dictionary<string, BingoGoal> itemRandoGoals = [];
         private static readonly Dictionary<string, List<BingoGoal>> goalGroupDefinitions = [];
-        private static readonly List<BingoGoal> allCustomGoals = [];
 
         public static void DumpDebugInfo()
         {
@@ -96,13 +95,17 @@ namespace BingoSync.CustomGoals
 
         public static void RegisterGoalsForCustom(string groupName, Dictionary<string, BingoGoal> goals)
         {
-            allCustomGoals.AddRange(goals.Values);
             goalGroupDefinitions[groupName] = goals.Values.ToList();
         }
 
-        internal static List<BingoGoal> GetGoalsFromNames(List<string> names)
+        internal static List<BingoGoal> GetGoalsFromNames(string groupName, List<string> goalNames)
         {
-            return allCustomGoals.Where(goal => names.Contains(goal.name)).ToList();
+            List<BingoGoal> goals = [];
+            if (GoalGroupExists(groupName))
+            {
+                goals = goalGroupDefinitions[groupName].FindAll(goal => goalNames.Contains(goal.name));
+            }
+            return goals;
         }
 
         public static List<GoalGroup> CreateDefaultCustomSettings()
@@ -128,11 +131,6 @@ namespace BingoSync.CustomGoals
         public static bool GoalGroupExists(string groupName)
         {
             return goalGroupDefinitions.ContainsKey(groupName);
-        }
-
-        public static bool GoalExists(string goalName)
-        {
-            return allCustomGoals.Any(goal => goal.name == goalName);
         }
 
         public static List<string> GameModeNames()
