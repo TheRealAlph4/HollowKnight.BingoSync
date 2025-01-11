@@ -56,9 +56,15 @@ namespace BingoSync.GameUI
 
             Loader.Preload();
 
-            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Transparent Background.png").ToSprite()));
-            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Opaque Background.png").ToSprite()));
-            boards.Add(new DisplayBoard(Loader.GetTexture("BingoSync Solid Background.png").ToSprite()));
+            Sprite highlightSprite = Loader.GetTexture("BingoSync Background Highlight.png").ToSprite();
+
+            Sprite transparentBackgroundSprite = Loader.GetTexture("BingoSync Background Transparent.png").ToSprite();
+            Sprite opaqueBackgroundSprite = Loader.GetTexture("BingoSync Background Opaque.png").ToSprite();
+            Sprite solidBackgroundSprite = Loader.GetTexture("BingoSync Background Solid.png").ToSprite();
+
+            boards.Add(new DisplayBoard(transparentBackgroundSprite, highlightSprite));
+            boards.Add(new DisplayBoard(opaqueBackgroundSprite, highlightSprite));
+            boards.Add(new DisplayBoard(solidBackgroundSprite, highlightSprite));
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
@@ -85,6 +91,7 @@ namespace BingoSync.GameUI
                     {
                         board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
                     }
+                    board.bingoLayout[square.GoalNr].Highlight.Height = square.Highlighted ? 110 : 0;
                 });
             }
         }

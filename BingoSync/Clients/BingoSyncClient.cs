@@ -131,7 +131,8 @@ namespace BingoSync.Clients
                     squares.Add(new Square() {
                         Name = networkSquare.Name,
                         MarkedBy = colors,
-                        GoalNr = int.Parse(networkSquare.Slot.Substring(4))-1,
+                        Highlighted = false,
+                        GoalNr = int.Parse(networkSquare.Slot.Substring(4)) - 1,
                     });
                 }
                 Board.SetSquares(squares);

@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using GridLayout = MagicUI.Elements.GridLayout;
+using System.Security.Permissions;
 
 namespace BingoSync.GameUI
 {
@@ -12,6 +13,7 @@ namespace BingoSync.GameUI
         internal class SquareLayoutObjects
         {
             public TextObject Text;
+            public Image Highlight;
             public Dictionary<string, Image> BackgroundColors;
         };
         public int id;
@@ -34,7 +36,7 @@ namespace BingoSync.GameUI
                 { "yellow", Colors.Yellow.GetColor() },
             };
 
-        public DisplayBoard(Sprite sprite)
+        public DisplayBoard(Sprite backgroundSprite, Sprite highlightSprite)
         {
             id = BingoBoardUI.GetBoardCount();
             layoutRoot = new(true, "Persistent layout");
@@ -64,7 +66,7 @@ namespace BingoSync.GameUI
                 Visibility = Visibility.Hidden,
             };
 
-            CreateBaseLayout(sprite);
+            CreateBaseLayout(backgroundSprite, highlightSprite);
 
             layoutRoot.VisibilityCondition = () => {
                 return (Controller.ActiveSession.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
@@ -72,7 +74,7 @@ namespace BingoSync.GameUI
 
         }
 
-        private void CreateBaseLayout(Sprite backgroundSprite)
+        private void CreateBaseLayout(Sprite backgroundSprite, Sprite highlightSprite)
         {
             bingoLayout = [];
             for (int row = 0; row < 5; row++)
@@ -82,7 +84,7 @@ namespace BingoSync.GameUI
                     var (stack, images) = GenerateSquareBackgroundImage(row, column, backgroundSprite);
                     gridLayout.Children.Add(stack);
 
-                    var textObject = new TextObject(layoutRoot, $"square_{row}_{column}")
+                    TextObject textObject = new TextObject(layoutRoot, $"square_{row}_{column}_text")
                     {
                         FontSize = 12,
                         Text = "",
@@ -95,9 +97,19 @@ namespace BingoSync.GameUI
                     }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
                     gridLayout.Children.Add(textObject);
 
+                    Image highlightImage = new Image(layoutRoot, highlightSprite, $"square_{row}_{column}_highlight")
+                    {
+                        Height = 110,
+                        Width = 110,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                    }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
+                    gridLayout.Children.Add(highlightImage);
+
                     bingoLayout.Add(new SquareLayoutObjects
                     {
                         Text = textObject,
+                        Highlight = highlightImage,
                         BackgroundColors = images,
                     });
                 }
