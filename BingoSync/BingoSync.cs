@@ -5,7 +5,6 @@ using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using UnityEngine;
 using BingoSync.Helpers;
-using BingoSync.Clients;
 
 namespace BingoSync
 {
@@ -13,7 +12,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.3.0";
+        public static string version = "1.3.4.0";
         public override string GetVersion() => version;
 
         public override int LoadPriority() => 0;
@@ -32,7 +31,7 @@ namespace BingoSync
             ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
             // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
             GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
-       }
+        }
 
         public static void ShowMenu()
         {

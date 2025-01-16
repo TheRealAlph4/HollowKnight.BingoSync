@@ -11,6 +11,7 @@ using BingoSync.GameUI;
 using System.Linq;
 using BingoSync.Clients;
 using BingoSync.Sessions;
+using BingoSync.Interfaces;
 
 namespace BingoSync
 {
@@ -19,7 +20,18 @@ namespace BingoSync
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
         public static Session DefaultSession { get; set; }
-        public static Session ActiveSession { get; set; }
+        private static Session _activeSession;
+        public static Session ActiveSession { 
+            get {
+                return _activeSession;
+            }
+            set {
+                Session previous = _activeSession;
+                _activeSession = value;
+                if (previous == null) return;
+                SessionManager.SessionChanged(previous);
+            }
+        }
         public static bool IsOnMainMenu { get; set; } = true;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;

@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace BingoSync.Clients
+namespace BingoSync.Clients.EventInfoObjects
 {
     public class ChatMessage : EventArgs
     {
         public string Text { get; set; }
         public string Sender { get; set; }
-        public DateTime TimeStamp { get; set; } = DateTime.Now;
+        public string Timestamp { get; set; }
     }
 }

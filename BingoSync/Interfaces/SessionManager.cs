@@ -13,6 +13,17 @@ namespace BingoSync.Interfaces
             Log = log;
         }
 
+        internal static void SessionChanged(Session previous)
+        {
+            OnSessionChanged(previous, previous);
+        }
+
+        /// <summary>
+        /// Called when the active session has changed. 
+        /// Passes the previous session as the parameter.
+        /// </summary>
+        public static event EventHandler<Session> OnSessionChanged;
+
         /// <summary>
         /// Sets the active session to the default BingoSync session.
         /// </summary>
@@ -60,6 +71,14 @@ namespace BingoSync.Interfaces
         public static void RegisterForAutomarking(Session session)
         {
             ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
+        }
+
+        /// <summary>
+        /// Returns the currently active session.
+        /// </summary>
+        public static Session GetActiveSession()
+        {
+            return Controller.ActiveSession;
         }
 
         /// <summary>

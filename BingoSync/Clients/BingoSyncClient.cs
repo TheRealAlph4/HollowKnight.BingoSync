@@ -1,4 +1,5 @@
-﻿using BingoSync.Sessions;
+﻿using BingoSync.Clients.EventInfoObjects;
+using BingoSync.Sessions;
 using HutongGames.PlayMaker.Actions;
 using Newtonsoft.Json;
 using System;
@@ -32,9 +33,13 @@ namespace BingoSync.Clients
 
         private bool shouldConnect = false;
 
+        public event EventHandler<CardRevealedBroadcast> CardRevealedBroadcastReceived;
         public event EventHandler<ChatMessage> ChatMessageReceived;
-        public event EventHandler<Square> GoalUpdateReceived;
-        public event EventHandler<bool> RoomSettingsReceived;
+        public event EventHandler<GoalUpdate> GoalUpdateReceived;
+        public event EventHandler<NewCardBroadcast> NewCardReceived;
+        public event EventHandler<PlayerColorChange> PlayerColorChangeReceived;
+        public event EventHandler<PlayerConnectedBroadcast> PlayerConnectedBroadcastReceived;
+        public event EventHandler<RoomSettings> RoomSettingsReceived;
 
         private BingoBoard Board;
 
@@ -399,6 +404,7 @@ namespace BingoSync.Clients
             {
                 Text = chatBroadcast.Text,
                 Sender = chatBroadcast.Player.Name,
+                Timestamp = chatBroadcast.Timestamp,
             });
         }
 
@@ -408,6 +414,10 @@ namespace BingoSync.Clients
             UpdateBoardAndBroadcast(null);
             UpdateBoard(newCardBroadcast.HideCard);
             UpdateSettings();
+            NewCardReceived(this, new NewCardBroadcast()
+            {
+                Player = newCardBroadcast.Player.Name,
+            });
         }
 
         private void HandleGoalBroadcast(string json)
@@ -423,7 +433,14 @@ namespace BingoSync.Clients
 //                        if (color == "blank") continue;
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    GoalUpdateReceived(this, square);
+                    GoalUpdateReceived(this, new GoalUpdate()
+                    {
+                        Player = goalBroadcast.Player.Name,
+                        Color = ColorExtensions.FromName(goalBroadcast.Color),
+                        Goal = goalBroadcast.Square.Name,
+                        Slot = square.GoalNr,
+                        Unmarking = goalBroadcast.Remove,
+                    });
                     break;
                 }
             }
@@ -433,6 +450,11 @@ namespace BingoSync.Clients
         private void HandleColorBroadcast(string json)
         {
             NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json);
+            PlayerColorChangeReceived(this, new PlayerColorChange()
+            {
+                Player = colorBroadcast.Player.Name,
+                Color = ColorExtensions.FromName(colorBroadcast.Color),
+            });
         }
 
         private void HandleRevealedBroadcast(string json)
@@ -443,11 +465,19 @@ namespace BingoSync.Clients
                 Controller.RevealCard();
             }
             Controller.BoardUpdate();
+            CardRevealedBroadcastReceived(this, new CardRevealedBroadcast()
+            {
+                Player = revealedBroadcast.Player.Name,
+            });
         }
 
         private void HandleConnectionBroadcast(string json)
         {
             NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json);
+            PlayerConnectedBroadcastReceived(this, new PlayerConnectedBroadcast()
+            {
+                Player = connectionBroadcast.Player.Name,
+            });
         }
 
         private void UpdateBoard(bool hideCard)
@@ -485,7 +515,10 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(settingsResponse =>
                     {
                         var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result);
-                        RoomSettingsReceived(this, settings.Settings.LockoutMode == LOCKOUT_MODE);
+                        RoomSettingsReceived(this, new RoomSettings()
+                        {
+                            IsLockout = settings.Settings.LockoutMode == LOCKOUT_MODE
+                        });
                     });
                 });
             }, maxRetries, nameof(UpdateSettings));

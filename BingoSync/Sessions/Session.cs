@@ -1,4 +1,5 @@
 ﻿using BingoSync.Clients;
+using BingoSync.Clients.EventInfoObjects;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,20 @@ namespace BingoSync.Sessions
         public bool IsMarking { get; set; }
         public bool RoomIsLockout { get; set; } = false;
         public BingoBoard Board { get; set; } = new();
+
+        #region Events
+
+        public event EventHandler<CardRevealedBroadcast> OnCardRevealedBroadcastReceived
+        {
+            add
+            {
+                _client.CardRevealedBroadcastReceived += value;
+            }
+            remove
+            {
+                _client.CardRevealedBroadcastReceived -= value;
+            }
+        }
 
         public event EventHandler<ChatMessage> OnChatMessageReceived
         {
@@ -23,6 +38,68 @@ namespace BingoSync.Sessions
             }
         }
 
+        public event EventHandler<GoalUpdate> OnGoalUpdateReceived
+        {
+            add
+            {
+                _client.GoalUpdateReceived += value;
+            }
+            remove
+            {
+                _client.GoalUpdateReceived -= value;
+            }
+        }
+
+        public event EventHandler<NewCardBroadcast> OnNewCardReceived
+        {
+            add
+            {
+                _client.NewCardReceived += value;
+            }
+            remove
+            {
+                _client.NewCardReceived -= value;
+            }
+        }
+
+        public event EventHandler<PlayerColorChange> OnPlayerColorChangeReceived
+        {
+            add
+            {
+                _client.PlayerColorChangeReceived += value;
+            }
+            remove
+            {
+                _client.PlayerColorChangeReceived -= value;
+            }
+        }
+
+        public event EventHandler<PlayerConnectedBroadcast> OnPlayerConnectedBroadcastReceived
+        {
+            add
+            {
+                _client.PlayerConnectedBroadcastReceived += value;
+            }
+            remove
+            {
+                _client.PlayerConnectedBroadcastReceived -= value;
+            }
+        }
+
+        public event EventHandler<RoomSettings> OnRoomSettingsReceived
+        {
+            add
+            {
+                _client.RoomSettingsReceived += value;
+            }
+            remove
+            {
+                _client.RoomSettingsReceived -= value;
+            }
+        }
+
+        #endregion
+
         public Session(IRemoteClient client, bool markingClient)
         {
             _client = client;
@@ -32,14 +109,19 @@ namespace BingoSync.Sessions
             _client.RoomSettingsReceived += ConsumeRoomSettings;
         }
 
-        private void ConsumeRoomSettings(object sender, bool isLockout)
+        public void LocalUpdate()
         {
-            RoomIsLockout = isLockout;
+            Controller.BoardUpdate();
         }
 
-        private void GoalUpdateFromServer(object sender, Square square)
+        private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
-            BingoTracker.GoalUpdated(this, square.Name, square.GoalNr);
+            RoomIsLockout = settings.IsLockout;
+        }
+
+        private void GoalUpdateFromServer(object sender, GoalUpdate update)
+        {
+            BingoTracker.GoalUpdated(this, update.Goal, update.Slot);
         }
 
         public bool IsPlayable()
