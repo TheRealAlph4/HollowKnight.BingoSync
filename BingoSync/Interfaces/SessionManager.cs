@@ -22,6 +22,15 @@ namespace BingoSync.Interfaces
         }
 
         /// <summary>
+        /// Gets the default BingoSync session
+        /// </summary>
+        /// <returns></returns>
+        public static Session GetDefaultSession()
+        {
+            return Controller.DefaultSession;
+        }
+
+        /// <summary>
         /// Creates a connection session for the given server. 
         /// This can be done manually, e.g. to use a custom client, 
         /// but the session needs to be manually signed up for automarking, 
@@ -31,14 +40,14 @@ namespace BingoSync.Interfaces
         /// <param name="isMarking"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static ConnectionSession CreateSession(Servers server, bool isMarking)
+        public static Session CreateSession(Servers server, bool isMarking)
         {
             IRemoteClient remoteClient = server switch
             {
                 Servers.BingoSync => new BingoSyncClient(Log),
                 _ => throw new NotImplementedException()
             };
-            ConnectionSession session = new(remoteClient, isMarking);
+            Session session = new(remoteClient, isMarking);
             ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
             return session;
         }
@@ -48,7 +57,7 @@ namespace BingoSync.Interfaces
         /// Session.isMarking.
         /// </summary>
         /// <param name="session"></param>
-        public static void RegisterForAutomarking(ConnectionSession session)
+        public static void RegisterForAutomarking(Session session)
         {
             ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
         }
@@ -59,7 +68,7 @@ namespace BingoSync.Interfaces
         /// interacts with the active session.
         /// </summary>
         /// <param name="session"></param>
-        public static void SetActiveSession(ConnectionSession session)
+        public static void SetActiveSession(Session session)
         {
             Controller.ActiveSession = session;
         }

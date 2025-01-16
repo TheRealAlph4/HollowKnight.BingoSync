@@ -18,8 +18,8 @@ namespace BingoSync
     {
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
 
-        public static ConnectionSession DefaultSession { get; set; }
-        public static ConnectionSession ActiveSession { get; set; }
+        public static Session DefaultSession { get; set; }
+        public static Session ActiveSession { get; set; }
         public static bool IsOnMainMenu { get; set; } = true;
         public static bool MenuIsVisible { get; set; } = true;
         public static bool BoardIsVisible { get; set; } = true;
@@ -65,7 +65,7 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            DefaultSession = new ConnectionSession(new BingoSyncClient(log), true);
+            DefaultSession = new Session(new BingoSyncClient(log), true);
             ActiveSession = DefaultSession;
             OnBoardUpdate(BingoBoardUI.UpdateGrid);
             OnBoardUpdate(ConfirmTopLeftOnReveal);

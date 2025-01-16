@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace BingoSync.Sessions
 {
-    public class ConnectionSession
+    public class Session
     {
         private readonly IRemoteClient _client;
-        private bool IsMarking { get; set; }
+        public bool IsMarking { get; set; }
         public bool RoomIsLockout { get; set; } = false;
         public BingoBoard Board { get; set; } = new();
 
@@ -23,7 +23,7 @@ namespace BingoSync.Sessions
             }
         }
 
-        public ConnectionSession(IRemoteClient client, bool markingClient)
+        public Session(IRemoteClient client, bool markingClient)
         {
             _client = client;
             IsMarking = markingClient;

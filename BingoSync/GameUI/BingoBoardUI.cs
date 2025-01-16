@@ -56,15 +56,17 @@ namespace BingoSync.GameUI
 
             Loader.Preload();
 
-            Sprite highlightSprite = Loader.GetTexture("BingoSync Background Highlight.png").ToSprite();
+            Sprite transparentHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Transparent.png").ToSprite();
+            Sprite opaqueHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Opaque.png").ToSprite();
+            Sprite solidHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Solid.png").ToSprite();
 
             Sprite transparentBackgroundSprite = Loader.GetTexture("BingoSync Background Transparent.png").ToSprite();
             Sprite opaqueBackgroundSprite = Loader.GetTexture("BingoSync Background Opaque.png").ToSprite();
             Sprite solidBackgroundSprite = Loader.GetTexture("BingoSync Background Solid.png").ToSprite();
 
-            boards.Add(new DisplayBoard(transparentBackgroundSprite, highlightSprite));
-            boards.Add(new DisplayBoard(opaqueBackgroundSprite, highlightSprite));
-            boards.Add(new DisplayBoard(solidBackgroundSprite, highlightSprite));
+            boards.Add(new DisplayBoard(transparentBackgroundSprite, transparentHighlightSprite));
+            boards.Add(new DisplayBoard(opaqueBackgroundSprite, opaqueHighlightSprite));
+            boards.Add(new DisplayBoard(solidBackgroundSprite, solidHighlightSprite));
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);

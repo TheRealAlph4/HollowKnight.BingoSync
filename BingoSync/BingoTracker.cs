@@ -143,7 +143,7 @@ namespace BingoSync
             }
         }
 
-        public static void ProcessBingo(ConnectionSession session)
+        public static void ProcessBingo(Session session)
         {
             if (!session.IsPlayable()) return;
             _allPossibleSquares.ForEach(square =>
@@ -228,7 +228,7 @@ namespace BingoSync
             condition.Conditions.ForEach(ClearCondition);
         }
 
-        public static void GoalUpdated(ConnectionSession session, string goal, int index)
+        public static void GoalUpdated(Session session, string goal, int index)
         {
             if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
@@ -243,7 +243,7 @@ namespace BingoSync
             UpdateGoal(session, goal, shouldUnmark: false);
         }
 
-        public static void UpdateGoal(ConnectionSession session, string goal, bool shouldUnmark)
+        public static void UpdateGoal(Session session, string goal, bool shouldUnmark)
         {
             if (!session.IsPlayable()) return;
             int index = -1;
