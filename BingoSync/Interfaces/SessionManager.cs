@@ -15,7 +15,7 @@ namespace BingoSync.Interfaces
 
         internal static void SessionChanged(Session previous)
         {
-            OnSessionChanged(previous, previous);
+            OnSessionChanged?.Invoke(previous, previous);
         }
 
         /// <summary>

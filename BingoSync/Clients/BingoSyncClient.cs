@@ -386,7 +386,7 @@ namespace BingoSync.Clients
                 }
                 catch (Exception ex)
                 {
-                    Log($"error receiving data from socket: {ex.Message}");
+                    Log($"'{ex.GetType().FullName}' error with message '{ex.Message}' while handling socket broadcast.\nStacktrace: \n{ex.StackTrace}");
                 }
             }
             if (shouldConnect)
@@ -400,7 +400,7 @@ namespace BingoSync.Clients
         private void HandleChatBroadcast(string json)
         {
             NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json);
-            ChatMessageReceived(this, new ChatMessage()
+            ChatMessageReceived?.Invoke(this, new ChatMessage()
             {
                 Text = chatBroadcast.Text,
                 Sender = chatBroadcast.Player.Name,
@@ -414,7 +414,7 @@ namespace BingoSync.Clients
             UpdateBoardAndBroadcast(null);
             UpdateBoard(newCardBroadcast.HideCard);
             UpdateSettings();
-            NewCardReceived(this, new NewCardBroadcast()
+            NewCardReceived?.Invoke(this, new NewCardBroadcast()
             {
                 Player = newCardBroadcast.Player.Name,
             });
@@ -433,7 +433,7 @@ namespace BingoSync.Clients
 //                        if (color == "blank") continue;
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    GoalUpdateReceived(this, new GoalUpdate()
+                    GoalUpdateReceived?.Invoke(this, new GoalUpdate()
                     {
                         Player = goalBroadcast.Player.Name,
                         Color = ColorExtensions.FromName(goalBroadcast.Color),
@@ -450,7 +450,7 @@ namespace BingoSync.Clients
         private void HandleColorBroadcast(string json)
         {
             NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json);
-            PlayerColorChangeReceived(this, new PlayerColorChange()
+            PlayerColorChangeReceived?.Invoke(this, new PlayerColorChange()
             {
                 Player = colorBroadcast.Player.Name,
                 Color = ColorExtensions.FromName(colorBroadcast.Color),
@@ -465,7 +465,7 @@ namespace BingoSync.Clients
                 Controller.RevealCard();
             }
             Controller.BoardUpdate();
-            CardRevealedBroadcastReceived(this, new CardRevealedBroadcast()
+            CardRevealedBroadcastReceived?.Invoke(this, new CardRevealedBroadcast()
             {
                 Player = revealedBroadcast.Player.Name,
             });
@@ -474,7 +474,7 @@ namespace BingoSync.Clients
         private void HandleConnectionBroadcast(string json)
         {
             NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json);
-            PlayerConnectedBroadcastReceived(this, new PlayerConnectedBroadcast()
+            PlayerConnectedBroadcastReceived?.Invoke(this, new PlayerConnectedBroadcast()
             {
                 Player = connectionBroadcast.Player.Name,
             });
