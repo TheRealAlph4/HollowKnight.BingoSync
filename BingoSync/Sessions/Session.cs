@@ -10,6 +10,8 @@ namespace BingoSync.Sessions
         private readonly IRemoteClient _client;
         public bool IsMarking { get; set; }
         public bool RoomIsLockout { get; set; } = false;
+        public string Nickname { get; private set; } = string.Empty;
+        public Colors Color { get; private set; } = Colors.Orange;
         public BingoBoard Board { get; set; } = new();
 
         #region Events
@@ -153,7 +155,9 @@ namespace BingoSync.Sessions
                 return;
             }
 
-            _client.JoinRoom(roomID, nickname, password, callback);
+            _client.JoinRoom(roomID, nickname, password, ColorExtensions.FromName(Controller.RoomColor), callback);
+            Nickname = nickname;
+            Color = ColorExtensions.FromName(Controller.RoomColor);
         }
 
         public void ExitRoom(Action callback)

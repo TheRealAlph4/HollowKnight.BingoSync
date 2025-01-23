@@ -146,7 +146,7 @@ namespace BingoSync.Clients
             Controller.BoardUpdate();
         }
 
-        public void JoinRoom(string roomID, string nickname, string password, Action<Exception> callback)
+        public void JoinRoom(string roomID, string nickname, string password, Colors color, Action<Exception> callback)
         {
             if (GetState() == ClientState.Loading)
             {
@@ -179,7 +179,7 @@ namespace BingoSync.Clients
                         ConnectToBroadcastSocket(socketJoin);
                         UpdateBoard(true); // TODO: check if card should be hidden
                         UpdateSettings();
-                        SetColor(Controller.RoomColor);
+                        SetColor(color.GetName());
                     });
                 }
                 catch (Exception _ex)

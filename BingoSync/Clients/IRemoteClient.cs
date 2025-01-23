@@ -18,7 +18,7 @@ namespace BingoSync.Clients
         public void DumpDebugInfo();
         public void Update();
         public ClientState GetState();
-        public void JoinRoom(string roomID, string nickname, string password, Action<Exception> callback);
+        public void JoinRoom(string roomID, string nickname, string password, Colors color, Action<Exception> callback);
         public void NewCard(string customJSON, bool lockout = true, bool hideCard = true);
         public void RevealCard();
         public void SendChatMessage(string text);
