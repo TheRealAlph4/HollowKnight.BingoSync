@@ -644,7 +644,7 @@
             "conditions": [
                 {
                     "type": "Bool",
-                    "variableName": "hornetFountainEncounter",
+                    "variableName": "talkedToHornetAtCoTFountain",
                     "expectedValue": true
                 },
                 {
