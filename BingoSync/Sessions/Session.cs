@@ -16,95 +16,83 @@ namespace BingoSync.Sessions
 
         #region Events
 
-        public event EventHandler<CardRevealedBroadcast> OnCardRevealedBroadcastReceived
+        public event EventHandler<CardRevealedBroadcast> OnCardRevealedBroadcastReceived;
+
+        private void RefireCardRevealedBroadcast(object _, CardRevealedBroadcast broadcast)
         {
-            add
-            {
-                _client.CardRevealedBroadcastReceived += value;
-            }
-            remove
-            {
-                _client.CardRevealedBroadcastReceived -= value;
-            }
+            OnCardRevealedBroadcastReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<ChatMessage> OnChatMessageReceived
+        public event EventHandler<ChatMessage> OnChatMessageReceived;
+
+        private void RefireChatMessage(object _, ChatMessage broadcast)
         {
-            add
-            {
-                _client.ChatMessageReceived += value;
-            }
-            remove
-            {
-                _client.ChatMessageReceived -= value;
-            }
+            OnChatMessageReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<GoalUpdate> OnGoalUpdateReceived
+        public event EventHandler<GoalUpdate> OnGoalUpdateReceived;
+
+        private void RefireGoalUpdate(object _, GoalUpdate broadcast)
         {
-            add
-            {
-                _client.GoalUpdateReceived += value;
-            }
-            remove
-            {
-                _client.GoalUpdateReceived -= value;
-            }
+            OnGoalUpdateReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<NewCardBroadcast> OnNewCardReceived
+        public event EventHandler<NewCardBroadcast> OnNewCardReceived;
+
+        private void RefireNewCard(object _, NewCardBroadcast broadcast)
         {
-            add
-            {
-                _client.NewCardReceived += value;
-            }
-            remove
-            {
-                _client.NewCardReceived -= value;
-            }
+            OnNewCardReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<PlayerColorChange> OnPlayerColorChangeReceived
+        public event EventHandler<PlayerColorChange> OnPlayerColorChangeReceived;
+
+        private void RefirePlayerColorChange(object _, PlayerColorChange broadcast)
         {
-            add
-            {
-                _client.PlayerColorChangeReceived += value;
-            }
-            remove
-            {
-                _client.PlayerColorChangeReceived -= value;
-            }
+            OnPlayerColorChangeReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<PlayerConnectedBroadcast> OnPlayerConnectedBroadcastReceived
+        public event EventHandler<PlayerConnectedBroadcast> OnPlayerConnectedBroadcastReceived;
+
+        private void RefirePlayerConnectedBroadcast(object _, PlayerConnectedBroadcast broadcast)
         {
-            add
-            {
-                _client.PlayerConnectedBroadcastReceived += value;
-            }
-            remove
-            {
-                _client.PlayerConnectedBroadcastReceived -= value;
-            }
+            OnPlayerConnectedBroadcastReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<RoomSettings> OnRoomSettingsReceived
+        public event EventHandler<RoomSettings> OnRoomSettingsReceived;
+
+        private void RefireRoomSettings(object _, RoomSettings broadcast)
         {
-            add
-            {
-                _client.RoomSettingsReceived += value;
-            }
-            remove
-            {
-                _client.RoomSettingsReceived -= value;
-            }
+            OnRoomSettingsReceived?.Invoke(this, broadcast);
         }
 
-        #endregion
+        private void UnsubscribeEventRefires()
+        {
+            _client.CardRevealedBroadcastReceived -= RefireCardRevealedBroadcast;
+            _client.ChatMessageReceived -= RefireChatMessage;
+            _client.GoalUpdateReceived -= RefireGoalUpdate;
+            _client.NewCardReceived -= RefireNewCard;
+            _client.PlayerColorChangeReceived -= RefirePlayerColorChange;
+            _client.PlayerConnectedBroadcastReceived -= RefirePlayerConnectedBroadcast;
+            _client.RoomSettingsReceived -= RefireRoomSettings;
+        }
+
+        private void SubscribeEventRefires()
+        {
+            _client.CardRevealedBroadcastReceived += RefireCardRevealedBroadcast;
+            _client.ChatMessageReceived += RefireChatMessage;
+            _client.GoalUpdateReceived += RefireGoalUpdate;
+            _client.NewCardReceived += RefireNewCard;
+            _client.PlayerColorChangeReceived += RefirePlayerColorChange;
+            _client.PlayerConnectedBroadcastReceived += RefirePlayerConnectedBroadcast;
+            _client.RoomSettingsReceived += RefireRoomSettings;
+        }
+
+    #endregion
 
         public Session(IRemoteClient client, bool markingClient)
         {
             _client = client;
+            SubscribeEventRefires();
             IsMarking = markingClient;
             _client.SetBoard(Board);
             _client.GoalUpdateReceived += GoalUpdateFromServer;
