@@ -3,7 +3,6 @@ using MagicUI.Core;
 using MagicUI.Elements;
 using MagicUI.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -12,7 +11,7 @@ namespace BingoSync.GameUI
 {
     internal static class BingoBoardUI
     {
-        private static readonly List<DisplayBoard> boards = [];
+        private static DisplayBoard board;
 
         private static readonly LayoutRoot commonRoot = new(true, "Persistent layout")
         {
@@ -56,17 +55,10 @@ namespace BingoSync.GameUI
 
             Loader.Preload();
 
-            Sprite transparentHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Transparent.png").ToSprite();
-            Sprite opaqueHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Opaque.png").ToSprite();
-            Sprite solidHighlightSprite = Loader.GetTexture("BingoSync Background Highlight Solid.png").ToSprite();
+            Sprite backgroundSprite = Loader.GetTexture("BingoSync Background.png").ToSprite();
+            Sprite highlightSprite = Loader.GetTexture("BingoSync Background Highlight.png").ToSprite();
 
-            Sprite transparentBackgroundSprite = Loader.GetTexture("BingoSync Background Transparent.png").ToSprite();
-            Sprite opaqueBackgroundSprite = Loader.GetTexture("BingoSync Background Opaque.png").ToSprite();
-            Sprite solidBackgroundSprite = Loader.GetTexture("BingoSync Background Solid.png").ToSprite();
-
-            boards.Add(new DisplayBoard(transparentBackgroundSprite, transparentHighlightSprite));
-            boards.Add(new DisplayBoard(opaqueBackgroundSprite, opaqueHighlightSprite));
-            boards.Add(new DisplayBoard(solidBackgroundSprite, solidHighlightSprite));
+            board = new DisplayBoard(backgroundSprite, highlightSprite);
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
@@ -77,7 +69,6 @@ namespace BingoSync.GameUI
         {
             loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
             revealCardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.Board.IsAvailable() && !Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
-            boards.ForEach(board => board.gridLayout.Visibility = (Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden);
 
             if (!Controller.ActiveSession.Board.IsAvailable())
             {
@@ -86,21 +77,19 @@ namespace BingoSync.GameUI
 
             foreach (Square square in Controller.ActiveSession.Board)
             {
-                boards.ForEach(board => board.bingoLayout[square.GoalNr].Text.Text = square.Name);
-                boards.ForEach(board => board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0));
-                boards.ForEach(board => {
-                    foreach (Colors color in square.MarkedBy)
-                    {
-                        board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
-                    }
-                    board.bingoLayout[square.GoalNr].Highlight.Height = square.Highlighted ? 110 : 0;
-                });
+                board.bingoLayout[square.GoalNr].Text.Text = square.Name;
+                board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
+                foreach (Colors color in square.MarkedBy)
+                {
+                    board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
+                }
+                board.bingoLayout[square.GoalNr].Highlight.Height = square.Highlighted ? 110 : 0;
             }
         }
 
-        public static int GetBoardCount()
+        public static void SetBoardAlpha(float alpha)
         {
-            return boards.Count;
+            board.SetAlpha(alpha);
         }
     }
 }

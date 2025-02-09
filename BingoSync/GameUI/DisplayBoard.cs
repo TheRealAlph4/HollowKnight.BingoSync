@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using GridLayout = MagicUI.Elements.GridLayout;
-using System.Security.Permissions;
+using Satchel;
 
 namespace BingoSync.GameUI
 {
@@ -16,10 +16,10 @@ namespace BingoSync.GameUI
             public Image Highlight;
             public Dictionary<string, Image> BackgroundColors;
         };
-        public int id;
         public LayoutRoot layoutRoot;
         public GridLayout gridLayout;
         public List<SquareLayoutObjects> bingoLayout;
+        private bool opacityInitialized = false;
 
         private static readonly Dictionary<string, Color> BingoColors = new()
         {
@@ -38,10 +38,9 @@ namespace BingoSync.GameUI
 
         public DisplayBoard(Sprite backgroundSprite, Sprite highlightSprite)
         {
-            id = BingoBoardUI.GetBoardCount();
-            layoutRoot = new(true, "Persistent layout");
+            layoutRoot = new(true, "BingoSync_BoardDisplayRoot");
 
-            gridLayout = new GridLayout(layoutRoot, "grid")
+            gridLayout = new GridLayout(layoutRoot, "BingoSync_BoardDisplayGrid")
             {
                 MinWidth = 600,
                 MinHeight = 600,
@@ -63,15 +62,44 @@ namespace BingoSync.GameUI
                 },
                 VerticalAlignment = VerticalAlignment.Top,
                 HorizontalAlignment = HorizontalAlignment.Right,
-                Visibility = Visibility.Hidden,
+                Visibility = Visibility.Visible,
             };
 
             CreateBaseLayout(backgroundSprite, highlightSprite);
 
-            layoutRoot.VisibilityCondition = () => {
-                return (Controller.ActiveSession.ClientIsConnected()) && (Controller.GlobalSettings.BoardID == id) && (Controller.BoardIsVisible);
-            };
+            layoutRoot.VisibilityCondition = BoardShouldBeVisible;
+        }
 
+        private bool BoardShouldBeVisible()
+        {
+            bool shouldBeVisible = Controller.ActiveSession.ClientIsConnected() && Controller.BoardIsVisible && Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.Board.IsRevealed;
+            if (shouldBeVisible && !opacityInitialized)
+            {
+                opacityInitialized = true;
+                SetAlpha(Controller.GlobalSettings.BoardAlpha);
+            }
+            return shouldBeVisible;
+        }
+
+        public void SetAlpha(float alpha)
+        {
+            GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
+            if (objects == null)
+            {
+                return;
+            }
+            foreach (GameObject obj in objects)
+            {
+                if (obj == null)
+                {
+                    continue;
+                }
+                string name = obj.GetName();
+                if(name.Contains("BingoSync_BoardDisplay") && !name.Contains("text"))
+                {
+                    obj.GetComponent<CanvasRenderer>()?.SetAlpha(alpha);
+                }
+            }
         }
 
         private void CreateBaseLayout(Sprite backgroundSprite, Sprite highlightSprite)
@@ -84,7 +112,7 @@ namespace BingoSync.GameUI
                     var (stack, images) = GenerateSquareBackgroundImage(row, column, backgroundSprite);
                     gridLayout.Children.Add(stack);
 
-                    TextObject textObject = new TextObject(layoutRoot, $"square_{row}_{column}_text")
+                    TextObject textObject = new TextObject(layoutRoot, $"BingoSync_BoardDisplay_square_{row}_{column}_text")
                     {
                         FontSize = 12,
                         Text = "",
@@ -97,7 +125,7 @@ namespace BingoSync.GameUI
                     }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
                     gridLayout.Children.Add(textObject);
 
-                    Image highlightImage = new Image(layoutRoot, highlightSprite, $"square_{row}_{column}_highlight")
+                    Image highlightImage = new Image(layoutRoot, highlightSprite, $"BingoSync_BoardDisplay_square_{row}_{column}_highlight")
                     {
                         Height = 110,
                         Width = 110,
@@ -118,7 +146,7 @@ namespace BingoSync.GameUI
 
         private (StackLayout, Dictionary<string, Image>) GenerateSquareBackgroundImage(int row, int column, Sprite backgroundSprite)
         {
-            var stack = new StackLayout(layoutRoot, $"background_{row}_{column}")
+            var stack = new StackLayout(layoutRoot, $"BingoSync_BoardDisplay_background_{row}_{column}")
             {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -133,7 +161,7 @@ namespace BingoSync.GameUI
                 Color tint;
                 if (BingoColors.TryGetValue(colors[brow], out tint))
                 {
-                    var backgroundImage = new Image(layoutRoot, backgroundSprite, $"image_{brow}_{row}_{column}")
+                    var backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
                     {
                         Height = 0,
                         Width = 110,

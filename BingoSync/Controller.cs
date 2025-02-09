@@ -157,7 +157,9 @@ namespace BingoSync
             {
                 return;
             }
-            GlobalSettings.BoardID = (GlobalSettings.BoardID + 1) % BingoBoardUI.GetBoardCount();
+            GlobalSettings.BoardAlphaIndex += 1;
+            GlobalSettings.BoardAlphaIndex %= GlobalSettings.BoardAlphas.Count();
+            BingoBoardUI.SetBoardAlpha(GlobalSettings.BoardAlpha);
         }
 
         public static void RevealButtonClicked(Button _)
@@ -252,7 +254,7 @@ namespace BingoSync
             GameModesManager.DumpDebugInfo();
 
             Log($"GlobalSettings");
-            Log($"\tBoardID = {GlobalSettings.BoardID}");
+            Log($"\tBoardAlphaIndex = {GlobalSettings.BoardAlphaIndex}");
             Log($"\tRevealCardOnGameStart = {GlobalSettings.RevealCardOnGameStart}");
             Log($"\tRevealCardWhenOthersReveal = {GlobalSettings.RevealCardWhenOthersReveal}");
             Log($"\tUnmarkGoals = {GlobalSettings.UnmarkGoals}");
@@ -262,10 +264,10 @@ namespace BingoSync
             foreach (string gamemode in GlobalSettings.CustomGameModes.Select(gameMode => gameMode.GetDisplayName()))
             {
                 Log($"\tCustomGameMode \"{gamemode}\"");
-            };
-    }
+            }
+        }
 
-    public static bool RenameActiveGameModeTo(string newName)
+        public static bool RenameActiveGameModeTo(string newName)
         {
             GameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
             if(gameMode == null || gameMode.GetType() != typeof(CustomGameMode))
