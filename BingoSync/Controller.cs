@@ -160,6 +160,7 @@ namespace BingoSync
             GlobalSettings.BoardAlphaIndex += 1;
             GlobalSettings.BoardAlphaIndex %= GlobalSettings.BoardAlphas.Count();
             RefreshBoardOpacity();
+            RefreshMenu();
         }
 
         public static void RefreshBoardOpacity()

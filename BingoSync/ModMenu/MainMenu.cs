@@ -10,7 +10,7 @@ namespace BingoSync.ModMenu
         private static MenuScreen _KeybindsScreen;
         private static MenuScreen _TogglesScreen;
         private static MenuScreen _DefaultsScreen;
-        private static MenuScreen _BoardOpacityScreen;
+        private static MenuScreen _BoardSettingsScreen;
         private static MenuScreen _ProfilesScreen;
 
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu) {
@@ -18,7 +18,7 @@ namespace BingoSync.ModMenu
             void GoToKeybinds(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_KeybindsScreen);
             void GoToToggles(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_TogglesScreen);
             void GoToDefaults(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_DefaultsScreen);
-            void GoToBoardOpacity(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_BoardOpacityScreen);
+            void GoToBoardSettings(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_BoardSettingsScreen);
             void GoToProfiles(MenuSelectable _) {
                 ProfilesManagementMenu.RefreshMenu();
                 UIManager.instance.UIGoToDynamicMenu(_ProfilesScreen);
@@ -53,9 +53,9 @@ namespace BingoSync.ModMenu
                         })
                         .AddMenuButton("Board Opacity", new MenuButtonConfig
                         {
-                            Label = "Board Opacity",
+                            Label = "Board Settings",
                             Proceed = true,
-                            SubmitAction = GoToBoardOpacity,
+                            SubmitAction = GoToBoardSettings,
                             CancelAction = ExitMenu,
                         })
                         .AddMenuButton("Profiles", new MenuButtonConfig
@@ -73,7 +73,7 @@ namespace BingoSync.ModMenu
             _TogglesScreen = TogglesMenu.CreateMenuScreen(_MainMenuScreen);
             _DefaultsScreen = DefaultsMenu.CreateMenuScreen(_MainMenuScreen);
             _ProfilesScreen = ProfilesManagementMenu.CreateMenuScreen(_MainMenuScreen);
-            _BoardOpacityScreen = BoardOpacityMenu.CreateMenuScreen(_MainMenuScreen);
+            _BoardSettingsScreen = BoardSettingsMenu.CreateMenuScreen(_MainMenuScreen);
 
             return _MainMenuScreen;
         }
@@ -84,6 +84,7 @@ namespace BingoSync.ModMenu
             TogglesMenu.RefreshMenu();
             DefaultsMenu.RefreshMenu();
             ProfilesManagementMenu.RefreshMenu();
+            BoardSettingsMenu.RefreshMenu();
         }
 
     }

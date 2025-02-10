@@ -7,6 +7,12 @@ namespace BingoSync.Settings
 {
     public class ModSettings
     {
+        public enum HighlightType
+        {
+            Border,
+            Star,
+        }
+
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new();
         public bool RevealCardOnGameStart = false;
@@ -24,9 +30,8 @@ namespace BingoSync.Settings
             {
                 return BoardAlphas[BoardAlphaIndex];
             }
-            set
-            {
-            }
+            set {}
         }
+        public HighlightType SelectedHighlightSprite = HighlightType.Border;
     }
 }

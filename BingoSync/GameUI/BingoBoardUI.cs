@@ -3,9 +3,11 @@ using MagicUI.Core;
 using MagicUI.Elements;
 using MagicUI.Graphics;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using static BingoSync.Settings.ModSettings;
 
 namespace BingoSync.GameUI
 {
@@ -56,9 +58,12 @@ namespace BingoSync.GameUI
             Loader.Preload();
 
             Sprite backgroundSprite = Loader.GetTexture("BingoSync Background.png").ToSprite();
-            Sprite highlightSprite = Loader.GetTexture("BingoSync Background Highlight.png").ToSprite();
 
-            board = new DisplayBoard(backgroundSprite, highlightSprite);
+            Dictionary<HighlightType, Sprite> highlights = [];
+            highlights[HighlightType.Border] = Loader.GetTexture("BingoSync Highlight Border.png").ToSprite();
+            highlights[HighlightType.Star] = Loader.GetTexture("BingoSync Highlight Star.png").ToSprite();
+
+            board = new DisplayBoard(backgroundSprite, highlights);
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
@@ -83,7 +88,12 @@ namespace BingoSync.GameUI
                 {
                     board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
                 }
-                board.bingoLayout[square.GoalNr].Highlight.Height = square.Highlighted ? 110 : 0;
+                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[square.GoalNr].Highlights)
+                {
+                    HighlightType sprite = entry.Key;
+                    Image image = entry.Value;
+                    image.Height = sprite == Controller.GlobalSettings.SelectedHighlightSprite && square.Highlighted ? 110 : 0;
+                }
             }
         }
 

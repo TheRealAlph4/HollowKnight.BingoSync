@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GridLayout = MagicUI.Elements.GridLayout;
 using Satchel;
+using static BingoSync.Settings.ModSettings;
 
 namespace BingoSync.GameUI
 {
@@ -13,7 +14,7 @@ namespace BingoSync.GameUI
         internal class SquareLayoutObjects
         {
             public TextObject Text;
-            public Image Highlight;
+            public Dictionary<HighlightType, Image> Highlights;
             public Dictionary<string, Image> BackgroundColors;
         };
         public LayoutRoot layoutRoot;
@@ -36,7 +37,7 @@ namespace BingoSync.GameUI
                 { "yellow", Colors.Yellow.GetColor() },
             };
 
-        public DisplayBoard(Sprite backgroundSprite, Sprite highlightSprite)
+        public DisplayBoard(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {
             layoutRoot = new(true, "BingoSync_BoardDisplayRoot");
 
@@ -65,7 +66,7 @@ namespace BingoSync.GameUI
                 Visibility = Visibility.Visible,
             };
 
-            CreateBaseLayout(backgroundSprite, highlightSprite);
+            CreateBaseLayout(backgroundSprite, highlightSprites);
 
             layoutRoot.VisibilityCondition = BoardShouldBeVisible;
         }
@@ -102,7 +103,7 @@ namespace BingoSync.GameUI
             }
         }
 
-        private void CreateBaseLayout(Sprite backgroundSprite, Sprite highlightSprite)
+        private void CreateBaseLayout(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {
             bingoLayout = [];
             for (int row = 0; row < 5; row++)
@@ -125,19 +126,24 @@ namespace BingoSync.GameUI
                     }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
                     gridLayout.Children.Add(textObject);
 
-                    Image highlightImage = new Image(layoutRoot, highlightSprite, $"BingoSync_BoardDisplay_square_{row}_{column}_highlight")
+                    Dictionary<HighlightType, Image> highlightImages = [];
+                    foreach(KeyValuePair<HighlightType, Sprite> entry in highlightSprites)
                     {
-                        Height = 110,
-                        Width = 110,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
-                    gridLayout.Children.Add(highlightImage);
+                        Image highlightImage = new Image(layoutRoot, entry.Value, $"BingoSync_BoardDisplay_square_{row}_{column}_highlight_{entry.Key}")
+                        {
+                            Height = 110,
+                            Width = 110,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center,
+                        }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
+                        gridLayout.Children.Add(highlightImage);
+                        highlightImages[entry.Key] = highlightImage;
+                    }
 
                     bingoLayout.Add(new SquareLayoutObjects
                     {
                         Text = textObject,
-                        Highlight = highlightImage,
+                        Highlights = highlightImages,
                         BackgroundColors = images,
                     });
                 }
