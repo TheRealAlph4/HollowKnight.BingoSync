@@ -151,7 +151,7 @@ namespace BingoSync
             ConnectionMenuUI.ReadCurrentConnectionInfo();
         }
 
-        public static void UpdateBoardOpacity()
+        public static void CycleBoardOpacity()
         {
             if (!ActiveSession.Board.IsAvailable())
             {
@@ -159,6 +159,11 @@ namespace BingoSync
             }
             GlobalSettings.BoardAlphaIndex += 1;
             GlobalSettings.BoardAlphaIndex %= GlobalSettings.BoardAlphas.Count();
+            RefreshBoardOpacity();
+        }
+
+        public static void RefreshBoardOpacity()
+        {
             BingoBoardUI.SetBoardAlpha(GlobalSettings.BoardAlpha);
         }
 

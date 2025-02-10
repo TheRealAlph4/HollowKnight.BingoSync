@@ -10,6 +10,7 @@ namespace BingoSync.ModMenu
         private static MenuScreen _KeybindsScreen;
         private static MenuScreen _TogglesScreen;
         private static MenuScreen _DefaultsScreen;
+        private static MenuScreen _BoardOpacityScreen;
         private static MenuScreen _ProfilesScreen;
 
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu) {
@@ -17,6 +18,7 @@ namespace BingoSync.ModMenu
             void GoToKeybinds(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_KeybindsScreen);
             void GoToToggles(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_TogglesScreen);
             void GoToDefaults(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_DefaultsScreen);
+            void GoToBoardOpacity(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_BoardOpacityScreen);
             void GoToProfiles(MenuSelectable _) {
                 ProfilesManagementMenu.RefreshMenu();
                 UIManager.instance.UIGoToDynamicMenu(_ProfilesScreen);
@@ -49,6 +51,13 @@ namespace BingoSync.ModMenu
                             SubmitAction = GoToDefaults,
                             CancelAction = ExitMenu,
                         })
+                        .AddMenuButton("Board Opacity", new MenuButtonConfig
+                        {
+                            Label = "Board Opacity",
+                            Proceed = true,
+                            SubmitAction = GoToBoardOpacity,
+                            CancelAction = ExitMenu,
+                        })
                         .AddMenuButton("Profiles", new MenuButtonConfig
                         {
                             Label = "Profiles",
@@ -64,6 +73,7 @@ namespace BingoSync.ModMenu
             _TogglesScreen = TogglesMenu.CreateMenuScreen(_MainMenuScreen);
             _DefaultsScreen = DefaultsMenu.CreateMenuScreen(_MainMenuScreen);
             _ProfilesScreen = ProfilesManagementMenu.CreateMenuScreen(_MainMenuScreen);
+            _BoardOpacityScreen = BoardOpacityMenu.CreateMenuScreen(_MainMenuScreen);
 
             return _MainMenuScreen;
         }

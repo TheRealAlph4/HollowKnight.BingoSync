@@ -18,7 +18,7 @@ namespace BingoSync.Settings
         public List<CustomGameMode> CustomGameModes = [];
         public bool DebugMode = false;
         public int BoardAlphaIndex = 0;
-        public List<float> BoardAlphas = [0.3f, 0.7f, 1f];
+        public List<float> BoardAlphas = [0.135f, 0.5f, 1f];
         public float BoardAlpha {
             get
             {
