@@ -196,6 +196,24 @@ namespace BingoSync
             }
         }
 
+        public static void ResetConnectionButtonClicked()
+        {
+            new Task(() =>
+            {
+                ActiveSession.ExitRoom(() =>
+                {
+                    ConnectionMenuUI.Update();
+                    RefreshGenerationButtonEnabled();
+                });
+                Thread.Sleep(250);
+                ActiveSession.JoinRoom(RoomCode, RoomNickname, RoomPassword, (ex) =>
+                {
+                    ConnectionMenuUI.Update();
+                    RefreshGenerationButtonEnabled();
+                });
+            }).Start();
+        }
+
         public static void RevealCard()
         {
             if (ActiveSession.Board.IsRevealed)

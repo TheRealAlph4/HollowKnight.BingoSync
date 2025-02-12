@@ -24,18 +24,18 @@ namespace BingoSync.GameUI
 
         private static readonly Dictionary<string, Color> BingoColors = new()
         {
-                { "blank", Color.black },
-                { "orange", Colors.Orange.GetColor() },
-                { "red", Colors.Red.GetColor() },
-                { "blue", Colors.Blue.GetColor() },
-                { "green", Colors.Green.GetColor() },
-                { "purple", Colors.Purple.GetColor() },
-                { "navy", Colors.Navy.GetColor() },
-                { "teal", Colors.Teal.GetColor() },
-                { "brown", Colors.Brown.GetColor() },
-                { "pink", Colors.Pink.GetColor() },
-                { "yellow", Colors.Yellow.GetColor() },
-            };
+            { "blank", Color.black },
+            { "orange", Colors.Orange.GetColor() },
+            { "red", Colors.Red.GetColor() },
+            { "blue", Colors.Blue.GetColor() },
+            { "green", Colors.Green.GetColor() },
+            { "purple", Colors.Purple.GetColor() },
+            { "navy", Colors.Navy.GetColor() },
+            { "teal", Colors.Teal.GetColor() },
+            { "brown", Colors.Brown.GetColor() },
+            { "pink", Colors.Pink.GetColor() },
+            { "yellow", Colors.Yellow.GetColor() },
+        };
 
         public DisplayBoard(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {

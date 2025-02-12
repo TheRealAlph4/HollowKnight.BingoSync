@@ -45,8 +45,12 @@ namespace BingoSync.ModMenu
                 elements[elementId] = _Sliders[i];
                 ++elementId;
             }
-            RefreshMenu();
             _BoardSettingsMenu = new Menu("Opacity Sliders", elements);
+            // do not call RefreshMenu here, Menu.Update does not work before Menu.GetMenuScreen is called first
+            for (int i = 0; i < _Sliders.Count; ++i)
+            {
+                _Sliders[i].Name = $"Opacity preset {i + 1}" + (i == Controller.GlobalSettings.BoardAlphaIndex ? " (active)" : "");
+            }
             return _BoardSettingsMenu.GetMenuScreen(parentMenu);
         }
 
@@ -69,6 +73,10 @@ namespace BingoSync.ModMenu
 
         public static void RefreshMenu()
         {
+            if(_Sliders == null || _BoardSettingsMenu == null)
+            {
+                return;
+            }
             for (int i = 0; i < _Sliders.Count; ++i)
             {
                 _Sliders[i].Name = $"Opacity preset {i + 1}" + (i == Controller.GlobalSettings.BoardAlphaIndex ? " (active)" : "");

@@ -64,6 +64,13 @@ namespace BingoSync.ModMenu
                             Proceed = true,
                             SubmitAction = GoToProfiles,
                             CancelAction = ExitMenu,
+                        })
+                        .AddMenuButton("Reset Active Connection", new MenuButtonConfig
+                        {
+                            Label = "Reset Active Connection",
+                            Proceed = false,
+                            SubmitAction = ResetConnectionButtonClicked,
+                            CancelAction = ExitMenu,
                         });
                     });
 
@@ -87,5 +94,9 @@ namespace BingoSync.ModMenu
             BoardSettingsMenu.RefreshMenu();
         }
 
+        public static void ResetConnectionButtonClicked(MenuButton _)
+        {
+            Controller.ResetConnectionButtonClicked();
+        }
     }
 }
