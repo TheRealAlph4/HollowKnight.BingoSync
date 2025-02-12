@@ -61,10 +61,15 @@ namespace BingoSync.ModMenu
             {
                 foreach (GoalGroup group in gameMode.GetGoalSettings())
                 {
+                    string groupName = group.Name;
+                    if (!GameModesManager.GoalGroupExists(group.Name))
+                    {
+                        groupName += " (missing)";
+                    }
                     MenuOptionHorizontal option;
                     c.AddHorizontalOption(group.Name, new HorizontalOptionConfig()
                     {
-                        Label = group.Name,
+                        Label = groupName,
                         Options = allOnOffCustom,
                         Description = new DescriptionInfo()
                         {
