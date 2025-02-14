@@ -97,6 +97,12 @@ namespace BingoSync.GameUI
             }
         }
 
+        public static void UpdateName()
+        {
+            board.boardName.Text = Controller.ActiveSession.SessionName;
+            board.boardName.Visibility = Controller.ShowSessionName ? Visibility.Visible : Visibility.Hidden;
+        }
+
         public static void SetBoardAlpha(float alpha)
         {
             board.SetAlpha(alpha);

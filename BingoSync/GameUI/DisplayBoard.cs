@@ -17,9 +17,11 @@ namespace BingoSync.GameUI
             public Dictionary<HighlightType, Image> Highlights;
             public Dictionary<string, Image> BackgroundColors;
         };
-        public LayoutRoot layoutRoot;
-        public GridLayout gridLayout;
+        private readonly LayoutRoot layoutRoot;
+        private readonly StackLayout boardAndName;
+        private readonly GridLayout gridLayout;
         public List<SquareLayoutObjects> bingoLayout;
+        public readonly TextObject boardName;
         private bool opacityInitialized = false;
 
         private static readonly Dictionary<string, Color> BingoColors = new()
@@ -40,6 +42,13 @@ namespace BingoSync.GameUI
         public DisplayBoard(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {
             layoutRoot = new(true, "BingoSync_BoardDisplayRoot");
+
+            boardAndName = new(layoutRoot, "BingoSync_BoardDisplayStack")
+            {
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Visibility = Visibility.Visible,
+            };
 
             gridLayout = new GridLayout(layoutRoot, "BingoSync_BoardDisplayGrid")
             {
@@ -65,6 +74,19 @@ namespace BingoSync.GameUI
                 HorizontalAlignment = HorizontalAlignment.Right,
                 Visibility = Visibility.Visible,
             };
+
+            boardName = new(layoutRoot, "BingoSync_BoardDisplayName")
+            {
+                HorizontalAlignment = HorizontalAlignment.Right,
+                TextAlignment = HorizontalAlignment.Left,
+                Text = "Hello there",
+                Visibility = Visibility.Visible,
+                FontSize = 26,
+                Padding = new Padding(5, 3),
+            };
+
+            boardAndName.Children.Add(gridLayout);
+            boardAndName.Children.Add(boardName);
 
             CreateBaseLayout(backgroundSprite, highlightSprites);
 

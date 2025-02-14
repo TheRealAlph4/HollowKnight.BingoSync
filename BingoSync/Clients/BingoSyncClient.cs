@@ -281,14 +281,14 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(SendChatMessage));
         }
 
-        public void SelectSquare(int square, Action errorCallback, bool clear = false)
+        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false)
         {
             if (GetState() != ClientState.Connected) return;
             var selectInput = new NetworkObjectSelectRequest
             {
                 Room = currentRoomID,
                 Slot = square,
-                Color = Controller.RoomColor,
+                Color = color.GetName(),
                 RemoveColor = clear,
             };
             RetryHelper.RetryWithExponentialBackoff(() =>

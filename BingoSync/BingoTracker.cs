@@ -232,7 +232,7 @@ namespace BingoSync
         {
             if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
-            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(Controller.RoomColor));
+            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(session.RoomColor.GetName()));
             if (marked)
                 return;
             var square = _allPossibleSquares.Find(x => x.Name == goal);

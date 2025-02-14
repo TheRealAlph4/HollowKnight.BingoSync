@@ -8,10 +8,13 @@ namespace BingoSync.Sessions
     public class Session
     {
         private readonly IRemoteClient _client;
+        public string SessionName { get; set; } = "Default";
         public bool IsMarking { get; set; }
         public bool RoomIsLockout { get; set; } = false;
-        public string Nickname { get; private set; } = string.Empty;
-        public Colors Color { get; private set; } = Colors.Orange;
+        public string RoomLink { get; set; } = string.Empty;
+        public string RoomNickname { get; set; } = string.Empty;
+        public string RoomPassword { get; set; } = string.Empty;
+        public Colors RoomColor { get; set; } = Colors.Orange;
         public BingoBoard Board { get; set; } = new();
 
         #region Events
@@ -89,8 +92,9 @@ namespace BingoSync.Sessions
 
     #endregion
 
-        public Session(IRemoteClient client, bool markingClient)
+        public Session(string name, IRemoteClient client, bool markingClient)
         {
+            SessionName = name;
             _client = client;
             SubscribeEventRefires();
             IsMarking = markingClient;
@@ -144,8 +148,8 @@ namespace BingoSync.Sessions
             }
 
             _client.JoinRoom(roomID, nickname, password, ColorExtensions.FromName(Controller.RoomColor), callback);
-            Nickname = nickname;
-            Color = ColorExtensions.FromName(Controller.RoomColor);
+            RoomNickname = nickname;
+            RoomColor = ColorExtensions.FromName(Controller.RoomColor);
         }
 
         public void ExitRoom(Action callback)
@@ -180,9 +184,14 @@ namespace BingoSync.Sessions
 
         public void SelectSquare(int square, Action errorCallback, bool clear = false)
         {
+            SelectSquare(square, RoomColor, errorCallback, clear);
+        }
+
+        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false)
+        {
             if(IsMarking)
             {
-                _client.SelectSquare(square, errorCallback, clear);
+                _client.SelectSquare(square, color, errorCallback, clear);
             }
         }
 

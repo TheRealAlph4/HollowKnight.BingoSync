@@ -6,6 +6,7 @@ using MagicUI.Graphics;
 using System.Reflection;
 using System.Linq;
 using System;
+using BingoSync.Sessions;
 
 namespace BingoSync.GameUI
 {
@@ -214,6 +215,24 @@ namespace BingoSync.GameUI
             Controller.RoomCode = SanitizeRoomCode(roomCodeInput.Text);
             Controller.RoomNickname = nicknameInput.Text;
             Controller.RoomPassword = passwordInput.Text;
+        }
+
+        public static void SetConnectionInfoFromSession(Session session)
+        {
+            roomCodeInput.Text = session.RoomLink;
+            nicknameInput.Text = session.RoomNickname;
+            passwordInput.Text = session.RoomPassword;
+            foreach(Button button in colorButtons)
+            {
+                if (button.Content.ToLower() == session.RoomColor.GetName())
+                {
+                    button.BorderColor = Color.white;
+                }
+                else
+                {
+                    button.BorderColor = button.ContentColor;
+                }
+            }
         }
 
         public static void Update(Button _ = null)

@@ -53,10 +53,57 @@ namespace BingoSync
             private set { }
         }
 
-        public static string RoomCode { get; set; } = string.Empty;
-        public static string RoomPassword { get; set; } = string.Empty;
-        public static string RoomNickname { get; set; } = string.Empty;
-        public static string RoomColor { get; set; } = string.Empty;
+        public static string RoomCode {
+            get
+            {
+                return ActiveSession?.RoomLink;
+            } 
+            set
+            {
+                ActiveSession.RoomLink = value;
+            }
+        }
+        public static string RoomPassword
+        {
+            get
+            {
+                return ActiveSession?.RoomPassword;
+            }
+            set
+            {
+                ActiveSession.RoomPassword = value;
+            }
+        }
+        public static string RoomNickname
+        {
+            get
+            {
+                return ActiveSession?.RoomNickname;
+            }
+            set
+            {
+                ActiveSession.RoomNickname = value;
+            }
+        }
+        public static string RoomColor
+        {
+            get
+            {
+                return ActiveSession?.RoomColor.GetName();
+            }
+            set
+            {
+                ActiveSession.RoomColor = ColorExtensions.FromName(value);
+            }
+        }
+
+        public static bool ShowSessionName { 
+            get
+            {
+                return SessionManager.ShowSessionName;
+            }
+            private set { }
+        }
 
         public static bool IsDebugMode
         {
@@ -77,10 +124,12 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            DefaultSession = new Session(new BingoSyncClient(log), true);
+            DefaultSession = new Session("Default", new BingoSyncClient(log), true);
             ActiveSession = DefaultSession;
             OnBoardUpdate(BingoBoardUI.UpdateGrid);
+            OnBoardUpdate(BingoBoardUI.UpdateName);
             OnBoardUpdate(ConfirmTopLeftOnReveal);
+            SessionManager.OnSessionChanged += OnSessionChanged;
         }
 
         public static void BoardUpdate()
@@ -91,6 +140,12 @@ namespace BingoSync
         public static void OnBoardUpdate(Action func)
         {
             OnBoardUpdateList.Add(func);
+        }
+
+        private static void OnSessionChanged(object _, Session previous)
+        {
+            ConnectionMenuUI.SetConnectionInfoFromSession(ActiveSession);
+            BoardUpdate();
         }
 
         public static void ToggleBoardKeybindClicked()

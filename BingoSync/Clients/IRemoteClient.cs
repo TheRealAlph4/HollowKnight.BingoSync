@@ -22,7 +22,7 @@ namespace BingoSync.Clients
         public void NewCard(string customJSON, bool lockout = true, bool hideCard = true);
         public void RevealCard();
         public void SendChatMessage(string text);
-        public void SelectSquare(int square, Action errorCallback, bool clear = false);
+        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false);
         public void ExitRoom(Action callback);
         public List<string> RoomHistory();
     }
