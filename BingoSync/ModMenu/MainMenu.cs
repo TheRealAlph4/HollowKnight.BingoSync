@@ -51,7 +51,7 @@ namespace BingoSync.ModMenu
                             SubmitAction = GoToDefaults,
                             CancelAction = ExitMenu,
                         })
-                        .AddMenuButton("Board Opacity", new MenuButtonConfig
+                        .AddMenuButton("Board Settings", new MenuButtonConfig
                         {
                             Label = "Board Settings",
                             Proceed = true,
@@ -65,8 +65,14 @@ namespace BingoSync.ModMenu
                             SubmitAction = GoToProfiles,
                             CancelAction = ExitMenu,
                         })
+                        .AddStaticPanel("Spacer", new RelVector2(new RelLength(1), new RelLength(1)), out _)
                         .AddMenuButton("Reset Active Connection", new MenuButtonConfig
                         {
+                            Style = new MenuButtonStyle()
+                            {
+                                TextSize = 30,
+                                Height = new RelLength(40f),
+                            },
                             Label = "Reset Active Connection",
                             Proceed = false,
                             SubmitAction = ResetConnectionButtonClicked,

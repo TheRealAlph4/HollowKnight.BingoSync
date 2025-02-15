@@ -45,7 +45,7 @@ namespace BingoSync.ModMenu
                 elements[elementId] = _Sliders[i];
                 ++elementId;
             }
-            _BoardSettingsMenu = new Menu("Opacity Sliders", elements);
+            _BoardSettingsMenu = new Menu("BingoSync", elements);
             // do not call RefreshMenu here, Menu.Update does not work before Menu.GetMenuScreen is called first
             for (int i = 0; i < _Sliders.Count; ++i)
             {
