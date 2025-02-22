@@ -1,8 +1,11 @@
 ﻿using BingoSync.Clients.EventInfoObjects;
 using BingoSync.Sessions;
 using HutongGames.PlayMaker.Actions;
+using ItemChanger.Extensions;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -11,6 +14,7 @@ using System.Net.WebSockets;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BingoSync.Clients
 {
@@ -33,12 +37,12 @@ namespace BingoSync.Clients
 
         private bool shouldConnect = false;
 
-        public event EventHandler<CardRevealedBroadcast> CardRevealedBroadcastReceived;
-        public event EventHandler<ChatMessage> ChatMessageReceived;
-        public event EventHandler<GoalUpdate> GoalUpdateReceived;
-        public event EventHandler<NewCardBroadcast> NewCardReceived;
-        public event EventHandler<PlayerColorChange> PlayerColorChangeReceived;
-        public event EventHandler<PlayerConnectedBroadcast> PlayerConnectedBroadcastReceived;
+        public event EventHandler<CardRevealedEventInfo> CardRevealedBroadcastReceived;
+        public event EventHandler<ChatMessageEventInfo> ChatMessageReceived;
+        public event EventHandler<GoalUpdateEventInfo> GoalUpdateReceived;
+        public event EventHandler<NewCardEventInfo> NewCardReceived;
+        public event EventHandler<PlayerColorChangeEventInfo> PlayerColorChangeReceived;
+        public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
         public event EventHandler<RoomSettings> RoomSettingsReceived;
 
         private BingoBoard Board;
@@ -240,6 +244,7 @@ namespace BingoSync.Clients
         public void RevealCard()
         {
             if (GetState() != ClientState.Connected) return;
+            ProcessRoomHistory((_) => { }, () => { });
             if (Board.IsRevealed) return;
             var revealInput = new NetworkObjectRevealRequest
             {
@@ -400,12 +405,7 @@ namespace BingoSync.Clients
         private void HandleChatBroadcast(string json)
         {
             NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json);
-            ChatMessageReceived?.Invoke(this, new ChatMessage()
-            {
-                Text = chatBroadcast.Text,
-                Sender = chatBroadcast.Player.Name,
-                Timestamp = chatBroadcast.Timestamp,
-            });
+            ChatMessageReceived?.Invoke(this, NetworkChatBroadcastToLocal(chatBroadcast));
         }
 
         private void HandleNewCardBroadcast(string json)
@@ -414,10 +414,7 @@ namespace BingoSync.Clients
             UpdateBoardAndBroadcast(null);
             UpdateBoard(newCardBroadcast.HideCard);
             UpdateSettings();
-            NewCardReceived?.Invoke(this, new NewCardBroadcast()
-            {
-                Player = newCardBroadcast.Player.Name,
-            });
+            NewCardReceived?.Invoke(this, NetworkNewCardBroadcastToLocal(newCardBroadcast));
         }
 
         private void HandleGoalBroadcast(string json)
@@ -433,14 +430,7 @@ namespace BingoSync.Clients
 //                        if (color == "blank") continue;
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
-                    GoalUpdateReceived?.Invoke(this, new GoalUpdate()
-                    {
-                        Player = goalBroadcast.Player.Name,
-                        Color = ColorExtensions.FromName(goalBroadcast.Color),
-                        Goal = goalBroadcast.Square.Name,
-                        Slot = square.GoalNr,
-                        Unmarking = goalBroadcast.Remove,
-                    });
+                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast, Board));
                     break;
                 }
             }
@@ -450,11 +440,7 @@ namespace BingoSync.Clients
         private void HandleColorBroadcast(string json)
         {
             NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json);
-            PlayerColorChangeReceived?.Invoke(this, new PlayerColorChange()
-            {
-                Player = colorBroadcast.Player.Name,
-                Color = ColorExtensions.FromName(colorBroadcast.Color),
-            });
+            PlayerColorChangeReceived?.Invoke(this, NetworkColorBroadcastToLocal(colorBroadcast));
         }
 
         private void HandleRevealedBroadcast(string json)
@@ -465,19 +451,13 @@ namespace BingoSync.Clients
                 Controller.RevealCard();
             }
             Controller.BoardUpdate();
-            CardRevealedBroadcastReceived?.Invoke(this, new CardRevealedBroadcast()
-            {
-                Player = revealedBroadcast.Player.Name,
-            });
+            CardRevealedBroadcastReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
         }
 
         private void HandleConnectionBroadcast(string json)
         {
             NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json);
-            PlayerConnectedBroadcastReceived?.Invoke(this, new PlayerConnectedBroadcast()
-            {
-                Player = connectionBroadcast.Player.Name,
-            });
+            PlayerConnectedBroadcastReceived?.Invoke(this, NetworkConnectionBroadcastToLocal(connectionBroadcast));
         }
 
         private void UpdateBoard(bool hideCard)
@@ -524,10 +504,141 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(UpdateSettings));
         }
 
-        public List<string> RoomHistory()
+        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
         {
-            return [];
+            if (GetState() != ClientState.Connected) return;
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var task = client.GetAsync($"room/{currentRoomID}/feed");
+                return task.ContinueWith(responseTask =>
+                {
+                    HttpResponseMessage response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    Task<string> readTask = response.Content.ReadAsStringAsync();
+                    readTask.ContinueWith(stringResponse =>
+                    {
+                        List<RoomEventInfo> events = ParseRoomHistory(stringResponse.Result);
+                        callback(events);
+                    });
+                });
+            }, maxRetries, nameof(ProcessRoomHistory), errorCallback);
         }
+
+        private List<RoomEventInfo> ParseRoomHistory(string json)
+        {
+            UnparsedRoomFeed unparsedFeed = JsonConvert.DeserializeObject<UnparsedRoomFeed>(json);
+            List<RoomEventInfo> events = [];
+            foreach(JObject unparsedEvent in unparsedFeed.Events)
+            {
+                string type = unparsedEvent.Property("type").Value.ToString();
+                RoomEventInfo parsedEvent = type switch
+                {
+                    "chat" => NetworkChatBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(unparsedEvent.ToString())),
+                    "new-card" => NetworkNewCardBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(unparsedEvent.ToString())),
+                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString()), Board),
+                    "color" => NetworkColorBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(unparsedEvent.ToString())),
+                    "revealed" => NetworkRevealedBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(unparsedEvent.ToString())),
+                    "connection" => NetworkConnectionBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(unparsedEvent.ToString())),
+                    _ => null,
+                };
+                if(parsedEvent != null)
+                {
+                    events.Add(parsedEvent);
+                }
+            }
+            return events;
+        }
+
+        [DataContract]
+        private class UnparsedRoomFeed
+        {
+            [JsonProperty("events")]
+            public List<JObject> Events = [];
+            [JsonProperty("allIncluded")]
+            public bool FullFeed = false;
+        }
+
+        #region Network objects to internal broadcast objects
+
+        private static PlayerInfo NetworkPlayerBroadcastToLocal(NetworkObjectPlayer network)
+        {
+            return new PlayerInfo()
+            {
+                UUID = network.UUID,
+                Name = network.Name,
+                Color = ColorExtensions.FromName(network.Color),
+                IsSpectator = network.IsSpectator,
+            };
+        }
+
+        private static ChatMessageEventInfo NetworkChatBroadcastToLocal(NetworkObjectChatBroadcast network)
+        {
+            return new ChatMessageEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+                Text = network.Text,
+            };
+        }
+
+        private static NewCardEventInfo NetworkNewCardBroadcastToLocal(NetworkObjectNewCardBroadcast network)
+        {
+            return new NewCardEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+                Game = network.Game,
+                Seed = network.Seed,
+                HideCard = network.HideCard,
+            };
+        }
+
+        private static GoalUpdateEventInfo NetworkGoalBroadcastToLocal(NetworkObjectGoalBroadcast network, BingoBoard board)
+        {
+            return new GoalUpdateEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+                Color = ColorExtensions.FromName(network.Color),
+                Goal = network.Square.Name,
+                Slot = board.Select((square, index) => new { square, index })
+                              .Where(pair => ((Square)pair.square).Name == network.Square.Name)
+                              .Select(pair => pair.index)
+                              .First(),
+                Unmarking = network.Remove,
+            };
+        }
+
+        private static PlayerColorChangeEventInfo NetworkColorBroadcastToLocal(NetworkObjectColorBroadcast network)
+        {
+            return new PlayerColorChangeEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+                Color = ColorExtensions.FromName(network.Color),
+            };
+        }
+
+        private static CardRevealedEventInfo NetworkRevealedBroadcastToLocal(NetworkObjectRevealedBroadcast network)
+        {
+            return new CardRevealedEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+            };
+        }
+
+        private static PlayerConnectionEventInfo NetworkConnectionBroadcastToLocal(NetworkObjectConnectionBroadcast network)
+        {
+            return new PlayerConnectionEventInfo()
+            {
+                Player = NetworkPlayerBroadcastToLocal(network.Player),
+                Timestamp = network.Timestamp,
+                IsDisconnect = network.EventType == "disconnected",
+            };
+        }
+
+        #endregion
     }
 
     #region Request objects

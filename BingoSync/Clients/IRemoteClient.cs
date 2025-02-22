@@ -7,12 +7,12 @@ namespace BingoSync.Clients
 {
     public interface IRemoteClient
     {
-        public event EventHandler<CardRevealedBroadcast> CardRevealedBroadcastReceived;
-        public event EventHandler<ChatMessage> ChatMessageReceived;
-        public event EventHandler<GoalUpdate> GoalUpdateReceived;
-        public event EventHandler<NewCardBroadcast> NewCardReceived;
-        public event EventHandler<PlayerColorChange> PlayerColorChangeReceived;
-        public event EventHandler<PlayerConnectedBroadcast> PlayerConnectedBroadcastReceived;
+        public event EventHandler<CardRevealedEventInfo> CardRevealedBroadcastReceived;
+        public event EventHandler<ChatMessageEventInfo> ChatMessageReceived;
+        public event EventHandler<GoalUpdateEventInfo> GoalUpdateReceived;
+        public event EventHandler<NewCardEventInfo> NewCardReceived;
+        public event EventHandler<PlayerColorChangeEventInfo> PlayerColorChangeReceived;
+        public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
         public event EventHandler<RoomSettings> RoomSettingsReceived;
         public void SetBoard(BingoBoard board);
         public void DumpDebugInfo();
@@ -24,6 +24,6 @@ namespace BingoSync.Clients
         public void SendChatMessage(string text);
         public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false);
         public void ExitRoom(Action callback);
-        public List<string> RoomHistory();
+        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback);
     }
 }

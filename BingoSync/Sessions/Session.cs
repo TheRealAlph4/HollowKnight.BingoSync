@@ -19,44 +19,44 @@ namespace BingoSync.Sessions
 
         #region Events
 
-        public event EventHandler<CardRevealedBroadcast> OnCardRevealedBroadcastReceived;
+        public event EventHandler<CardRevealedEventInfo> OnCardRevealedBroadcastReceived;
 
-        private void RefireCardRevealedBroadcast(object _, CardRevealedBroadcast broadcast)
+        private void RefireCardRevealedBroadcast(object _, CardRevealedEventInfo broadcast)
         {
             OnCardRevealedBroadcastReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<ChatMessage> OnChatMessageReceived;
+        public event EventHandler<ChatMessageEventInfo> OnChatMessageReceived;
 
-        private void RefireChatMessage(object _, ChatMessage broadcast)
+        private void RefireChatMessage(object _, ChatMessageEventInfo broadcast)
         {
             OnChatMessageReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<GoalUpdate> OnGoalUpdateReceived;
+        public event EventHandler<GoalUpdateEventInfo> OnGoalUpdateReceived;
 
-        private void RefireGoalUpdate(object _, GoalUpdate broadcast)
+        private void RefireGoalUpdate(object _, GoalUpdateEventInfo broadcast)
         {
             OnGoalUpdateReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<NewCardBroadcast> OnNewCardReceived;
+        public event EventHandler<NewCardEventInfo> OnNewCardReceived;
 
-        private void RefireNewCard(object _, NewCardBroadcast broadcast)
+        private void RefireNewCard(object _, NewCardEventInfo broadcast)
         {
             OnNewCardReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<PlayerColorChange> OnPlayerColorChangeReceived;
+        public event EventHandler<PlayerColorChangeEventInfo> OnPlayerColorChangeReceived;
 
-        private void RefirePlayerColorChange(object _, PlayerColorChange broadcast)
+        private void RefirePlayerColorChange(object _, PlayerColorChangeEventInfo broadcast)
         {
             OnPlayerColorChangeReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<PlayerConnectedBroadcast> OnPlayerConnectedBroadcastReceived;
+        public event EventHandler<PlayerConnectionEventInfo> OnPlayerConnectedBroadcastReceived;
 
-        private void RefirePlayerConnectedBroadcast(object _, PlayerConnectedBroadcast broadcast)
+        private void RefirePlayerConnectedBroadcast(object _, PlayerConnectionEventInfo broadcast)
         {
             OnPlayerConnectedBroadcastReceived?.Invoke(this, broadcast);
         }
@@ -113,7 +113,7 @@ namespace BingoSync.Sessions
             RoomIsLockout = settings.IsLockout;
         }
 
-        private void GoalUpdateFromServer(object sender, GoalUpdate update)
+        private void GoalUpdateFromServer(object sender, GoalUpdateEventInfo update)
         {
             BingoTracker.GoalUpdated(this, update.Goal, update.Slot);
         }
@@ -195,9 +195,9 @@ namespace BingoSync.Sessions
             }
         }
 
-        public List<string> RoomHistory()
+        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
         {
-            return _client.RoomHistory();
+            _client.ProcessRoomHistory(callback, errorCallback);
         }
 
         public void DumpDebugInfo()

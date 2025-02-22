@@ -12,6 +12,11 @@ using System.Linq;
 using BingoSync.Clients;
 using BingoSync.Sessions;
 using BingoSync.Interfaces;
+using Satchel.Futils.Serialiser;
+using System.CodeDom.Compiler;
+using System.IO;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -93,7 +98,10 @@ namespace BingoSync
             }
             set
             {
-                ActiveSession.RoomColor = ColorExtensions.FromName(value);
+                if (ActiveSession != null)
+                {
+                    ActiveSession.RoomColor = ColorExtensions.FromName(value);
+                }
             }
         }
 
@@ -309,7 +317,7 @@ namespace BingoSync
             Log("-------------------   BingoSync Debug Dump   -------------------");
             Log("-------------------                          -------------------");
             Log("----------------------------------------------------------------");
-
+            /*
             Log("Controller");
             Log($"\tBoard");
             foreach (string goalname in ActiveSession.Board.Select(square => square.Name))
@@ -344,6 +352,15 @@ namespace BingoSync
             {
                 Log($"\tCustomGameMode \"{gamemode}\"");
             }
+            */
+            Log($"\tActiveSession.GetClientState() = {ActiveSession.GetClientState()}");
+
+            ActiveSession.ProcessRoomHistory(history => {
+                var stringBuilder = new StringBuilder();
+                var serializer = new JsonSerializer();
+                serializer.Serialize(new IndentedTextWriter(new StringWriter(stringBuilder)), history);
+                Log(stringBuilder.ToString());
+            }, () => { });
         }
 
         public static bool RenameActiveGameModeTo(string newName)
