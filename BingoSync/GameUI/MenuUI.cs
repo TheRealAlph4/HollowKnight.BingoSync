@@ -22,6 +22,16 @@ namespace BingoSync.GameUI
         public static readonly int profileNameFieldWidth = textFieldWidth - 2*profileScreenArrowButtonWidth - acceptProfileNameButtonWidth - gapWidth * 3;
         public static readonly int fontSize = 22;
 
+        public static bool HandMode {
+            get
+            {
+                return ConnectionMenuUI.HandMode;
+            }
+            set
+            {
+                ConnectionMenuUI.HandMode = value;
+            }
+        }
 
         private static readonly LayoutRoot layoutRoot = new(true, "Persistent layout")
         {
@@ -60,11 +70,6 @@ namespace BingoSync.GameUI
         public static bool IsLockout()
         {
             return GenerationMenuUI.LockoutToggleButtonIsOn();
-        }
-
-        public static bool IsHandMode()
-        {
-            return ConnectionMenuUI.HandModeToggleButtonIsOn();
         }
 
         public static (int, bool) GetSeed()

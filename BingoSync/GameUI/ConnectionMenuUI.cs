@@ -26,6 +26,20 @@ namespace BingoSync.GameUI
         private static ToggleButton handModeToggleButton;
 
         public static bool TextBoxActive { get; private set; } = false;
+        public static bool HandMode
+        {
+            get
+            {
+                return handModeToggleButton.IsOn;
+            }
+            set
+            {
+                if (handModeToggleButton.IsOn != value)
+                {
+                    handModeToggleButton.Toggle(null);
+                }
+            }
+        }
 
         public static void Setup(Action<string> log, LayoutRoot layoutRoot)
         {
@@ -154,7 +168,7 @@ namespace BingoSync.GameUI
             Sprite handModeSprite = Loader.GetTexture("BingoSync Hand Icon.png").ToSprite();
             Sprite nonHandModeSprite = Loader.GetTexture("BingoSync Eye Icon.png").ToSprite();
 
-            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, _ => { }, "Hand Mode Toggle");
+            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, Controller.ToggleHandModeButtonClicked, "Hand Mode Toggle");
             Button handModeButton = new(layoutRoot, "handModeToggleButton")
             {
                 MinWidth = MenuUI.handModeButtonWidth,
@@ -176,7 +190,7 @@ namespace BingoSync.GameUI
 
             bottomRow.Children.Add(joinRoomButton);
             bottomRow.Children.Add(handModeToggleButton);
-
+            
             connectionMenu.Children.Add(bottomRow);
         }
 
@@ -222,6 +236,7 @@ namespace BingoSync.GameUI
             roomCodeInput.Text = session.RoomLink;
             nicknameInput.Text = session.RoomNickname;
             passwordInput.Text = session.RoomPassword;
+            HandMode = session.HandMode;
             foreach(Button button in colorButtons)
             {
                 if (button.Content.ToLower() == session.RoomColor.GetName())
@@ -282,11 +297,6 @@ namespace BingoSync.GameUI
             {
                 selectedColorButton.BorderColor = Color.white;
             }
-        }
-
-        public static bool HandModeToggleButtonIsOn()
-        {
-            return handModeToggleButton.IsOn;
         }
     }
 }

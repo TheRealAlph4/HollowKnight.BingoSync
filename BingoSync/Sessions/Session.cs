@@ -1,5 +1,6 @@
 ﻿using BingoSync.Clients;
 using BingoSync.Clients.EventInfoObjects;
+using BingoSync.GameUI;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,23 @@ namespace BingoSync.Sessions
         private readonly IRemoteClient _client;
         public string SessionName { get; set; } = "Default";
         public bool IsMarking { get; set; }
+        public bool BoardIsVisible { get; set; } = true;
+        private bool _handMode = false;
+        public bool HandMode
+        {
+            get
+            {
+                return _handMode;
+            }
+            set
+            {
+                _handMode = value;
+                if (Controller.ActiveSession == this)
+                {
+                    Controller.SetHandModeButtonState(value);
+                }
+            }
+        }
         public bool RoomIsLockout { get; set; } = false;
         public string RoomLink { get; set; } = string.Empty;
         public string RoomNickname { get; set; } = string.Empty;

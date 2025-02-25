@@ -39,7 +39,20 @@ namespace BingoSync
         }
         public static bool IsOnMainMenu { get; set; } = true;
         public static bool MenuIsVisible { get; set; } = true;
-        public static bool BoardIsVisible { get; set; } = true;
+        public static bool BoardIsVisible
+        {
+            get
+            {
+                return ActiveSession?.BoardIsVisible ?? false;
+            }
+            set
+            {
+                if (ActiveSession != null)
+                {
+                    ActiveSession.BoardIsVisible = value;
+                }
+            }
+        }
         public static string ActiveGameMode { get; set; } = string.Empty;
         public static bool MenuIsLockout
         {
@@ -53,9 +66,16 @@ namespace BingoSync
         {
             get
             {
-                return MenuUI.IsHandMode();
+                return ActiveSession?.HandMode ?? false; // MenuUI.IsHandMode();
             }
-            private set { }
+            set
+            {
+                if (ActiveSession != null)
+                {
+                    ActiveSession.HandMode = value;
+                    MenuUI.HandMode = value;
+                }
+            }
         }
 
         public static string RoomCode {
@@ -152,8 +172,18 @@ namespace BingoSync
 
         private static void OnSessionChanged(object _, Session previous)
         {
-            ConnectionMenuUI.SetConnectionInfoFromSession(ActiveSession);
+            RefreshUIWithSession(ActiveSession);
+        }
+
+        public static void RefreshUIWithSession(Session session)
+        {
+            ConnectionMenuUI.SetConnectionInfoFromSession(session);
             BoardUpdate();
+        }
+
+        public static void SetHandModeButtonState(bool handMode)
+        {
+            MenuUI.HandMode = handMode;
         }
 
         public static void ToggleBoardKeybindClicked()
@@ -259,6 +289,11 @@ namespace BingoSync
             }
         }
 
+        public static void ToggleHandModeButtonClicked(Button _)
+        {
+            HandMode = MenuUI.HandMode;
+        }
+
         public static void ResetConnectionButtonClicked()
         {
             new Task(() =>
@@ -352,7 +387,7 @@ namespace BingoSync
             {
                 Log($"\tCustomGameMode \"{gamemode}\"");
             }
-            */
+            
             Log($"\tActiveSession.GetClientState() = {ActiveSession.GetClientState()}");
 
             ActiveSession.ProcessRoomHistory(history => {
@@ -361,6 +396,12 @@ namespace BingoSync
                 serializer.Serialize(new IndentedTextWriter(new StringWriter(stringBuilder)), history);
                 Log(stringBuilder.ToString());
             }, () => { });
+            */
+
+            Log("Controller.HandMode: " + HandMode.ToString());
+            Log("MenuUI.HandMode: " + MenuUI.HandMode.ToString());
+            Log("ConnectionMenuUI.HandMode: " + ConnectionMenuUI.HandMode.ToString());
+            Log("ActiveSession.HandMode: " + ActiveSession.HandMode.ToString());
         }
 
         public static bool RenameActiveGameModeTo(string newName)
