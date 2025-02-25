@@ -12,7 +12,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.5.0";
+        public static string version = "1.3.6.0";
         public override string GetVersion() => version;
 
         public override int LoadPriority() => 0;
@@ -56,12 +56,19 @@ namespace BingoSync
         public void OnLoadGlobal(ModSettings s)
         {
             Controller.GlobalSettings = s;
+
+            // transition from having CustomGameModes in the global settings to separate files for each
+            // it'll be removed at some point after a few updates, after everyone transitions
+            Controller.MoveGameModesFromSettings();
+
+            GameModesManager.LoadCustomGameModesFromFiles();
             MenuUI.LoadDefaults();
             MainMenu.RefreshMenu();
         }
 
         public ModSettings OnSaveGlobal()
         {
+            GameModesManager.SaveCustomGameModesToFiles();
             return Controller.GlobalSettings;
         }
 

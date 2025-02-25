@@ -12,11 +12,6 @@ using System.Linq;
 using BingoSync.Clients;
 using BingoSync.Sessions;
 using BingoSync.Interfaces;
-using Satchel.Futils.Serialiser;
-using System.CodeDom.Compiler;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -334,14 +329,14 @@ namespace BingoSync
         public static void RegenerateGameModeButtons()
         {
             GenerationMenuUI.SetupProfileSelection();
-            GameModesManager.LoadCustomGameModes();
+            GameModesManager.RefreshCustomGameModes();
             GenerationMenuUI.CreateGenerationMenu();
             GenerationMenuUI.SetupGameModeButtons();
         }
 
         public static void AfterGoalPacksLoaded()
         {
-            GameModesManager.LoadCustomGameModes();
+            GameModesManager.RefreshCustomGameModes();
             MenuUI.SetupGameModeButtons();
         }
 
@@ -413,7 +408,9 @@ namespace BingoSync
                 return false;
             }
             CustomGameMode customGameMode = (CustomGameMode)gameMode;
+            string oldName = customGameMode.InternalName;
             customGameMode.InternalName = newName;
+            GameModesManager.RenameGameModeFile(oldName, newName);
             ActiveGameMode = customGameMode.GetDisplayName();
             return true;
         }
@@ -436,6 +433,15 @@ namespace BingoSync
         public static void RefreshMenu()
         {
             MainMenu.RefreshMenu();
+        }
+
+        internal static void MoveGameModesFromSettings()
+        {
+            foreach (CustomGameMode gameMode in GlobalSettings.CustomGameModes)
+            {
+                GameModesManager.CustomGameModes.Add(gameMode);
+            }
+            GlobalSettings.CustomGameModes.Clear();
         }
     }
 }

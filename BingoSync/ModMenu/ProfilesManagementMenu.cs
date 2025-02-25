@@ -19,7 +19,7 @@ namespace BingoSync.ModMenu
             void ExitMenu(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(parentMenu);
             MenuBuilder builder = MenuUtils.CreateMenuBuilderWithBackButton("BingoSync", parentMenu, out _);
 
-            List<CustomGameMode> gameModes = Controller.GlobalSettings.CustomGameModes;
+            List<CustomGameMode> gameModes = GameModesManager.CustomGameModes;
             string[] gameModeNames = gameModes.Select(x => x.InternalName).ToArray();
 
             builder.AddContent(
@@ -67,11 +67,11 @@ namespace BingoSync.ModMenu
 
         public static void RefreshMenu()
         {
-            List<CustomGameMode> gameModes = Controller.GlobalSettings.CustomGameModes;
+            List<CustomGameMode> gameModes = GameModesManager.CustomGameModes;
             string[] gameModeNames = gameModes?.Select(x => x.InternalName).ToArray();
             if (gameModeSelector == null) return;
             gameModeSelector.optionList = gameModeNames;
-            if (Controller.GlobalSettings.CustomGameModes.Count == 0)
+            if (GameModesManager.CustomGameModes.Count == 0)
             {
                 gameModeSelector.optionText.text = "No Profiles";
             }
@@ -84,10 +84,10 @@ namespace BingoSync.ModMenu
 
         private static void EditSelectedProfile(MenuButton _)
         {
-            if (Controller.GlobalSettings.CustomGameModes.Count == 0) return;
+            if (GameModesManager.CustomGameModes.Count == 0) return;
 
             int gameModeIndex = gameModeSelector.selectedOptionIndex;
-            CustomGameMode gameMode = Controller.GlobalSettings.CustomGameModes.ElementAt(gameModeIndex);
+            CustomGameMode gameMode = GameModesManager.CustomGameModes.ElementAt(gameModeIndex);
 
             if (!_GameModeScreens.ContainsKey(gameMode))
             {
@@ -98,12 +98,13 @@ namespace BingoSync.ModMenu
 
         private static void DeleteSelectedProfile(MenuButton _)
         {
-            if (Controller.GlobalSettings.CustomGameModes.Count == 0) return;
+            if (GameModesManager.CustomGameModes.Count == 0) return;
             int currentIndex = gameModeSelector.selectedOptionIndex;
-            Controller.GlobalSettings.CustomGameModes.RemoveAt(currentIndex);
+            GameModesManager.DeleteGameModeFile(GameModesManager.CustomGameModes.ElementAt(currentIndex).InternalName);
+            GameModesManager.CustomGameModes.RemoveAt(currentIndex);
             int nextIndex = Math.Max(currentIndex - 1, 0);
             gameModeSelector.SetOptionTo(nextIndex);
-            string next = Controller.GlobalSettings.CustomGameModes.Count == 0 ? "No Profiles" : Controller.GlobalSettings.CustomGameModes.ElementAt(nextIndex).InternalName;
+            string next = GameModesManager.CustomGameModes.Count == 0 ? "No Profiles" : GameModesManager.CustomGameModes.ElementAt(nextIndex).InternalName;
             gameModeSelector.optionText.text = next;
             gameModeSelector.optionText.FontTextureChanged();
             Controller.RegenerateGameModeButtons();
@@ -112,15 +113,15 @@ namespace BingoSync.ModMenu
 
         private static void AddNewProfile(MenuButton _)
         {
-            List<string> gameModeNames = Controller.GlobalSettings.CustomGameModes.Select(x => x.InternalName).ToList();
+            List<string> gameModeNames = GameModesManager.CustomGameModes.Select(x => x.InternalName).ToList();
             string name = "Profile ";
             int nr = 1;
             for (; gameModeNames.Contains(name + nr); ++nr) ;
-            Controller.GlobalSettings.CustomGameModes.Add(new CustomGameMode(name + nr, []));
-            if(Controller.GlobalSettings.CustomGameModes.Count == 1)
+            GameModesManager.CustomGameModes.Add(new CustomGameMode(name + nr, []));
+            if(GameModesManager.CustomGameModes.Count == 1)
             {
                 gameModeSelector.SetOptionTo(0);
-                gameModeSelector.optionText.text = Controller.GlobalSettings.CustomGameModes.ElementAt(0).InternalName;
+                gameModeSelector.optionText.text = GameModesManager.CustomGameModes.ElementAt(0).InternalName;
                 gameModeSelector.Select();
             }
             Controller.RegenerateGameModeButtons();
