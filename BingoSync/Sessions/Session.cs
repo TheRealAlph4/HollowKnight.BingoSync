@@ -9,7 +9,18 @@ namespace BingoSync.Sessions
     public class Session
     {
         private readonly IRemoteClient _client;
-        public string SessionName { get; set; } = "Default";
+        private string _sessionName = "Default";
+        public string SessionName {
+            get
+            {
+                return _sessionName;
+            }
+            set
+            {
+                _sessionName = value;
+                Controller.BoardUpdate();
+            }
+        }
         public bool IsMarking { get; set; }
         public bool BoardIsVisible { get; set; } = true;
         private bool _handMode = false;

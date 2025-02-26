@@ -137,7 +137,7 @@ namespace BingoSync
             private set { }
         }
 
-        private static readonly List<Action> OnBoardUpdateList = [];
+        public static event Action OnBoardUpdate;
 
         private static Action<string> Log;
         private static readonly Stopwatch timer = new();
@@ -149,24 +149,21 @@ namespace BingoSync
             Log = log;
             DefaultSession = new Session("Default", new BingoSyncClient(log), true);
             ActiveSession = DefaultSession;
-            OnBoardUpdate(BingoBoardUI.UpdateGrid);
-            OnBoardUpdate(BingoBoardUI.UpdateName);
-            OnBoardUpdate(ConfirmTopLeftOnReveal);
+            OnBoardUpdate += BingoBoardUI.UpdateGrid;
+            OnBoardUpdate += BingoBoardUI.UpdateName;
+            OnBoardUpdate += ConfirmTopLeftOnReveal;
+            OnBoardUpdate += RefreshGenerationButtonEnabled;
             SessionManager.OnSessionChanged += OnSessionChanged;
         }
 
         public static void BoardUpdate()
         {
-            OnBoardUpdateList.ForEach(f => f());
-        }
-
-        public static void OnBoardUpdate(Action func)
-        {
-            OnBoardUpdateList.Add(func);
+            OnBoardUpdate?.Invoke();
         }
 
         private static void OnSessionChanged(object _, Session previous)
         {
+            RefreshGenerationButtonEnabled();
             RefreshUIWithSession(ActiveSession);
         }
 
