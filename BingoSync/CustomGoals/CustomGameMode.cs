@@ -58,15 +58,17 @@ namespace BingoSync.CustomGoals
                     continue;
                 }
                 List<string> activeGoals = goalGroup.GetActiveGoals();
-                List<BingoGoal> activeBingoGoals = GameModesManager.GetGoalsFromNames(activeGoals);
+                List<BingoGoal> activeBingoGoals = GameModesManager.GetGoalsFromNames(goalGroup.Name, activeGoals);
                 foreach(BingoGoal goal in activeBingoGoals)
                 {
-                    if(!GameModesManager.GoalExists(goal.name))
+                    if(goals.ContainsKey(goal.name))
                     {
-                        Modding.Logger.Log($"Goal \"{goal.name}\" is not registered, skipping");
-                        continue;
+                        goals[goal.name].exclusions.AddRange(goal.exclusions);
                     }
-                    goals[goal.name] = goal;
+                    else
+                    {
+                        goals[goal.name] = goal;
+                    }
                 }
             }
             SetGoals(goals);

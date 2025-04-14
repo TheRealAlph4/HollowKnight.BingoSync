@@ -6,6 +6,8 @@ using System.Linq;
 using System.Reflection;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
+using BingoSync.Clients;
+using BingoSync.Sessions;
 
 namespace BingoSync
 {
@@ -141,25 +143,15 @@ namespace BingoSync
             }
         }
 
-        public static bool BoardIsPlayable()
+        public static void ProcessBingo(Session session)
         {
-            BingoSyncClient.Update();
-            if (!Controller.BoardIsAvailable() || !Controller.BoardIsRevealed)
-                return false;
-            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
-                return false;
-            return true;
-        }
-
-        public static void ProcessBingo()
-        {
-            if (!BoardIsPlayable()) return;
+            if (!session.IsPlayable()) return;
             _allPossibleSquares.ForEach(square =>
             {
                 bool wasSolved = square.Condition.Solved;
                 bool isSolved = IsSolved(square);
                 if (wasSolved != isSolved)
-                    UpdateGoal(square.Name, shouldUnmark: !isSolved);
+                    UpdateGoal(session, square.Name, shouldUnmark: !isSolved);
             });
         }
 
@@ -236,11 +228,11 @@ namespace BingoSync
             condition.Conditions.ForEach(ClearCondition);
         }
 
-        public static void GoalUpdated(string goal, int index)
+        public static void GoalUpdated(Session session, string goal, int index)
         {
             if (!Controller.GlobalSettings.UnmarkGoals)
                 return;
-            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
+            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(session.RoomColor.GetName()));
             if (marked)
                 return;
             var square = _allPossibleSquares.Find(x => x.Name == goal);
@@ -248,23 +240,31 @@ namespace BingoSync
                 return;
             if (!square.Condition.Solved)
                 return;
-            UpdateGoal(goal, shouldUnmark: false);
+            UpdateGoal(session, goal, shouldUnmark: false);
         }
 
-        public static void UpdateGoal(string goal, bool shouldUnmark)
+        public static void UpdateGoal(Session session, string goal, bool shouldUnmark)
         {
-            if (!BoardIsPlayable()) return;
-            var index = Controller.Board.FindIndex(x => x.Name == goal);
+            if (!session.IsPlayable()) return;
+            int index = -1;
+            foreach(Square square in session.Board)
+            {
+                if(square.Name == goal)
+                {
+                    index = square.GoalNr;
+                    break;
+                }
+            }
             if (index == -1)
                 return;
-            bool marked = Controller.Board[index].Colors.Contains(Controller.RoomColor);
-            bool isBlank = Controller.Board[index].Colors.Contains(Controller.BLANK_COLOR);
-            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!Controller.RoomIsLockout || isBlank)))
+            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(Controller.RoomColor));
+            bool isBlank = session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
+            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!session.RoomIsLockout || isBlank)))
             {
                 //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
-                BingoSyncClient.SelectSquare(index + 1, () =>
+                session.SelectSquare(index + 1, () =>
                 {
-                    UpdateGoal(goal, shouldUnmark);
+                    UpdateGoal(session, goal, shouldUnmark);
                 }, shouldUnmark);
             }
         }

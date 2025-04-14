@@ -12,7 +12,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.0.0";
+        public static string version = "1.3.6.0";
         public override string GetVersion() => version;
 
         public override int LoadPriority() => 0;
@@ -24,7 +24,6 @@ namespace BingoSync
             Hooks.Setup();
             RetryHelper.Setup(Log);
             MenuUI.Setup(Log);
-            BingoSyncClient.Setup(Log);
             BingoTracker.Setup(Log);
             BingoBoardUI.Setup(Log);
             GameModesManager.Setup(Log);
@@ -32,7 +31,7 @@ namespace BingoSync
             ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
             // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
             GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
-       }
+        }
 
         public static void ShowMenu()
         {
@@ -57,12 +56,19 @@ namespace BingoSync
         public void OnLoadGlobal(ModSettings s)
         {
             Controller.GlobalSettings = s;
+
+            // transition from having CustomGameModes in the global settings to separate files for each
+            // it'll be removed at some point after a few updates, after everyone transitions
+            Controller.MoveGameModesFromSettings();
+
+            GameModesManager.LoadCustomGameModesFromFiles();
             MenuUI.LoadDefaults();
             MainMenu.RefreshMenu();
         }
 
         public ModSettings OnSaveGlobal()
         {
+            GameModesManager.SaveCustomGameModesToFiles();
             return Controller.GlobalSettings;
         }
 

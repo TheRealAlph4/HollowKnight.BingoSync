@@ -22,6 +22,9 @@ namespace BingoSync
             ModHooks.SetPlayerBoolHook += UpdateBoolInternal;
             ModHooks.SetPlayerIntHook += UpdateIntInternal;
 
+            // Fountain Fragment
+            ModHooks.SetPlayerIntHook += FountainFragment.CheckCollected;
+
             // GeoSpent
             On.GeoCounter.TakeGeo += GeoSpent.UpdateGeoSpent;
             On.GeoCounter.Update += GeoSpent.UpdateGeoText;
@@ -156,7 +159,7 @@ namespace BingoSync
 
         private static void HeroUpdate()
         {
-            BingoTracker.ProcessBingo();
+            BingoTracker.ProcessBingo(Controller.ActiveSession);
         }
 
         private static bool UpdateBoolInternal(string name, bool orig)
@@ -177,7 +180,8 @@ namespace BingoSync
             if (cg.name == "MainMenuScreen")
             {
                 Controller.MenuIsVisible = false;
-                Controller.SetGenerationButtonEnabled(false);
+                Controller.IsOnMainMenu = false;
+                Controller.RefreshGenerationButtonEnabled();
             }
             return orig(self, cg);
         }
@@ -187,7 +191,8 @@ namespace BingoSync
             if (cg.name == "MainMenuScreen")
             {
                 Controller.MenuIsVisible = true;
-                Controller.SetGenerationButtonEnabled(true);
+                Controller.IsOnMainMenu = true;
+                Controller.RefreshGenerationButtonEnabled();
             }
             return orig(self, cg);
         }
@@ -195,7 +200,8 @@ namespace BingoSync
         private static void ContinueGame(On.UIManager.orig_ContinueGame orig, UIManager self)
         {
             Controller.MenuIsVisible = false;
-            Controller.SetGenerationButtonEnabled(false);
+            Controller.IsOnMainMenu = false;
+            Controller.RefreshGenerationButtonEnabled();
             if (Controller.GlobalSettings.RevealCardOnGameStart)
             {
                 Controller.RevealCard();
@@ -209,7 +215,8 @@ namespace BingoSync
         private static void StartNewGame(On.UIManager.orig_StartNewGame orig, UIManager self, bool permaDeath, bool bossRush)
         {
             Controller.MenuIsVisible = false;
-            Controller.SetGenerationButtonEnabled(false);
+            Controller.IsOnMainMenu = false;
+            Controller.RefreshGenerationButtonEnabled();
             if (Controller.GlobalSettings.RevealCardOnGameStart)
             {
                 Controller.RevealCard();

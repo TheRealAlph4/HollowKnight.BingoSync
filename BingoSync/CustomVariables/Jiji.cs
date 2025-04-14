@@ -4,7 +4,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class Jiji
     {
-        private static string variableName = "killedShadeJiji";
+        private static readonly string variableName = "killedShadeJiji";
         public static bool CheckIfKilledShadeInJijis(string name, bool orig)
         {
             if (name != nameof(PlayerData.instance.soulLimited) || orig)

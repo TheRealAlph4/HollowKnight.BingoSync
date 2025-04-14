@@ -4,7 +4,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class Myla
     {
-        private static string variableName = "killedMyla";
+        private static readonly string variableName = "killedMyla";
         public static int CheckIfMylaWasKilled(string name, int orig)
         {
             if (name != nameof(PlayerData.instance.killsZombieMiner))

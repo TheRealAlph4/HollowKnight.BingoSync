@@ -1,20 +1,22 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
     internal static class Tiso
     {
-        private static string variableName = "tisoShieldHit";
-        private static string objectName = "Tiso Shield Bone";
-        private static string fsmName = "Head Control";
-        private static string hitStateName = "Hit Effects";
+        private static readonly string variableName = "tisoShieldHit";
+        private static readonly string objectName = "Tiso Shield Bone";
+        private static readonly string fsmName = "Head Control";
+        private static readonly string hitStateName = "Hit Effects";
 
         public static void CreateTisoShieldTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName) return;
+            bool hasHitState = self.TryGetState(hitStateName, out FsmState hitState);
+            if (self == null || self.FsmName != fsmName || !hasHitState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(hitStateName, () => {
+            hitState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

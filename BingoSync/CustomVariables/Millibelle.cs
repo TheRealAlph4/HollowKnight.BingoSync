@@ -1,20 +1,22 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
     internal static class Millibelle
     {
-        private static string variableName = "millibelleHit";
-        private static string objectName = "Banker Spa NPC";
-        private static string fsmName = "Hit Around";
-        private static string slashStateName = "Give Geo";
+        private static readonly string variableName = "millibelleHit";
+        private static readonly string objectName = "Banker Spa NPC";
+        private static readonly string fsmName = "Hit Around";
+        private static readonly string slashStateName = "Give Geo";
 
         public static void CreateMillibelleHitTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName) return;
+            bool hasSlashState = self.TryGetState(slashStateName, out FsmState slashState);
+            if (self == null || self.FsmName != fsmName || !hasSlashState) return;
             if (self.gameObject == null || self.gameObject.name != objectName) return;
-            self.AddCustomAction(slashStateName, () => {
+            slashState.AddCustomAction(() => {
                 BingoTracker.UpdateBoolean(variableName, true);
             });
         }

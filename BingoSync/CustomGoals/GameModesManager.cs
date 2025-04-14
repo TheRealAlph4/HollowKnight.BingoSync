@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using BingoSync.Settings;
+using Newtonsoft.Json;
+using UnityEngine;
 
 namespace BingoSync.CustomGoals
 {
     internal static class GameModesManager
     {
+        private static readonly string CustomGameModesPath = Path.Combine(Path.Combine(Application.persistentDataPath, "BingoSync"), "CustomProfiles");
         private static Action<string> Log;
         private static readonly List<GameMode> gameModes = [];
         private static readonly Dictionary<string, BingoGoal> vanillaGoals = [];
         private static readonly Dictionary<string, BingoGoal> itemRandoGoals = [];
         private static readonly Dictionary<string, List<BingoGoal>> goalGroupDefinitions = [];
-        private static readonly List<BingoGoal> allCustomGoals = [];
+
+        public static readonly List<CustomGameMode> CustomGameModes = [];
 
         public static void DumpDebugInfo()
         {
@@ -71,13 +76,82 @@ namespace BingoSync.CustomGoals
             return GetGoalsByGroupName("Item Rando");
         }
 
-        public static void LoadCustomGameModes()
+        public static void RefreshCustomGameModes()
         {
             gameModes.RemoveAll(gameMode => gameMode.GetType() == typeof(CustomGameMode));
-            foreach (CustomGameMode gameMode in Controller.GlobalSettings.CustomGameModes)
+            foreach (CustomGameMode gameMode in CustomGameModes)
             {
                 SychronizeGoalGroups(gameMode);
                 AddGameMode(gameMode);
+            }
+        }
+
+        public static void RenameGameModeFile(string oldName, string newName)
+        {
+            if(!File.Exists(MakeFilepathForGameModeName(oldName)) || File.Exists(MakeFilepathForGameModeName(newName)))
+            {
+                return;
+            }
+            File.Move(MakeFilepathForGameModeName(oldName), MakeFilepathForGameModeName(newName));
+        }
+
+        public static void DeleteGameModeFile(string name)
+        {
+            if (!File.Exists(MakeFilepathForGameModeName(name)))
+            {
+                return;
+            }
+            File.Delete(MakeFilepathForGameModeName(name));
+        }
+
+        public static void SaveCustomGameModesToFiles()
+        {
+            CreateFolderIfMissing();
+            foreach (CustomGameMode gameMode in CustomGameModes)
+            {
+                File.WriteAllText(MakeFilepathForGameModeName(gameMode.InternalName), JsonConvert.SerializeObject(gameMode));
+            }
+        }
+
+        public static void LoadCustomGameModesFromFiles()
+        {
+            CreateFolderIfMissing();
+            string[] paths = Directory.GetFiles(CustomGameModesPath, "*.json");
+            foreach (string path in paths)
+            {
+                CustomGameMode gameMode = LoadCustomGameModeFromFile(path);
+                if (gameMode != null)
+                {
+                    CustomGameModes.Add(gameMode);
+                }
+            }
+        }
+
+        private static CustomGameMode LoadCustomGameModeFromFile(string filepath)
+        {
+            if (filepath == null || !File.Exists(filepath))
+            {
+                return null;
+            }
+            CustomGameMode gameMode = JsonConvert.DeserializeObject<CustomGameMode>(File.ReadAllText(filepath));
+            File.Move(filepath, MakeFilepathForGameModeName(gameMode.InternalName));
+            return gameMode;
+        }
+
+        private static string MakeFilepathForGameModeName(string gameModeName)
+        {
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                gameModeName = gameModeName.Replace(c, '_');
+            }
+            return Path.Combine(CustomGameModesPath, gameModeName + ".json");
+        }
+
+        private static void CreateFolderIfMissing()
+        {
+            if (!Directory.Exists(CustomGameModesPath))
+            {
+                Directory.CreateDirectory(CustomGameModesPath);
             }
         }
 
@@ -95,13 +169,17 @@ namespace BingoSync.CustomGoals
 
         public static void RegisterGoalsForCustom(string groupName, Dictionary<string, BingoGoal> goals)
         {
-            allCustomGoals.AddRange(goals.Values);
             goalGroupDefinitions[groupName] = goals.Values.ToList();
         }
 
-        internal static List<BingoGoal> GetGoalsFromNames(List<string> names)
+        internal static List<BingoGoal> GetGoalsFromNames(string groupName, List<string> goalNames)
         {
-            return allCustomGoals.Where(goal => names.Contains(goal.name)).ToList();
+            List<BingoGoal> goals = [];
+            if (GoalGroupExists(groupName))
+            {
+                goals = goalGroupDefinitions[groupName].FindAll(goal => goalNames.Contains(goal.name));
+            }
+            return goals;
         }
 
         public static List<GoalGroup> CreateDefaultCustomSettings()
@@ -129,11 +207,6 @@ namespace BingoSync.CustomGoals
             return goalGroupDefinitions.ContainsKey(groupName);
         }
 
-        public static bool GoalExists(string goalName)
-        {
-            return allCustomGoals.Any(goal => goal.name == goalName);
-        }
-
         public static List<string> GameModeNames()
         {
             List<string> names = [];
@@ -149,13 +222,13 @@ namespace BingoSync.CustomGoals
             (int seed, bool isCustomSeed) = Controller.GetCurrentSeed();
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
-            BingoSyncClient.ChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
+            Controller.ActiveSession.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with {isCustomSeedString} seed {seed}");
             string customJSON = GameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
                 customJSON = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            BingoSyncClient.NewCard(customJSON, Controller.MenuIsLockout);
+            Controller.ActiveSession.NewCard(customJSON, Controller.MenuIsLockout);
         }
 
         private static void SetupVanillaGoals()

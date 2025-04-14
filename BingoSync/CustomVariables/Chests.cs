@@ -1,17 +1,19 @@
-﻿using Satchel;
+﻿using HutongGames.PlayMaker;
+using Satchel;
 
 namespace BingoSync.CustomVariables
 {
     internal static class Chests
     {
-        private static string fsmName = "Chest Control";
-        private static string openStateName = "Opened";
+        private static readonly string fsmName = "Chest Control";
+        private static readonly string openStateName = "Opened";
 
         public static void CreateChestOpenTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || self.FsmName != fsmName) return;
-            self.AddCustomAction(openStateName, () => {
+            bool hasOpenState = self.TryGetState(openStateName, out FsmState openState);
+            if (self == null || self.FsmName != fsmName || !hasOpenState) return;
+            openState.AddCustomAction(() => {
                 string variableName = $"chestOpen_{GameManager.instance.GetSceneNameString()}";
                 BingoTracker.UpdateBoolean(variableName, true);
             });

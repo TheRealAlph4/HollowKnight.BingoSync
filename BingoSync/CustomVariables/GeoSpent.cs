@@ -3,8 +3,8 @@
 namespace BingoSync.CustomVariables
 {
     internal static class GeoSpent {
-        private static string variableName = "geoSpent";
-        private static string bankSceneName = "Fungus3_35";
+        private static readonly string variableName = "geoSpent";
+        private static readonly string bankSceneName = "Fungus3_35";
         private static readonly FieldInfo counterCurrent = typeof(GeoCounter).GetField("counterCurrent", BindingFlags.NonPublic | BindingFlags.Instance);
 
         public static void UpdateGeoText(On.GeoCounter.orig_Update orig, GeoCounter self)

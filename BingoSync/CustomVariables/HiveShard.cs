@@ -4,7 +4,7 @@ namespace BingoSync.CustomVariables
 {
     internal static class HiveShard
     {
-        private static string variableName = "collectedHiveShard";
+        private static readonly string variableName = "collectedHiveShard";
         public static bool CheckIfHiveShardWasCollected(string name, bool orig)
         {
             if (name != nameof(PlayerData.instance.heartPieceCollected) || !orig)

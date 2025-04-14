@@ -527,7 +527,7 @@
         "name": "Obtain fountain vessel fragment",
         "condition": {
             "type": "Bool",
-            "variableName": "fountainVesselSummoned",
+            "variableName": "fountainVesselFragmentCollected",
             "expectedValue": true
         }
     },
@@ -644,7 +644,7 @@
             "conditions": [
                 {
                     "type": "Bool",
-                    "variableName": "hornetFountainEncounter",
+                    "variableName": "talkedToHornetAtCoTFountain",
                     "expectedValue": true
                 },
                 {

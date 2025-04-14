@@ -870,7 +870,7 @@
     {
         "name": "Obtain Quick Slash or Nailmaster's Glory",
         "condition": {
-            "criteria": "Some",
+            "type": "Some",
             "amount": 1,
             "conditions": [
                 {

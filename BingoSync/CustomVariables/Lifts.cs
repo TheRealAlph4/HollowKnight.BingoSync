@@ -2,7 +2,7 @@
 {
     internal static class Lifts
     {
-        private static string[] liftRoomPrefixes = {"Crossroads_49", "Ruins2_10"};
+        private static readonly string[] liftRoomPrefixes = {"Crossroads_49", "Ruins2_10"};
 
         public static bool CheckIfLiftWasUsed(string name, bool orig)
         {

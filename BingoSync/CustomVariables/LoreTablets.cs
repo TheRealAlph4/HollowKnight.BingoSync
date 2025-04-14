@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
+using HutongGames.PlayMaker;
 using Satchel;
 
 namespace BingoSync.CustomVariables
 {
     internal static class LoreTablets
     {
-        private static List<string> fsmNames = new List<string>{ "inspect_region", "Inspection" };
-        private static string readStateName = "Take Control";
+        private static readonly List<string> fsmNames = new List<string>{ "inspect_region", "Inspection" };
+        private static readonly string readStateName = "Take Control";
 
         public static void MarkLoreTabletAsRead(string roomName, string objectName)
         {
@@ -17,8 +18,9 @@ namespace BingoSync.CustomVariables
         public static void CreateLoreTabletTrigger(On.PlayMakerFSM.orig_OnEnable orig, PlayMakerFSM self)
         {
             orig(self);
-            if (self == null || !fsmNames.Contains(self.FsmName) || self.gameObject == null) return;
-            self.AddCustomAction(readStateName, () => {
+            bool hasReadState = self.TryGetState(readStateName, out FsmState readState);
+            if (self == null || !fsmNames.Contains(self.FsmName) || self.gameObject == null || !hasReadState) return;
+            readState.AddCustomAction(() => {
                 MarkLoreTabletAsRead(self.gameObject.scene.name, self.gameObject.name);
             });
         }

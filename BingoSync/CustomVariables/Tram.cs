@@ -2,8 +2,8 @@
 {
     internal static class Tram
     {
-        private static string lowerTramRoom = "Room_Tram";
-        private static string upperTramRoom = "Room_Tram_RG";
+        private static readonly string lowerTramRoom = "Room_Tram";
+        private static readonly string upperTramRoom = "Room_Tram_RG";
 
         public static int CheckIfStationWasVisited(string name, int orig)
         {

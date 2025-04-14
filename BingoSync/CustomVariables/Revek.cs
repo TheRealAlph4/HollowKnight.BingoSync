@@ -1,11 +1,14 @@
-﻿using System.Collections;
+﻿using Satchel;
+using System.Collections;
+using System.Linq;
+using UnityEngine;
 
 namespace BingoSync.CustomVariables
 {
     internal static class Revek
     {
-        private static string variableName = "parryRevekConsecutive";
-        private static string revekScene = "RestingGrounds_08";
+        private static readonly string variableName = "parryRevekConsecutive";
+        private static readonly string revekScene = "RestingGrounds_08";
 
         public static IEnumerator EnterRoom(On.HeroController.orig_EnterScene orig, HeroController self, TransitionPoint enterGate, float delayBeforeEnter)
         {
@@ -19,6 +22,28 @@ namespace BingoSync.CustomVariables
             if (GameManager.instance.GetSceneNameString() != revekScene) {
                 return;
             }
+
+            GameObject[] objects = GameObject.FindObjectsOfType<GameObject>();
+            if (objects == null)
+            {
+                return;
+            }
+
+            foreach (GameObject obj in objects)
+            {
+                if (obj.GetName() != "Hollow Shade(Clone)")
+                {
+                    continue;
+                }
+                foreach (PlayMakerFSM fsm in obj.GetComponents<PlayMakerFSM>())
+                {
+                    if (fsm.FsmName == "Shade Control" && fsm.ActiveStateName == "Slash")
+                    {
+                        return;
+                    }
+                }
+            }
+
             var consecutiveParries = BingoTracker.GetInteger(variableName) + 1;
             BingoTracker.UpdateInteger(variableName, consecutiveParries);
         }

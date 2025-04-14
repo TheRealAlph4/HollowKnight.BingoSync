@@ -7,18 +7,31 @@ namespace BingoSync.GameUI
     {
         private static Action<string> Log;
 
+        public static readonly int gapWidth = 10;
         public static readonly int colorButtonWidth = 100;
         public static readonly int lockoutButtonWidth = 50;
         public static readonly int handModeButtonWidth = 43;
-        public static readonly int textFieldWidth = colorButtonWidth * 5 + 40;
-        public static readonly int joinRoomButtonWidth = textFieldWidth - handModeButtonWidth - 10;
-        public static readonly int gameModeButtonWidth = (textFieldWidth - 20) / 3;
-        public static readonly int generateButtonWidth = (int)(1.5 * gameModeButtonWidth) + 10;
-        public static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - lockoutButtonWidth - 20;
-        public static readonly int profileNameFieldWidth = (int)(0.75 * textFieldWidth);
-        public static readonly int acceptProfileNameButtonWidth = textFieldWidth - profileNameFieldWidth - 10;
+        // public static readonly int resetConnectionButtonWidth = 43;
+        public static readonly int textFieldWidth = colorButtonWidth * 5 + gapWidth * 4;
+        public static readonly int joinRoomButtonWidth = textFieldWidth - handModeButtonWidth - gapWidth;
+        public static readonly int gameModeButtonWidth = (textFieldWidth - gapWidth * 2) / 3;
+        public static readonly int generateButtonWidth = (int)(1.5 * gameModeButtonWidth) + gapWidth;
+        public static readonly int seedFieldWidth = textFieldWidth - generateButtonWidth - lockoutButtonWidth - gapWidth * 2;
+        public static readonly int profileScreenArrowButtonWidth = 35;
+        public static readonly int acceptProfileNameButtonWidth = 120;
+        public static readonly int profileNameFieldWidth = textFieldWidth - 2*profileScreenArrowButtonWidth - acceptProfileNameButtonWidth - gapWidth * 3;
         public static readonly int fontSize = 22;
 
+        public static bool HandMode {
+            get
+            {
+                return ConnectionMenuUI.HandMode;
+            }
+            set
+            {
+                ConnectionMenuUI.HandMode = value;
+            }
+        }
 
         private static readonly LayoutRoot layoutRoot = new(true, "Persistent layout")
         {
@@ -35,7 +48,7 @@ namespace BingoSync.GameUI
 
 
             layoutRoot.VisibilityCondition = () => {
-                BingoSyncClient.Update();
+                Controller.ActiveSession.Update();
                 ConnectionMenuUI.Update();
                 return Controller.MenuIsVisible;
             };
@@ -57,11 +70,6 @@ namespace BingoSync.GameUI
         public static bool IsLockout()
         {
             return GenerationMenuUI.LockoutToggleButtonIsOn();
-        }
-
-        public static bool IsHandMode()
-        {
-            return ConnectionMenuUI.HandModeToggleButtonIsOn();
         }
 
         public static (int, bool) GetSeed()

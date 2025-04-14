@@ -6,6 +6,7 @@ using MagicUI.Graphics;
 using System.Reflection;
 using System.Linq;
 using System;
+using BingoSync.Sessions;
 
 namespace BingoSync.GameUI
 {
@@ -25,6 +26,20 @@ namespace BingoSync.GameUI
         private static ToggleButton handModeToggleButton;
 
         public static bool TextBoxActive { get; private set; } = false;
+        public static bool HandMode
+        {
+            get
+            {
+                return handModeToggleButton.IsOn;
+            }
+            set
+            {
+                if (handModeToggleButton.IsOn != value)
+                {
+                    handModeToggleButton.Toggle(null);
+                }
+            }
+        }
 
         public static void Setup(Action<string> log, LayoutRoot layoutRoot)
         {
@@ -93,16 +108,16 @@ namespace BingoSync.GameUI
         {
             colorButtons =
             [
-                CreateColorButton("Orange", Colors.Orange),
-                CreateColorButton("Red", Colors.Red),
-                CreateColorButton("Blue", Colors.Blue),
-                CreateColorButton("Green", Colors.Green),
-                CreateColorButton("Purple", Colors.Purple),
-                CreateColorButton("Navy", Colors.Navy),
-                CreateColorButton("Teal", Colors.Teal),
-                CreateColorButton("Brown", Colors.Brown),
-                CreateColorButton("Pink", Colors.Pink),
-                CreateColorButton("Yellow", Colors.Yellow)
+                CreateColorButton("Orange", Colors.Orange.GetColor()),
+                CreateColorButton("Red", Colors.Red.GetColor()),
+                CreateColorButton("Blue", Colors.Blue.GetColor()),
+                CreateColorButton("Green", Colors.Green.GetColor()),
+                CreateColorButton("Purple", Colors.Purple.GetColor()),
+                CreateColorButton("Navy", Colors.Navy.GetColor()),
+                CreateColorButton("Teal", Colors.Teal.GetColor()),
+                CreateColorButton("Brown", Colors.Brown.GetColor()),
+                CreateColorButton("Pink", Colors.Pink.GetColor()),
+                CreateColorButton("Yellow", Colors.Yellow.GetColor())
             ];
 
             StackLayout colorButtonsLayout = new(layoutRoot)
@@ -153,7 +168,7 @@ namespace BingoSync.GameUI
             Sprite handModeSprite = Loader.GetTexture("BingoSync Hand Icon.png").ToSprite();
             Sprite nonHandModeSprite = Loader.GetTexture("BingoSync Eye Icon.png").ToSprite();
 
-            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, _ => { }, "Hand Mode Toggle");
+            handModeToggleButton = new(layoutRoot, handModeSprite, nonHandModeSprite, Controller.ToggleHandModeButtonClicked, "Hand Mode Toggle");
             Button handModeButton = new(layoutRoot, "handModeToggleButton")
             {
                 MinWidth = MenuUI.handModeButtonWidth,
@@ -161,7 +176,9 @@ namespace BingoSync.GameUI
             };
             handModeToggleButton.SetButton(handModeButton);
 
-            joinRoomButton.Click += JoinRoomButtonClicked;
+            joinRoomButton.Click += ReadCurrentConnectionInfo;
+            joinRoomButton.Click += Controller.JoinRoomButtonClicked;
+            joinRoomButton.Click += Update;
 
             StackLayout bottomRow = new(layoutRoot)
             {
@@ -173,7 +190,7 @@ namespace BingoSync.GameUI
 
             bottomRow.Children.Add(joinRoomButton);
             bottomRow.Children.Add(handModeToggleButton);
-
+            
             connectionMenu.Children.Add(bottomRow);
         }
 
@@ -207,43 +224,41 @@ namespace BingoSync.GameUI
             .Split('/').Last();
         }
 
-        public static void ReadCurrentConnectionInfo()
+        public static void ReadCurrentConnectionInfo(Button _ = null)
         {
             Controller.RoomCode = SanitizeRoomCode(roomCodeInput.Text);
             Controller.RoomNickname = nicknameInput.Text;
             Controller.RoomPassword = passwordInput.Text;
         }
 
-        private static void JoinRoomButtonClicked(Button sender)
+        public static void SetConnectionInfoFromSession(Session session)
         {
-            if (BingoSyncClient.GetState() != BingoSyncClient.State.Connected)
+            roomCodeInput.Text = session.RoomLink;
+            nicknameInput.Text = session.RoomNickname;
+            passwordInput.Text = session.RoomPassword;
+            HandMode = session.HandMode;
+            foreach(Button button in colorButtons)
             {
-                ReadCurrentConnectionInfo();
-                BingoSyncClient.JoinRoom((ex) =>
+                if (button.Content.ToLower() == session.RoomColor.GetName())
                 {
-                    Update();
-                });
-                Update();
-            }
-            else
-            {
-                BingoSyncClient.ExitRoom(() =>
+                    button.BorderColor = Color.white;
+                }
+                else
                 {
-                    Update();
-                });
-                Update();
+                    button.BorderColor = button.ContentColor;
+                }
             }
         }
 
-        public static void Update()
+        public static void Update(Button _ = null)
         {
-            if (Controller.ClientIsConnected())
+            if (Controller.ActiveSession.ClientIsConnected())
             {
                 joinRoomButton.Content = "Exit Room";
                 joinRoomButton.Enabled = true;
                 SetEnabled(false);
             }
-            else if (Controller.ClientIsConnecting())
+            else if (Controller.ActiveSession.ClientIsConnecting())
             {
                 joinRoomButton.Content = "Loading...";
                 joinRoomButton.Enabled = false;
@@ -282,11 +297,6 @@ namespace BingoSync.GameUI
             {
                 selectedColorButton.BorderColor = Color.white;
             }
-        }
-
-        public static bool HandModeToggleButtonIsOn()
-        {
-            return handModeToggleButton.IsOn;
         }
     }
 }
