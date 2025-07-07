@@ -12,6 +12,7 @@ namespace BingoSync.ModMenu
         private static MenuScreen _DefaultsScreen;
         private static MenuScreen _BoardSettingsScreen;
         private static MenuScreen _ProfilesScreen;
+        private static MenuScreen _AccessibilityScreen;
 
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu) {
             void ExitMenu(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(parentMenu);
@@ -23,6 +24,7 @@ namespace BingoSync.ModMenu
                 ProfilesManagementMenu.RefreshMenu();
                 UIManager.instance.UIGoToDynamicMenu(_ProfilesScreen);
             };
+            void GoToAccessibility(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_AccessibilityScreen);
 
             MenuBuilder mainMenuBuilder = MenuUtils.CreateMenuBuilderWithBackButton("BingoSync", parentMenu, out _);
 
@@ -65,6 +67,13 @@ namespace BingoSync.ModMenu
                             SubmitAction = GoToProfiles,
                             CancelAction = ExitMenu,
                         })
+                        .AddMenuButton("Accessibility", new MenuButtonConfig
+                        {
+                            Label = "Accessibility",
+                            Proceed = true,
+                            SubmitAction = GoToAccessibility,
+                            CancelAction = ExitMenu,
+                        })
                         .AddStaticPanel("Spacer", new RelVector2(new RelLength(1), new RelLength(1)), out _)
                         .AddMenuButton("Reset Active Connection", new MenuButtonConfig
                         {
@@ -87,6 +96,7 @@ namespace BingoSync.ModMenu
             _DefaultsScreen = DefaultsMenu.CreateMenuScreen(_MainMenuScreen);
             _ProfilesScreen = ProfilesManagementMenu.CreateMenuScreen(_MainMenuScreen);
             _BoardSettingsScreen = BoardSettingsMenu.CreateMenuScreen(_MainMenuScreen);
+            _AccessibilityScreen = AccessibilityMenu.CreateMenuScreen(_MainMenuScreen);
 
             return _MainMenuScreen;
         }

@@ -70,6 +70,11 @@ namespace BingoSync.GameUI
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.CycleBoardOpacity, Controller.CycleBoardOpacity);
         }
 
+        public static void UpdateColorScheme()
+        {
+            board.UpdateColorScheme();
+        }
+
         public static void UpdateGrid()
         {
             loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;

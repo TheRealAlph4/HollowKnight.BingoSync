@@ -2,7 +2,6 @@
 using MagicUI.Elements;
 using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using GridLayout = MagicUI.Elements.GridLayout;
 using Satchel;
 using static BingoSync.Settings.ModSettings;
@@ -23,21 +22,21 @@ namespace BingoSync.GameUI
         public List<SquareLayoutObjects> bingoLayout;
         public readonly TextObject boardName;
         private bool opacityInitialized = false;
-
-        private static readonly Dictionary<string, Color> BingoColors = new()
+        private readonly Dictionary<string, List<Image>> backgroundImagesByColor = new()
         {
-            { "blank", Color.black },
-            { "orange", Colors.Orange.GetColor() },
-            { "red", Colors.Red.GetColor() },
-            { "blue", Colors.Blue.GetColor() },
-            { "green", Colors.Green.GetColor() },
-            { "purple", Colors.Purple.GetColor() },
-            { "navy", Colors.Navy.GetColor() },
-            { "teal", Colors.Teal.GetColor() },
-            { "brown", Colors.Brown.GetColor() },
-            { "pink", Colors.Pink.GetColor() },
-            { "yellow", Colors.Yellow.GetColor() },
+            ["orange"] = [],
+            ["red"] = [],
+            ["blue"] = [],
+            ["green"] = [],
+            ["purple"] = [],
+            ["navy"] = [],
+            ["teal"] = [],
+            ["brown"] = [],
+            ["pink"] = [],
+            ["yellow"] = [],
+            ["blank"] = []
         };
+
 
         public DisplayBoard(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {
@@ -182,27 +181,36 @@ namespace BingoSync.GameUI
                 Spacing = 0,
             }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
 
-            var colors = BingoColors.Keys.ToList();
+            var colors = ColorExtensions.GetAllColorNames();
             var images = new Dictionary<string, Image>();
             for (int brow = 0; brow < colors.Count; brow++)
             {
-                Color tint;
-                if (BingoColors.TryGetValue(colors[brow], out tint))
+                Color tint = ColorExtensions.FromName(colors[brow]).GetColor();
+                var backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
                 {
-                    var backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
-                    {
-                        Height = 0,
-                        Width = 110,
-                        Tint = tint,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                    };
-                    stack.Children.Add(backgroundImage);
-                    images.Add(colors[brow], backgroundImage);
-                }
+                    Height = 0,
+                    Width = 110,
+                    Tint = tint,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                };
+                stack.Children.Add(backgroundImage);
+                images.Add(colors[brow], backgroundImage);
+                backgroundImagesByColor[colors[brow]].Add(backgroundImage);
             }
 
             return (stack, images);
+        }
+
+        public void UpdateColorScheme()
+        {
+            foreach(string color in ColorExtensions.GetAllColorNames())
+            {
+                foreach(Image image in backgroundImagesByColor[color])
+                {
+                    image.Tint = ColorExtensions.FromName(color).GetColor();
+                }
+            }
         }
     }
 }

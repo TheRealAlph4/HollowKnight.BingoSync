@@ -298,5 +298,16 @@ namespace BingoSync.GameUI
                 selectedColorButton.BorderColor = Color.white;
             }
         }
+
+        public static void UpdateColorScheme()
+        {
+            foreach(Button button in colorButtons)
+            {
+                button.ContentColor = ColorExtensions.FromName(button.Content.ToLower()).GetColor();
+                button.BorderColor = ColorExtensions.FromName(button.Content.ToLower()).GetColor();
+            }
+            layoutRoot.GetElement<Button>(Controller.RoomColor).BorderColor = Color.white;
+        }
+
     }
 }
