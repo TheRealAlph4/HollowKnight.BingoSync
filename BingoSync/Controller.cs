@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using MagicUI.Elements;
@@ -18,6 +17,8 @@ namespace BingoSync
     internal static class Controller
     {
         public static ModSettings GlobalSettings { get; set; } = new ModSettings();
+
+        public static AudioPlayer Audio { get; set; } = new AudioPlayer();
 
         public static Session DefaultSession { get; set; }
         private static Session _activeSession;
@@ -148,6 +149,7 @@ namespace BingoSync
         {
             Log = log;
             DefaultSession = new Session("Default", new BingoSyncClient(log), true);
+            DefaultSession.AudioNotificationOn = GlobalSettings.AudioNotificationOn;
             ActiveSession = DefaultSession;
             OnBoardUpdate += BingoBoardUI.UpdateGrid;
             OnBoardUpdate += BingoBoardUI.UpdateName;
@@ -339,61 +341,6 @@ namespace BingoSync
 
         public static void DumpDebugInfo()
         {
-            Log("----------------------------------------------------------------");
-            Log("-------------------                          -------------------");
-            Log("-------------------   BingoSync Debug Dump   -------------------");
-            Log("-------------------                          -------------------");
-            Log("----------------------------------------------------------------");
-            /*
-            Log("Controller");
-            Log($"\tBoard");
-            foreach (string goalname in ActiveSession.Board.Select(square => square.Name))
-            {
-                Log($"\t\tGoal \"{goalname}\"");
-            };
-            Log($"\tMenuIsVisible = {MenuIsVisible}");
-            Log($"\tBoardIsVisible = {BoardIsVisible}");
-            Log($"\tBoardIsConfirmed = {ActiveSession.Board.IsConfirmed}");
-            Log($"\tBoardIsRevealed = {ActiveSession.Board.IsRevealed}");
-            Log($"\tActiveGameMode = {ActiveGameMode}");
-            Log($"\tRoomCode = {RoomCode}");
-            Log($"\tRoomPassword = {RoomPassword}");
-            Log($"\tRoomNickname = {RoomNickname}");
-            Log($"\tRoomColor = {RoomColor}");
-            Log($"\tRoomIsLockout = {ActiveSession.RoomIsLockout}");
-
-
-            ActiveSession.DumpDebugInfo();
-
-            GameModesManager.DumpDebugInfo();
-
-            Log($"GlobalSettings");
-            Log($"\tBoardAlphaIndex = {GlobalSettings.BoardAlphaIndex}");
-            Log($"\tRevealCardOnGameStart = {GlobalSettings.RevealCardOnGameStart}");
-            Log($"\tRevealCardWhenOthersReveal = {GlobalSettings.RevealCardWhenOthersReveal}");
-            Log($"\tUnmarkGoals = {GlobalSettings.UnmarkGoals}");
-            Log($"\tDefaultNickname = {GlobalSettings.DefaultNickname}");
-            Log($"\tDefaultPassword = {GlobalSettings.DefaultPassword}");
-            Log($"\tDefaultColor = {GlobalSettings.DefaultColor}");
-            foreach (string gamemode in GlobalSettings.CustomGameModes.Select(gameMode => gameMode.GetDisplayName()))
-            {
-                Log($"\tCustomGameMode \"{gamemode}\"");
-            }
-            
-            Log($"\tActiveSession.GetClientState() = {ActiveSession.GetClientState()}");
-
-            ActiveSession.ProcessRoomHistory(history => {
-                var stringBuilder = new StringBuilder();
-                var serializer = new JsonSerializer();
-                serializer.Serialize(new IndentedTextWriter(new StringWriter(stringBuilder)), history);
-                Log(stringBuilder.ToString());
-            }, () => { });
-            */
-
-            Log("Controller.HandMode: " + HandMode.ToString());
-            Log("MenuUI.HandMode: " + MenuUI.HandMode.ToString());
-            Log("ConnectionMenuUI.HandMode: " + ConnectionMenuUI.HandMode.ToString());
-            Log("ActiveSession.HandMode: " + ActiveSession.HandMode.ToString());
         }
 
         public static bool RenameActiveGameModeTo(string newName)

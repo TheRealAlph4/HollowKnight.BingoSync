@@ -39,6 +39,24 @@ namespace BingoSync.Sessions
                 }
             }
         }
+        public AudioNotificationCondition AudioNotificationOn { get; set; } = AudioNotificationCondition.None;
+        public bool HasCustomAudio { get; set; } = false;
+        private int _customAudioClipId = 0;
+        public int ActiveAudioId { 
+            get
+            {
+                if (HasCustomAudio)
+                {
+                    return _customAudioClipId;
+                }
+                return Controller.GlobalSettings.AudioClipId;
+            }
+            set
+            {
+                HasCustomAudio = true;
+                _customAudioClipId = value;
+            }
+        }
         public bool RoomIsLockout { get; set; } = false;
         public string RoomLink { get; set; } = string.Empty;
         public string RoomNickname { get; set; } = string.Empty;
@@ -130,6 +148,7 @@ namespace BingoSync.Sessions
             _client.SetBoard(Board);
             _client.GoalUpdateReceived += GoalUpdateFromServer;
             _client.RoomSettingsReceived += ConsumeRoomSettings;
+            OnGoalUpdateReceived += DoAudioNotification;
         }
 
         public void LocalUpdate()
@@ -232,6 +251,37 @@ namespace BingoSync.Sessions
         public void DumpDebugInfo()
         {
             _client.DumpDebugInfo();
+        }
+
+        public void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
+        {
+            if (goalUpdate.Unmarking || !Board.IsAvailable() || !Board.IsRevealed)
+            {
+                return;
+            }
+            switch(AudioNotificationOn)
+            {
+                case AudioNotificationCondition.None:
+                    break;
+
+                case AudioNotificationCondition.OtherPlayers:
+                    if(goalUpdate.Player.Name != RoomNickname)
+                    {
+                        Controller.Audio.Play(ActiveAudioId);
+                    }
+                    break;
+
+                case AudioNotificationCondition.OtherColors:
+                    if (goalUpdate.Player.Color != RoomColor)
+                    {
+                        Controller.Audio.Play(ActiveAudioId);
+                    }
+                    break;
+
+                case AudioNotificationCondition.AllGoals:
+                    Controller.Audio.Play(ActiveAudioId);
+                    break;
+            }
         }
     }
 }
