@@ -43,5 +43,6 @@ namespace BingoSync.Settings
 
         public int ColorScheme = 0;
         public bool UseShapesForColors = false;
+        public bool AdaptIconOpcaity = false;
     }
 }

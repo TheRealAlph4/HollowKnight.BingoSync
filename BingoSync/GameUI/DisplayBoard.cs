@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using GridLayout = MagicUI.Elements.GridLayout;
 using Satchel;
 using static BingoSync.Settings.ModSettings;
+using MagicUI.Graphics;
+using System.Reflection;
 
 namespace BingoSync.GameUI
 {
@@ -15,6 +17,7 @@ namespace BingoSync.GameUI
             public TextObject Text;
             public Dictionary<HighlightType, Image> Highlights;
             public Dictionary<string, Image> BackgroundColors;
+            public Dictionary<string, Image> ColorsIcons;
         };
         private readonly LayoutRoot layoutRoot;
         private readonly StackLayout boardAndName;
@@ -37,6 +40,24 @@ namespace BingoSync.GameUI
             ["blank"] = []
         };
 
+        private static readonly Dictionary<string, Sprite> colorIconSprites = [];
+
+        private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images.ColorIcons");
+        static DisplayBoard()
+        {
+            Loader.Preload();
+
+            colorIconSprites["orange"] = Loader.GetTexture("BingoSync Color Icon Orange.png").ToSprite();
+            colorIconSprites["red"] = Loader.GetTexture("BingoSync Color Icon Red.png").ToSprite();
+            colorIconSprites["blue"] = Loader.GetTexture("BingoSync Color Icon Blue.png").ToSprite();
+            colorIconSprites["green"] = Loader.GetTexture("BingoSync Color Icon Green.png").ToSprite();
+            colorIconSprites["purple"] = Loader.GetTexture("BingoSync Color Icon Purple.png").ToSprite();
+            colorIconSprites["navy"] = Loader.GetTexture("BingoSync Color Icon Navy.png").ToSprite();
+            colorIconSprites["teal"] = Loader.GetTexture("BingoSync Color Icon Teal.png").ToSprite();
+            colorIconSprites["brown"] = Loader.GetTexture("BingoSync Color Icon Brown.png").ToSprite();
+            colorIconSprites["pink"] = Loader.GetTexture("BingoSync Color Icon Pink.png").ToSprite();
+            colorIconSprites["yellow"] = Loader.GetTexture("BingoSync Color Icon Yellow.png").ToSprite();
+        }
 
         public DisplayBoard(Sprite backgroundSprite, Dictionary<HighlightType, Sprite> highlightSprites)
         {
@@ -119,7 +140,14 @@ namespace BingoSync.GameUI
                 string name = obj.GetName();
                 if(name.Contains("BingoSync_BoardDisplay") && !name.Contains("text"))
                 {
-                    obj.GetComponent<CanvasRenderer>()?.SetAlpha(alpha);
+                    if (!name.Contains("icon") || Controller.GlobalSettings.AdaptIconOpcaity)
+                    {
+                        obj.GetComponent<CanvasRenderer>()?.SetAlpha(alpha);
+                    }
+                    else
+                    {
+                        obj.GetComponent<CanvasRenderer>()?.SetAlpha(1.0f);
+                    }
                 }
             }
         }
@@ -131,8 +159,8 @@ namespace BingoSync.GameUI
             {
                 for (int column = 0; column < 5; column++)
                 {
-                    var (stack, images) = GenerateSquareBackgroundImage(row, column, backgroundSprite);
-                    gridLayout.Children.Add(stack);
+                    var (stack, images, icons) = GenerateSquareBackgroundImage(row, column, backgroundSprite);
+                    gridLayout.Children.Add(stack.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column));
 
                     TextObject textObject = new TextObject(layoutRoot, $"BingoSync_BoardDisplay_square_{row}_{column}_text")
                     {
@@ -161,19 +189,25 @@ namespace BingoSync.GameUI
                         highlightImages[entry.Key] = highlightImage;
                     }
 
+                    foreach(KeyValuePair<string, Image> entry in icons)
+                    {
+                        gridLayout.Children.Add(icons[entry.Key].WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column));
+                    }
+
                     bingoLayout.Add(new SquareLayoutObjects
                     {
                         Text = textObject,
                         Highlights = highlightImages,
                         BackgroundColors = images,
+                        ColorsIcons = icons,
                     });
                 }
             }
         }
 
-        private (StackLayout, Dictionary<string, Image>) GenerateSquareBackgroundImage(int row, int column, Sprite backgroundSprite)
+        private (StackLayout, Dictionary<string, Image>, Dictionary<string, Image>) GenerateSquareBackgroundImage(int row, int column, Sprite backgroundSprite)
         {
-            var stack = new StackLayout(layoutRoot, $"BingoSync_BoardDisplay_background_{row}_{column}")
+            StackLayout stack = new StackLayout(layoutRoot, $"BingoSync_BoardDisplay_background_{row}_{column}")
             {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
@@ -181,12 +215,13 @@ namespace BingoSync.GameUI
                 Spacing = 0,
             }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
 
-            var colors = ColorExtensions.GetAllColorNames();
-            var images = new Dictionary<string, Image>();
+            List<string> colors = ColorExtensions.GetAllColorNames();
+            Dictionary<string, Image> images = [];
+            Dictionary<string, Image> icons = [];
             for (int brow = 0; brow < colors.Count; brow++)
             {
                 Color tint = ColorExtensions.FromName(colors[brow]).GetColor();
-                var backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
+                Image backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
                 {
                     Height = 0,
                     Width = 110,
@@ -197,9 +232,21 @@ namespace BingoSync.GameUI
                 stack.Children.Add(backgroundImage);
                 images.Add(colors[brow], backgroundImage);
                 backgroundImagesByColor[colors[brow]].Add(backgroundImage);
+
+                if(colors[brow] != "blank")
+                {
+                    Image colorIcon = new Image(layoutRoot, colorIconSprites[colors[brow]], $"BingoSync_BoardDisplay_icon_{brow}_{row}_{column}")
+                    {
+                        Height = 110,
+                        Width = 110,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                    };
+                    icons.Add(colors[brow], colorIcon);
+                }
             }
 
-            return (stack, images);
+            return (stack, images, icons);
         }
 
         public void UpdateColorScheme()
