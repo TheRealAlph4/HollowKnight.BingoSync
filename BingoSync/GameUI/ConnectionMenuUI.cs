@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Linq;
 using System;
 using BingoSync.Sessions;
+using InputField = UnityEngine.UI.InputField;
 
 namespace BingoSync.GameUI
 {
@@ -88,10 +89,20 @@ namespace BingoSync.GameUI
             };
             passwordInput.OnHover += HoverTextInput;
             passwordInput.OnUnhover += UnhoverTextInput;
+            HideTextInputContent(passwordInput);
 
             connectionMenu.Children.Add(roomCodeInput);
             connectionMenu.Children.Add(nicknameInput);
             connectionMenu.Children.Add(passwordInput);
+        }
+
+        private static void HideTextInputContent(TextInput textInput)
+        {
+            FieldInfo inputFieldInfo = typeof(TextInput).GetField("input", BindingFlags.NonPublic | BindingFlags.Instance);
+            InputField inputField = inputFieldInfo.GetValue(textInput) as InputField;
+
+            FieldInfo inputTypeFieldInfo = typeof(InputField).GetField("m_InputType", BindingFlags.NonPublic | BindingFlags.Instance);
+            inputTypeFieldInfo.SetValue(inputField, InputField.InputType.Password);
         }
 
         private static void HoverTextInput(TextInput _)
