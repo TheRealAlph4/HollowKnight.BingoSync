@@ -1,6 +1,5 @@
 ﻿using HutongGames.PlayMaker;
 using Satchel;
-using UnityEngine;
 
 namespace BingoSync.CustomVariables
 {

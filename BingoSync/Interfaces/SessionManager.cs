@@ -16,10 +16,6 @@ namespace BingoSync.Interfaces
             {
                 return NeedsSessionNameKeys.Count > 0;
             }
-            private set
-            {
-                throw new InvalidOperationException("Cannot directly set SessionManager.ShowSessionName, use SessionManager.ShowBoardNameWithKey and SessionManager.HideBoardNameWithKey instead");
-            }
         }
 
         internal static void Setup(Action<string> log)

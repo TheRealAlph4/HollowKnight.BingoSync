@@ -86,23 +86,14 @@ namespace BingoSync.GameUI
                 FontSize = MenuUI.fontSize,
                 MinWidth = MenuUI.textFieldWidth,
                 Placeholder = "Password",
+                ContentType = InputField.ContentType.Password,
             };
             passwordInput.OnHover += HoverTextInput;
             passwordInput.OnUnhover += UnhoverTextInput;
-            HideTextInputContent(passwordInput);
 
             connectionMenu.Children.Add(roomCodeInput);
             connectionMenu.Children.Add(nicknameInput);
             connectionMenu.Children.Add(passwordInput);
-        }
-
-        private static void HideTextInputContent(TextInput textInput)
-        {
-            FieldInfo inputFieldInfo = typeof(TextInput).GetField("input", BindingFlags.NonPublic | BindingFlags.Instance);
-            InputField inputField = inputFieldInfo.GetValue(textInput) as InputField;
-
-            FieldInfo inputTypeFieldInfo = typeof(InputField).GetField("m_InputType", BindingFlags.NonPublic | BindingFlags.Instance);
-            inputTypeFieldInfo.SetValue(inputField, InputField.InputType.Password);
         }
 
         private static void HoverTextInput(TextInput _)

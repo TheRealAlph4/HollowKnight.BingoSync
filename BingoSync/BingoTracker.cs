@@ -6,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
-using BingoSync.Clients;
 using BingoSync.Sessions;
 
 namespace BingoSync

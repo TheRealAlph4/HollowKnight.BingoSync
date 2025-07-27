@@ -1,11 +1,8 @@
 ﻿using BingoSync.Clients.EventInfoObjects;
 using BingoSync.Sessions;
-using HutongGames.PlayMaker.Actions;
-using ItemChanger.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -193,8 +190,8 @@ namespace BingoSync.Clients
                 }
                 finally
                 {
-                    callback(ex);
                     forcedState = ClientState.None;
+                    callback(ex);
                 }
             });
         }
@@ -244,7 +241,6 @@ namespace BingoSync.Clients
         public void RevealCard()
         {
             if (GetState() != ClientState.Connected) return;
-            ProcessRoomHistory((_) => { }, () => { });
             if (Board.IsRevealed) return;
             var revealInput = new NetworkObjectRevealRequest
             {
@@ -427,7 +423,6 @@ namespace BingoSync.Clients
                     square.MarkedBy.Clear();
                     foreach (string color in goalBroadcast.Square.Colors.Split(' '))
                     {
-//                        if (color == "blank") continue;
                         square.MarkedBy.Add(ColorExtensions.FromName(color));
                     }
                     GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast, Board));
