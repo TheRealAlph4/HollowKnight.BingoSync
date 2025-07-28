@@ -13,8 +13,8 @@
 		<Product>BingoSync</Product>
 		<Description>A Hollow Knight Mod</Description>
 		<Copyright>Copyright ©  2024</Copyright>
-		<AssemblyVersion>1.3.10.2</AssemblyVersion>
-		<FileVersion>1.3.10.2</FileVersion>
+		<AssemblyVersion>1.3.10.3</AssemblyVersion>
+		<FileVersion>1.3.10.3</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>

@@ -1,5 +1,6 @@
 ﻿using BingoSync.Clients;
 using BingoSync.Clients.EventInfoObjects;
+using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using System;
 using System.Collections.Generic;
@@ -146,9 +147,11 @@ namespace BingoSync.Sessions
             SubscribeEventRefires();
             IsMarking = markingClient;
             _client.SetBoard(Board);
-            _client.GoalUpdateReceived += GoalUpdateFromServer;
-            _client.RoomSettingsReceived += ConsumeRoomSettings;
+            OnGoalUpdateReceived += GoalUpdateFromServer;
             OnGoalUpdateReceived += DoAudioNotification;
+            OnRoomSettingsReceived += ConsumeRoomSettings;
+            OnCardRevealedBroadcastReceived += HandleOnReveal;
+            _client.NeedBoardUpdate += ClientTriggeredBoardUpdate;
         }
 
         public void LocalUpdate()
@@ -208,6 +211,7 @@ namespace BingoSync.Sessions
         public void Update()
         {
             _client.Update();
+            Controller.BoardUpdate();
         }
 
         public ClientState GetClientState()
@@ -215,9 +219,9 @@ namespace BingoSync.Sessions
             return _client.GetState();
         }
 
-        public void NewCard(string customJSON, bool lockout = true, bool hideCard = true)
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
         {
-            _client.NewCard(customJSON, lockout, hideCard);
+            _client.NewCard(board, lockout, hideCard);
         }
 
         public void RevealCard()
@@ -253,7 +257,7 @@ namespace BingoSync.Sessions
             _client.DumpDebugInfo();
         }
 
-        public void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
+        private void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
         {
             if (goalUpdate.Unmarking || !Board.IsAvailable() || !Board.IsRevealed)
             {
@@ -281,6 +285,23 @@ namespace BingoSync.Sessions
                 case AudioNotificationCondition.AllGoals:
                     Controller.Audio.Play(ActiveAudioId);
                     break;
+            }
+        }
+
+        private void HandleOnReveal(object sender, CardRevealedEventInfo revealedInfo)
+        {
+            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
+            {
+                Controller.RevealCard();
+            }
+        }
+
+        private void ClientTriggeredBoardUpdate(object sender, ClientBoardUpdateInfo info)
+        {
+            Controller.BoardUpdate();
+            if(info.NeedsConditionReset)
+            {
+                BingoTracker.ClearFinishedGoals();
             }
         }
     }

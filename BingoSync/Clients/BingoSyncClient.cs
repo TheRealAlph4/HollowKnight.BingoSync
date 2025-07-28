@@ -1,4 +1,5 @@
 ﻿using BingoSync.Clients.EventInfoObjects;
+using BingoSync.CustomGoals;
 using BingoSync.Sessions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -42,6 +43,8 @@ namespace BingoSync.Clients
         public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
         public event EventHandler<RoomSettings> RoomSettingsReceived;
 
+        public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
+
         private BingoBoard Board;
 
         public void DumpDebugInfo()
@@ -80,7 +83,6 @@ namespace BingoSync.Clients
         {
             if (webSocketClient.State == lastSocketState)
                 return;
-            Controller.BoardUpdate();
             forcedState = ClientState.None;
             lastSocketState = webSocketClient.State;
         }
@@ -143,8 +145,10 @@ namespace BingoSync.Clients
                 }
                 Board.SetSquares(squares);
             }
-            BingoTracker.ClearFinishedGoals();
-            Controller.BoardUpdate();
+            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo()
+            {
+                NeedsConditionReset = true,
+            });
         }
 
         public void JoinRoom(string roomID, string nickname, string password, Colors color, Action<Exception> callback)
@@ -216,15 +220,15 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(SetColor));
         }
 
-        public void NewCard(string customJSON, bool lockout = true, bool hideCard = true)
+        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true)
         {
             if (GetState() != ClientState.Connected) return;
             var newCard = new NetworkObjectNewCardRequest
             {
                 Room = currentRoomID,
-                Game = 18, // this is supposed to be custom alread
+                Game = 18, // this is supposed to be custom already
                 Variant = 18, // but this is also required for custom ???
-                CustomJSON = customJSON,
+                CustomJSON = JsonifyBoard(board),
                 Lockout = !lockout, // false is lockout here for some godforsaken reason
                 Seed = "",
                 HideCard = hideCard,
@@ -236,6 +240,17 @@ namespace BingoSync.Clients
                 var task = client.PostAsync("api/new-card", content);
                 return task.ContinueWith(responseTask => { });
             }, maxRetries, nameof(SendChatMessage));
+        }
+
+        private static string JsonifyBoard(List<BingoGoal> board)
+        {
+            string output = "[";
+            for (int i = 0; i < board.Count; i++)
+            {
+                output += "{\"name\": \"" + board.ElementAt(i).name + "\"}" + (i < 24 ? "," : "");
+            }
+            output += "]";
+            return output;
         }
 
         public void RevealCard()
@@ -256,7 +271,7 @@ namespace BingoSync.Clients
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     Board.IsRevealed = true;
-                    Controller.BoardUpdate();
+                    NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
                 });
             }, maxRetries, nameof(RevealCard));
         }
@@ -429,7 +444,7 @@ namespace BingoSync.Clients
                     break;
                 }
             }
-            Controller.BoardUpdate();
+            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
         }
 
         private void HandleColorBroadcast(string json)
@@ -441,11 +456,7 @@ namespace BingoSync.Clients
         private void HandleRevealedBroadcast(string json)
         {
             NetworkObjectRevealedBroadcast revealedBroadcast = JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(json);
-            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
-            {
-                Controller.RevealCard();
-            }
-            Controller.BoardUpdate();
+            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
             CardRevealedBroadcastReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
         }
 

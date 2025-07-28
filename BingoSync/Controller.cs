@@ -148,8 +148,10 @@ namespace BingoSync
         public static void Setup(Action<string> log)
         {
             Log = log;
-            DefaultSession = new Session("Default", new BingoSyncClient(log), true);
-            DefaultSession.AudioNotificationOn = GlobalSettings.AudioNotificationOn;
+            DefaultSession = new Session("Default", new BingoSyncClient(log), true)
+            {
+                AudioNotificationOn = GlobalSettings.AudioNotificationOn
+            };
             ActiveSession = DefaultSession;
             OnBoardUpdate += BingoBoardUI.UpdateGrid;
             OnBoardUpdate += BingoBoardUI.UpdateName;
