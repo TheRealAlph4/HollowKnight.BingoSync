@@ -5,6 +5,8 @@ using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using UnityEngine;
 using BingoSync.Helpers;
+using System;
+using System.Diagnostics.Tracing;
 
 namespace BingoSync
 {
@@ -12,10 +14,11 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.3.10.3";
+        public static string version = "1.3.11.0";
         public override string GetVersion() => version;
-
         public override int LoadPriority() => 0;
+
+        public static Action OnDoneLoading;
 
         public override void Initialize()
         {

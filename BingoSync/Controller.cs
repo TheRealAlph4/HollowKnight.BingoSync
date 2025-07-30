@@ -339,6 +339,8 @@ namespace BingoSync
         {
             GameModesManager.RefreshCustomGameModes();
             MenuUI.SetupGameModeButtons();
+            
+            BingoSync.OnDoneLoading?.Invoke();
         }
 
         public static void DumpDebugInfo()
