@@ -13,8 +13,8 @@
 		<Product>BingoSync</Product>
 		<Description>A Hollow Knight Mod</Description>
 		<Copyright>Copyright ©  2024</Copyright>
-		<AssemblyVersion>1.3.11.0</AssemblyVersion>
-		<FileVersion>1.3.11.0</FileVersion>
+		<AssemblyVersion>1.3.12.0</AssemblyVersion>
+		<FileVersion>1.3.12.0</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<LangVersion>latest</LangVersion>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -338,6 +338,12 @@
 		</Reference>
 		<Reference Include="ItemChanger">
 			<HintPath>$(HollowKnightRefs)/Mods/ItemChanger/ItemChanger.dll</HintPath>
+		</Reference>
+		<Reference Include="ItemSync">
+			<HintPath>$(HollowKnightRefs)/Mods/ItemSync/ItemSync.dll</HintPath>
+		</Reference>
+		<Reference Include="MultiWorldLib">
+			<HintPath>$(HollowKnightRefs)/Mods/MultiWorldLib/MultiWorldLib.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>

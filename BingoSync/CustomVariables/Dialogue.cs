@@ -32,6 +32,10 @@
             if (convName.StartsWith("HORNET_SPIDER_TOWN")) {
                 BingoTracker.UpdateBoolean("metHornetBeastsDen", true);
             }
+            // Salubra overcharmed
+            if (convName.StartsWith("CHARMSLUG") && PlayerData.instance.overcharmed) {
+                BingoTracker.UpdateBoolean("talkedToSalubraOvercharmed", true);
+            }
         }
     }
 }
