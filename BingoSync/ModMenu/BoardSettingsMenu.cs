@@ -77,10 +77,7 @@ namespace BingoSync.ModMenu
 
             elements[elementId] = new CustomSlider(
                 name: "Audio Volume",
-                storeValue: (float value) =>
-                {
-                    Controller.GlobalSettings.AudioClipVolume = value;
-                },
+                storeValue: value => Controller.GlobalSettings.AudioClipVolume = value,
                 loadValue: () =>
                 {
                     return Controller.GlobalSettings.AudioClipVolume;

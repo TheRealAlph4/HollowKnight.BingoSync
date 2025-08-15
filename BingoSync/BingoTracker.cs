@@ -1,12 +1,15 @@
-﻿using Newtonsoft.Json;
+﻿using BingoSync.CustomGoals;
+using BingoSync.Helpers;
+using BingoSync.Sessions;
+using BingoSync.Settings;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using BingoSync.Settings;
-using BingoSync.CustomGoals;
-using BingoSync.Sessions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BingoSync
 {
@@ -256,16 +259,42 @@ namespace BingoSync
             }
             if (index == -1)
                 return;
-            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(Controller.RoomColor));
+            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(session.RoomColor);
             bool isBlank = session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
-            if ((shouldUnmark && marked) || (!shouldUnmark && !marked && (!session.RoomIsLockout || isBlank)))
+            bool isUnmarking = shouldUnmark && marked;
+            bool isMarkable = !session.RoomIsLockout || isBlank;
+            bool isMarking = !shouldUnmark && !marked && isMarkable;
+            if (isUnmarking || isMarking)
             {
-                //Log($"Updating Goal: {goal}, [Unmarking: {shouldUnmark}]");
-                session.SelectSquare(index + 1, () =>
-                {
-                    UpdateGoal(session, goal, shouldUnmark);
-                }, shouldUnmark);
+                Task.Run(() => MarkingThread(session, goal, shouldUnmark, index));
             }
+        }
+
+        private static void MarkingThread(Session session, string goal, bool shouldUnmark, int index)
+        {
+            if (ItemSyncInterop.ShouldIgnoreMark)
+            {
+                Log($"Ignoring mark of goal '{goal}'");
+                return;
+            }
+            if (ItemSyncInterop.ShouldDelayMark)
+            {
+                Log($"Waiting {ItemSyncInterop.MarkDelay} to mark goal '{goal}'");
+                Thread.Sleep(ItemSyncInterop.MarkDelay);
+                bool marked = session.Board.GetSlot(index).MarkedBy.Contains(session.RoomColor);
+                bool isBlank = session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
+                bool isUnmarking = shouldUnmark && marked;
+                bool isMarkable = !session.RoomIsLockout || isBlank;
+                bool isMarking = !shouldUnmark && !marked && isMarkable;
+                if (!(isUnmarking || isMarking))
+                {
+                    return;
+                }
+            }
+            session.SelectSquare(index + 1, () =>
+            {
+                UpdateGoal(session, goal, shouldUnmark);
+            }, shouldUnmark);
         }
     }
 

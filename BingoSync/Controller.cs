@@ -1,16 +1,21 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using MagicUI.Elements;
-using System.Threading;
-using BingoSync.ModMenu;
-using BingoSync.Settings;
+﻿using BingoSync.Clients;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
-using System.Linq;
-using BingoSync.Clients;
-using BingoSync.Sessions;
+using BingoSync.Helpers;
 using BingoSync.Interfaces;
+using BingoSync.ModMenu;
+using BingoSync.Sessions;
+using BingoSync.Settings;
+using ItemSyncMod;
+using MagicUI.Elements;
+using MonoMod.RuntimeDetour;
+using MultiWorldLib;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BingoSync
 {
@@ -339,7 +344,9 @@ namespace BingoSync
         {
             GameModesManager.RefreshCustomGameModes();
             MenuUI.SetupGameModeButtons();
-            
+
+            ItemSyncInterop.Initialize(Log);
+
             BingoSync.OnDoneLoading?.Invoke();
         }
 

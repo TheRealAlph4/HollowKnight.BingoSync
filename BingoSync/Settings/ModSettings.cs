@@ -13,6 +13,12 @@ namespace BingoSync.Settings
             Border,
             Star,
         }
+        public enum ItemSyncMarkDelay
+        {
+            None = 0,
+            Delay = 1,
+            NoMark = 2,
+        }
 
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new();
@@ -44,5 +50,8 @@ namespace BingoSync.Settings
         public int ColorScheme = 0;
         public bool UseShapesForColors = false;
         public bool AdaptIconOpcaity = false;
+
+        public ItemSyncMarkDelay ItemSyncMarkSetting = ItemSyncMarkDelay.Delay;
+        public int ItemSyncMarkDelayMilliseconds = 1000;
     }
 }

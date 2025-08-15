@@ -8,7 +8,7 @@ namespace BingoSync.ModMenu
     {
         private static MenuScreen _MainMenuScreen;
         private static MenuScreen _KeybindsScreen;
-        private static MenuScreen _TogglesScreen;
+        private static MenuScreen _GeneralScreen;
         private static MenuScreen _DefaultsScreen;
         private static MenuScreen _BoardSettingsScreen;
         private static MenuScreen _ProfilesScreen;
@@ -17,7 +17,7 @@ namespace BingoSync.ModMenu
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu) {
             void ExitMenu(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(parentMenu);
             void GoToKeybinds(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_KeybindsScreen);
-            void GoToToggles(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_TogglesScreen);
+            void GoToGeneral(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_GeneralScreen);
             void GoToDefaults(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_DefaultsScreen);
             void GoToBoardSettings(MenuSelectable _) => UIManager.instance.UIGoToDynamicMenu(_BoardSettingsScreen);
             void GoToProfiles(MenuSelectable _) {
@@ -32,18 +32,18 @@ namespace BingoSync.ModMenu
                     RegularGridLayout.CreateVerticalLayout(105f),
                     c =>
                     {
-                        c.AddMenuButton("Keybinds", new MenuButtonConfig
+                        c.AddMenuButton("General", new MenuButtonConfig
+                        {
+                            Label = "General",
+                            Proceed = true,
+                            SubmitAction = GoToGeneral,
+                            CancelAction = ExitMenu,
+                        })
+                        .AddMenuButton("Keybinds", new MenuButtonConfig
                         {
                             Label = "Keybinds",
                             Proceed = true,
                             SubmitAction = GoToKeybinds,
-                            CancelAction = ExitMenu,
-                        })
-                        .AddMenuButton("Toggles", new MenuButtonConfig
-                        {
-                            Label = "Toggles",
-                            Proceed = true,
-                            SubmitAction = GoToToggles,
                             CancelAction = ExitMenu,
                         })
                         .AddMenuButton("Defaults", new MenuButtonConfig
@@ -92,7 +92,7 @@ namespace BingoSync.ModMenu
             _MainMenuScreen = mainMenuBuilder.Build();
 
             _KeybindsScreen = KeybindsMenu.CreateMenuScreen(_MainMenuScreen);
-            _TogglesScreen = TogglesMenu.CreateMenuScreen(_MainMenuScreen);
+            _GeneralScreen = GeneralMenu.CreateMenuScreen(_MainMenuScreen);
             _DefaultsScreen = DefaultsMenu.CreateMenuScreen(_MainMenuScreen);
             _ProfilesScreen = ProfilesManagementMenu.CreateMenuScreen(_MainMenuScreen);
             _BoardSettingsScreen = BoardSettingsMenu.CreateMenuScreen(_MainMenuScreen);
@@ -104,7 +104,7 @@ namespace BingoSync.ModMenu
         public static void RefreshMenu()
         {
             KeybindsMenu.RefreshMenu();
-            TogglesMenu.RefreshMenu();
+            GeneralMenu.RefreshMenu();
             DefaultsMenu.RefreshMenu();
             ProfilesManagementMenu.RefreshMenu();
             BoardSettingsMenu.RefreshMenu();
