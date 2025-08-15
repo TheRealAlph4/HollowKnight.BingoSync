@@ -29,7 +29,6 @@ namespace BingoSync.Helpers
                 return;
             }
 
-            Log("here");
             ModHooks.HeroUpdateHook += OnEachFrame;
 
             itemReceivedMethod = typeof(ClientConnection).GetMethod("InvokeDataReceived", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -38,14 +37,11 @@ namespace BingoSync.Helpers
 
         private static void OnItemSyncInvokeDataReceived(Action<ClientConnection, DataReceivedEvent> orig, ClientConnection self, DataReceivedEvent dataReceivedEvent)
         {
-            Log(dataReceivedEvent.Content);
             orig(self, dataReceivedEvent);
             if (string.IsNullOrEmpty(dataReceivedEvent.Content) || dataReceivedEvent.Content[0] == '{')
             {
                 return;
             }
-            Log($"Received item: {dataReceivedEvent.Content}");
-            Log($"Adding {ItemReceivedBufferFrameCount} frames of buffer where goals are delayed by {Controller.GlobalSettings.ItemSyncMarkDelayMilliseconds} milliseconds");
             framesSinceItemReceived = ItemReceivedBufferFrameCount;
         }
 
