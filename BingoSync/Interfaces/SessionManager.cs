@@ -1,6 +1,5 @@
 ﻿using BingoSync.Clients;
 using BingoSync.Sessions;
-using Modding;
 using System;
 using System.Collections.Generic;
 
@@ -76,9 +75,7 @@ namespace BingoSync.Interfaces
 
         /// <summary>
         /// Creates a connection session for the given server. 
-        /// This can be done manually, e.g. to use a custom client, 
-        /// but the session needs to be manually signed up for automarking, 
-        /// using SessionManager.RegisterForAutomarking(Session)
+        /// This can be done manually, e.g. to use a custom client.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="server"></param>
@@ -93,18 +90,7 @@ namespace BingoSync.Interfaces
                 _ => throw new NotImplementedException()
             };
             Session session = new(name, remoteClient, isMarking);
-            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(session); };
             return session;
-        }
-
-        /// <summary>
-        /// Registers a session as capable of automarking. Not to be confused with
-        /// Session.isMarking.
-        /// </summary>
-        /// <param name="session"></param>
-        public static void RegisterForAutomarking(Session session)
-        {
-            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(session); };
         }
 
         /// <summary>

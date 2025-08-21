@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using ItemSyncMarkDelay = BingoSync.Settings.ModSettings.ItemSyncMarkDelay;
 
 namespace BingoSync
 {
@@ -145,7 +146,7 @@ namespace BingoSync
             }
         }
 
-        public static void UpdateAllKnownSquares(Session session)
+        public static void UpdateAllKnownSquares(Session session, bool isItemSyncUpdate = false)
         {
             if (!session.IsPlayable()) return;
             _allKnownSquares.ForEach(square =>
@@ -153,7 +154,7 @@ namespace BingoSync
                 bool wasSolved = square.Condition.Solved;
                 bool isSolved = IsSolved(square);
                 if (wasSolved != isSolved)
-                    UpdateSquare(session, square.Name, shouldUnmark: !isSolved);
+                    UpdateSquare(session, square.Name, shouldUnmark: !isSolved, isItemSyncUpdate);
             });
         }
 
@@ -245,7 +246,7 @@ namespace BingoSync
             UpdateSquare(session, goal, shouldUnmark: false);
         }
 
-        public static void UpdateSquare(Session session, string goal, bool shouldUnmark)
+        public static void UpdateSquare(Session session, string goal, bool shouldUnmark, bool isItemSyncUpdate = false)
         {
             if (!session.IsPlayable()) return;
             int index = -1;
@@ -266,18 +267,19 @@ namespace BingoSync
             bool isMarking = !shouldUnmark && !marked && isMarkable;
             if (isUnmarking || isMarking)
             {
-                Task.Run(() => MarkingThread(session, goal, shouldUnmark, index));
+                Task.Run(() => MarkingThread(session, goal, shouldUnmark, index, isItemSyncUpdate));
             }
         }
 
-        private static void MarkingThread(Session session, string goal, bool shouldUnmark, int index)
+        private static void MarkingThread(Session session, string goal, bool shouldUnmark, int index, bool isItemSyncUpdate)
         {
-            if (ItemSyncInterop.ShouldIgnoreMark)
+            ItemSyncMarkDelay setting = Controller.GlobalSettings.ItemSyncMarkSetting;
+            if (setting == ItemSyncMarkDelay.NoMark && isItemSyncUpdate)
             {
                 Log($"Ignoring mark of goal '{goal}'");
                 return;
             }
-            if (ItemSyncInterop.ShouldDelayMark)
+            if (setting == ItemSyncMarkDelay.Delay && isItemSyncUpdate)
             {
                 Log($"Waiting {ItemSyncInterop.MarkDelay} to mark goal '{goal}'");
                 Thread.Sleep(ItemSyncInterop.MarkDelay);

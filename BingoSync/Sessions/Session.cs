@@ -2,6 +2,8 @@
 using BingoSync.Clients.EventInfoObjects;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
+using BingoSync.Helpers;
+using Modding;
 using System;
 using System.Collections.Generic;
 
@@ -152,6 +154,8 @@ namespace BingoSync.Sessions
             OnRoomSettingsReceived += ConsumeRoomSettings;
             OnCardRevealedBroadcastReceived += HandleOnReveal;
             _client.NeedBoardUpdate += ClientTriggeredBoardUpdate;
+            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(this); };
+            ItemSyncInterop.AddSession(this);
         }
 
         public void LocalUpdate()

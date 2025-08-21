@@ -1,23 +1,24 @@
-﻿using ItemSyncMod;
+﻿using BingoSync.Sessions;
+using ItemSyncMod;
 using Modding;
 using MonoMod.RuntimeDetour;
 using MultiWorldLib;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace BingoSync.Helpers
 {
     internal static class ItemSyncInterop
     {
-        private const int ItemReceivedBufferFrameCount = 2;
         private static Action<string> Log;
         private static Hook itemReceivedHook;
         private static MethodInfo itemReceivedMethod;
 
-        private static int framesSinceItemReceived = 0;
+        private static readonly List<Session> knownSessions = [];
+        public static void AddSession(Session session) { knownSessions.Add(session); }
+        public static void RemoveSession(Session session) { knownSessions.Remove(session); }
 
-        public static bool ShouldIgnoreMark => (Controller.GlobalSettings.ItemSyncMarkSetting == Settings.ModSettings.ItemSyncMarkDelay.NoMark) && (framesSinceItemReceived > 0);
-        public static bool ShouldDelayMark => (Controller.GlobalSettings.ItemSyncMarkSetting == Settings.ModSettings.ItemSyncMarkDelay.Delay) && (framesSinceItemReceived > 0);
         public static TimeSpan MarkDelay => TimeSpan.FromMilliseconds(Controller.GlobalSettings.ItemSyncMarkDelayMilliseconds);
 
         public static void Initialize(Action<string> log)
@@ -29,28 +30,24 @@ namespace BingoSync.Helpers
                 return;
             }
 
-            ModHooks.HeroUpdateHook += OnEachFrame;
-
             itemReceivedMethod = typeof(ClientConnection).GetMethod("InvokeDataReceived", BindingFlags.NonPublic | BindingFlags.Instance);
             itemReceivedHook = new Hook(itemReceivedMethod, OnItemSyncInvokeDataReceived);
         }
 
         private static void OnItemSyncInvokeDataReceived(Action<ClientConnection, DataReceivedEvent> orig, ClientConnection self, DataReceivedEvent dataReceivedEvent)
         {
+            foreach (Session session in knownSessions)
+            {
+                GoalCompletionTracker.UpdateAllKnownSquares(session, false);
+            }
             orig(self, dataReceivedEvent);
             if (string.IsNullOrEmpty(dataReceivedEvent.Content) || dataReceivedEvent.Content[0] == '{')
             {
                 return;
             }
-            framesSinceItemReceived = ItemReceivedBufferFrameCount;
-        }
-
-        private static void OnEachFrame()
-        {
-            --framesSinceItemReceived;
-            if (framesSinceItemReceived <= 0)
+            foreach (Session session in knownSessions)
             {
-                framesSinceItemReceived = 0;
+                GoalCompletionTracker.UpdateAllKnownSquares(session, true);
             }
         }
     }
