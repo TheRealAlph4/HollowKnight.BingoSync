@@ -3,9 +3,7 @@ using BingoSync.ModMenu;
 using BingoSync.Settings;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
-using UnityEngine;
-using BingoSync.Helpers;
-using System;
+using BingoSync.Interfaces;
 
 namespace BingoSync
 {
@@ -13,26 +11,13 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.0.1";
+        public static string version = "1.4.1.0";
         public override string GetVersion() => version;
-        public override int LoadPriority() => 0;
-
-        public static Action OnDoneLoading;
 
         public override void Initialize()
         {
-            Controller.Setup(Log);
-            Variables.Setup(Log);
-            Hooks.Setup();
-            RetryHelper.Setup(Log);
-            MenuUI.Setup(Log);
-            BingoTracker.Setup(Log);
-            BingoBoardUI.Setup(Log);
-            GameModesManager.Setup(Log);
-
-            ModHooks.FinishedLoadingModsHook += Controller.AfterGoalPacksLoaded;
-            // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
-            GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
+            OrderedLoader.Setup(Log);
+            OrderedLoader.LoadInternal();
         }
 
         public static void ShowMenu()

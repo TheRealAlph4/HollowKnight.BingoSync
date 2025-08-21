@@ -1,19 +1,14 @@
 ﻿using BingoSync.Clients;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
-using BingoSync.Helpers;
 using BingoSync.Interfaces;
 using BingoSync.ModMenu;
 using BingoSync.Sessions;
 using BingoSync.Settings;
-using ItemSyncMod;
 using MagicUI.Elements;
-using MonoMod.RuntimeDetour;
-using MultiWorldLib;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -338,16 +333,6 @@ namespace BingoSync
             GameModesManager.RefreshCustomGameModes();
             GenerationMenuUI.CreateGenerationMenu();
             GenerationMenuUI.SetupGameModeButtons();
-        }
-
-        public static void AfterGoalPacksLoaded()
-        {
-            GameModesManager.RefreshCustomGameModes();
-            MenuUI.SetupGameModeButtons();
-
-            ItemSyncInterop.Initialize(Log);
-
-            BingoSync.OnDoneLoading?.Invoke();
         }
 
         public static void DumpDebugInfo()
