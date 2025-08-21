@@ -166,7 +166,7 @@ namespace BingoSync.Sessions
 
         private void GoalUpdateFromServer(object sender, GoalUpdateEventInfo update)
         {
-            BingoTracker.GoalUpdated(this, update.Goal, update.Slot);
+            GoalCompletionTracker.GoalUpdateFromServer(this, update.Goal, update.Slot);
         }
 
         public bool IsPlayable()
@@ -301,7 +301,7 @@ namespace BingoSync.Sessions
             Controller.BoardUpdate();
             if(info.NeedsConditionReset)
             {
-                BingoTracker.ClearFinishedGoals();
+                GoalCompletionTracker.ClearFinishedGoals();
             }
         }
     }

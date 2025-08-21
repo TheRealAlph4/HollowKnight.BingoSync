@@ -11,7 +11,7 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.1.0";
+        public static string version = "1.4.1.1";
         public override string GetVersion() => version;
 
         public override void Initialize()
@@ -32,12 +32,12 @@ namespace BingoSync
 
         public void OnLoadLocal(SaveSettings s)
         {
-            BingoTracker.Settings = s;
+            GoalCompletionTracker.Settings = s;
         }
 
         public SaveSettings OnSaveLocal()
         {
-            return BingoTracker.Settings;
+            return GoalCompletionTracker.Settings;
         }
 
         public void OnLoadGlobal(ModSettings s)

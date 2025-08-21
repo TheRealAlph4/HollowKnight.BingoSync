@@ -45,7 +45,7 @@ namespace BingoSync.Interfaces
             Variables.Setup(Log);
             Hooks.Setup();
             RetryHelper.Setup(Log);
-            BingoTracker.Setup(Log);
+            GoalCompletionTracker.Setup(Log);
             GameModesManager.Setup(Log);
             MenuUI.Setup(Log);
             BingoBoardUI.Setup(Log);

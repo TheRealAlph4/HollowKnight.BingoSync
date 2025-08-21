@@ -93,7 +93,7 @@ namespace BingoSync.Interfaces
                 _ => throw new NotImplementedException()
             };
             Session session = new(name, remoteClient, isMarking);
-            ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
+            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(session); };
             return session;
         }
 
@@ -104,7 +104,7 @@ namespace BingoSync.Interfaces
         /// <param name="session"></param>
         public static void RegisterForAutomarking(Session session)
         {
-            ModHooks.HeroUpdateHook += delegate { BingoTracker.ProcessBingo(session); };
+            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(session); };
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
         {
             if (name == fragmentVariableName && GameManager.instance.GetSceneNameString() == fountainSceneName)
             {
-                BingoTracker.UpdateBoolean(variableName, true);
+                GoalCompletionTracker.UpdateBoolean(variableName, true);
             }
             return orig;
         }
