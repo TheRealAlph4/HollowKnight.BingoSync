@@ -53,5 +53,8 @@ namespace BingoSync.Settings
 
         public ItemSyncMarkDelay ItemSyncMarkSetting = ItemSyncMarkDelay.Delay;
         public int ItemSyncMarkDelayMilliseconds = 1000;
+
+        public bool MarkCompletedGoalsOnLoadSavefile = true;
+        public bool MarkCompletedGoalsOnNewCardReceived = true;
     }
 }

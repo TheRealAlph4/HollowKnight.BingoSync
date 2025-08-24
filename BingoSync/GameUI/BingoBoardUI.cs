@@ -87,18 +87,18 @@ namespace BingoSync.GameUI
 
             foreach (Square square in Controller.ActiveSession.Board)
             {
-                board.bingoLayout[square.GoalNr].Text.Text = square.Name;
-                board.bingoLayout[square.GoalNr].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
-                board.bingoLayout[square.GoalNr].ColorsIcons.Values.ToList().ForEach(img => img.Visibility = Visibility.Hidden);
+                board.bingoLayout[square.GoalIndex].Text.Text = square.Name;
+                board.bingoLayout[square.GoalIndex].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
+                board.bingoLayout[square.GoalIndex].ColorsIcons.Values.ToList().ForEach(img => img.Visibility = Visibility.Hidden);
                 foreach (Colors color in square.MarkedBy)
                 {
-                    board.bingoLayout[square.GoalNr].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
+                    board.bingoLayout[square.GoalIndex].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
                     if (Controller.GlobalSettings.UseShapesForColors && color != Colors.Blank)
                     {
-                        board.bingoLayout[square.GoalNr].ColorsIcons[color.GetName()].Visibility = Visibility.Visible;
+                        board.bingoLayout[square.GoalIndex].ColorsIcons[color.GetName()].Visibility = Visibility.Visible;
                     }
                 }
-                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[square.GoalNr].Highlights)
+                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[square.GoalIndex].Highlights)
                 {
                     HighlightType sprite = entry.Key;
                     Image image = entry.Value;

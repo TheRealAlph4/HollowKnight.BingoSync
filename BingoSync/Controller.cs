@@ -231,7 +231,7 @@ namespace BingoSync
                 return;
             }
             ActiveSession.Board.IsConfirmed = true;
-            string message = $"Revealed my card in hand-mode, my top-left goal is \"{ActiveSession.Board.GetSlot(0).Name}\"";
+            string message = $"Revealed my card in hand-mode, my top-left goal is \"{ActiveSession.Board.GetIndex(0).Name}\"";
             ActiveSession.SendChatMessage(message);
         }
 

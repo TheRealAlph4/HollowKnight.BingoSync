@@ -63,6 +63,8 @@ namespace BingoSync.Interfaces
             OnReadyForUIPages?.Invoke(null, EventArgs.Empty);
             OnDefaultSessionReady?.Invoke(null, EventArgs.Empty);
 
+            GoalCompletionTracker.SetupDictionaries();
+
             OnCompletelyLoaded?.Invoke(null, EventArgs.Empty);
 
             GameModesManager.RefreshCustomGameModes();

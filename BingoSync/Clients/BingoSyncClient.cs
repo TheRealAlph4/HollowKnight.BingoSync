@@ -140,7 +140,7 @@ namespace BingoSync.Clients
                         Name = networkSquare.Name,
                         MarkedBy = colors,
                         Highlighted = false,
-                        GoalNr = int.Parse(networkSquare.Slot.Substring(4)) - 1,
+                        GoalIndex = int.Parse(networkSquare.Slot.Substring(4)) - 1,
                     });
                 }
                 Board.SetSquares(squares);
@@ -297,13 +297,13 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(SendChatMessage));
         }
 
-        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false)
+        public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
         {
             if (GetState() != ClientState.Connected) return;
             var selectInput = new NetworkObjectSelectRequest
             {
                 Room = currentRoomID,
-                Slot = square,
+                Slot = slot,
                 Color = color.GetName(),
                 RemoveColor = clear,
             };
@@ -317,7 +317,7 @@ namespace BingoSync.Clients
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                 });
-            }, maxRetries, nameof(SelectSquare), errorCallback);
+            }, maxRetries, nameof(SelectSlot), errorCallback);
         }
 
         public void ExitRoom(Action callback)
@@ -433,7 +433,7 @@ namespace BingoSync.Clients
             NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json);
             foreach (Square square in Board)
             {
-                if ("slot" + (square.GoalNr + 1) == goalBroadcast.Square.Slot)
+                if ("slot" + (square.GoalIndex + 1) == goalBroadcast.Square.Slot)
                 {
                     square.MarkedBy.Clear();
                     foreach (string color in goalBroadcast.Square.Colors.Split(' '))
@@ -607,8 +607,8 @@ namespace BingoSync.Clients
                 Timestamp = network.Timestamp,
                 Color = ColorExtensions.FromName(network.Color),
                 Goal = network.Square.Name,
-                Slot = board.Select((square, index) => new { square, index })
-                              .Where(pair => ((Square)pair.square).Name == network.Square.Name)
+                Index = board.Select((square, index) => new { square, index })
+                              .Where(pair => pair.square.Name == network.Square.Name)
                               .Select(pair => pair.index)
                               .First(),
                 Unmarking = network.Remove,

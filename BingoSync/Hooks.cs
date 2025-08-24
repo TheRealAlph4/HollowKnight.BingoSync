@@ -15,9 +15,6 @@ namespace BingoSync
     {
         public static void Setup()
         {
-            // Check bingo objectives every frame
-            ModHooks.HeroUpdateHook += HeroUpdate;
-
             // General
             ModHooks.SetPlayerBoolHook += UpdateBoolInternal;
             ModHooks.SetPlayerIntHook += UpdateIntInternal;
@@ -155,11 +152,6 @@ namespace BingoSync
                 DreamTrees.TrackDreamTrees
             );
 
-        }
-
-        private static void HeroUpdate()
-        {
-            GoalCompletionTracker.UpdateAllKnownSquares(Controller.ActiveSession);
         }
 
         private static bool UpdateBoolInternal(string name, bool orig)

@@ -3,9 +3,12 @@ using BingoSync.Clients.EventInfoObjects;
 using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using BingoSync.Helpers;
-using Modding;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using static BingoSync.GoalCompletionTracker;
+using static BingoSync.Settings.ModSettings;
 
 namespace BingoSync.Sessions
 {
@@ -149,12 +152,11 @@ namespace BingoSync.Sessions
             SubscribeEventRefires();
             IsMarking = markingClient;
             _client.SetBoard(Board);
-            OnGoalUpdateReceived += GoalUpdateFromServer;
             OnGoalUpdateReceived += DoAudioNotification;
             OnRoomSettingsReceived += ConsumeRoomSettings;
             OnCardRevealedBroadcastReceived += HandleOnReveal;
             _client.NeedBoardUpdate += ClientTriggeredBoardUpdate;
-            ModHooks.HeroUpdateHook += delegate { GoalCompletionTracker.UpdateAllKnownSquares(this); };
+            GoalCompletionTracker.OnGoalCompletionChanged += OnInternalGoalUpdate;
             ItemSyncInterop.AddSession(this);
         }
 
@@ -166,11 +168,6 @@ namespace BingoSync.Sessions
         private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
             RoomIsLockout = settings.IsLockout;
-        }
-
-        private void GoalUpdateFromServer(object sender, GoalUpdateEventInfo update)
-        {
-            GoalCompletionTracker.GoalUpdateFromServer(this, update.Goal, update.Slot);
         }
 
         public bool IsPlayable()
@@ -238,16 +235,79 @@ namespace BingoSync.Sessions
             _client.SendChatMessage(text);
         }
 
-        public void SelectSquare(int square, Action errorCallback, bool clear = false)
+        internal void OnInternalGoalUpdate(object sender, InternalGoalUpdate goalUpdate)
         {
-            SelectSquare(square, RoomColor, errorCallback, clear);
+            if(!IsMarking)
+            {
+                return;
+            }
+            int slot = 1;
+            foreach (Square square in Board)
+            {
+                if (square.Name == goalUpdate.Name)
+                {
+                    UpdateGoalBySlot(slot, goalUpdate);
+                }
+                ++slot;
+            }
         }
 
-        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false)
+        private void UpdateGoalBySlot(int slot, InternalGoalUpdate goalUpdate)
+        {
+            Square square = Board.GetSlot(slot);
+            if (!SquareNeedsUpdate(square, goalUpdate.Clear))
+            {
+                return;
+            }
+            Task.Run(() =>
+            {
+                ItemSyncMarkDelay setting = Controller.GlobalSettings.ItemSyncMarkSetting;
+                if (setting == ItemSyncMarkDelay.NoMark && goalUpdate.IsItemSyncUpdate)
+                {
+                    return;
+                }
+                if (setting == ItemSyncMarkDelay.Delay && goalUpdate.IsItemSyncUpdate)
+                {
+                    Thread.Sleep(ItemSyncInterop.MarkDelay);
+                    if (!SquareNeedsUpdate(square, goalUpdate.Clear))
+                    {
+                        return;
+                    }
+                }
+                SelectSlot(slot, () => { }, goalUpdate.Clear);
+            });
+        }
+
+        private bool SquareNeedsUpdate(Square square, bool clear)
+        {
+            bool isMarked = square.MarkedBy.Contains(RoomColor);
+            bool isBlank = square.MarkedBy.Contains(Colors.Blank);
+            bool canMark = isBlank || (!isMarked && !RoomIsLockout);
+            bool shouldMark = canMark && !clear;
+            bool shouldUnmark = isMarked && clear;
+            return shouldMark || shouldUnmark;
+        }
+
+        public void SelectIndex(int index, Action errorCallback, bool clear = false)
+        {
+            SelectSlot(index + 1, RoomColor, errorCallback, clear);
+        }
+
+        public void SelectSlot(int slot, Action errorCallback, bool clear = false)
+        {
+            SelectSlot(slot, RoomColor, errorCallback, clear);
+        }
+
+        public void SelectIndex(int index, Colors color, Action errorCallback, bool clear = false)
+        {
+            SelectSlot(index + 1, color, errorCallback, clear);
+        }
+
+        public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
         {
             if(IsMarking)
             {
-                _client.SelectSquare(square, color, errorCallback, clear);
+                _client.SelectSlot(slot, color, errorCallback, clear);
             }
         }
 

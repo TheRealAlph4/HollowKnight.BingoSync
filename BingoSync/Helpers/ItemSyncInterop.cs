@@ -21,34 +21,29 @@ namespace BingoSync.Helpers
 
         public static TimeSpan MarkDelay => TimeSpan.FromMilliseconds(Controller.GlobalSettings.ItemSyncMarkDelayMilliseconds);
 
+        public static bool IsItemSyncUpdate { get; private set; } = false;
+
         public static void Initialize(Action<string> log)
         {
             Log = log;
 
-            if (ModHooks.GetMod(nameof(ItemSyncMod.ItemSyncMod)) is not Mod)
+            if (ModHooks.GetMod("ItemSyncMod") is Mod)
             {
-                return;
+                SetupItemSyncHook();
             }
+        }
 
+        private static void SetupItemSyncHook()
+        {
             itemReceivedMethod = typeof(ClientConnection).GetMethod("InvokeDataReceived", BindingFlags.NonPublic | BindingFlags.Instance);
             itemReceivedHook = new Hook(itemReceivedMethod, OnItemSyncInvokeDataReceived);
         }
 
         private static void OnItemSyncInvokeDataReceived(Action<ClientConnection, DataReceivedEvent> orig, ClientConnection self, DataReceivedEvent dataReceivedEvent)
         {
-            foreach (Session session in knownSessions)
-            {
-                GoalCompletionTracker.UpdateAllKnownSquares(session, false);
-            }
+            IsItemSyncUpdate = true;
             orig(self, dataReceivedEvent);
-            if (string.IsNullOrEmpty(dataReceivedEvent.Content) || dataReceivedEvent.Content[0] == '{')
-            {
-                return;
-            }
-            foreach (Session session in knownSessions)
-            {
-                GoalCompletionTracker.UpdateAllKnownSquares(session, true);
-            }
+            IsItemSyncUpdate = false;
         }
     }
 }

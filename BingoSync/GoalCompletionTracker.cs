@@ -1,6 +1,5 @@
 ﻿using BingoSync.CustomGoals;
 using BingoSync.Helpers;
-using BingoSync.Sessions;
 using BingoSync.Settings;
 using Newtonsoft.Json;
 using System;
@@ -8,22 +7,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using ItemSyncMarkDelay = BingoSync.Settings.ModSettings.ItemSyncMarkDelay;
 
 namespace BingoSync
 {
     internal class GoalCompletionTracker
     {
-        private static List<BingoSquare> _allKnownSquares;
+        private static readonly Dictionary<string, BingoSquare> AllKnownSquaresByName = [];
+        private static readonly Dictionary<string, List<BingoSquare>> GoalsByVariable = [];
+        private static readonly Dictionary<string, List<BingoSquare>> GoalsByRuleset = [];
+
         private static Action<string> Log;
         public static SaveSettings Settings { get; set; }
 
+        public class InternalGoalUpdate
+        {
+            public string Name { get; set; }
+            public bool Clear { get; set; }
+            public bool IsItemSyncUpdate { get; set; }
+        }
+
+        public static event EventHandler<InternalGoalUpdate> OnGoalCompletionChanged;
+
         public static void Setup(Action<string> log)
         {
-            _allKnownSquares = [];
-
             Log = log;
 
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
@@ -37,8 +43,60 @@ namespace BingoSync
                 using StreamReader reader = new(s);
                 using JsonTextReader jsonReader = new(reader);
                 JsonSerializer ser = new();
-                var squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
-                _allKnownSquares.AddRange(squares);
+                List<BingoSquare> squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                foreach (BingoSquare square in squares)
+                {
+                    AllKnownSquaresByName[square.Name] = square;
+                }
+            }
+        }
+
+        public static bool IsGoalMarkedByName(string name)
+        {
+            if(!AllKnownSquaresByName.TryGetValue(name, out BingoSquare square))
+            {
+                return false;
+            }
+            return square.Condition.Solved;
+        }
+
+        internal static void SetupDictionaries()
+        {
+            foreach (BingoSquare square in AllKnownSquaresByName.Values)
+            {
+                AddAllVariablesToTrack(square, square.Condition);
+                if(!GoalsByRuleset.ContainsKey(square.Ruleset))
+                {
+                    GoalsByRuleset[square.Ruleset] = [];
+                }
+                GoalsByRuleset[square.Ruleset].Add(square);
+            }
+        }
+
+        private static void AddAllVariablesToTrack(BingoSquare square, Condition condition)
+        {
+            switch (condition.Type)
+            {
+                case ConditionType.Or:
+                case ConditionType.And:
+                case ConditionType.Some:
+                    foreach (Condition subcondition in condition.Conditions)
+                    {
+                        AddAllVariablesToTrack(square, subcondition);
+                    }
+                    break;
+                case ConditionType.Bool:
+                case ConditionType.Int:
+                default:
+                    string variableName = condition.VariableName;
+                    if (!GoalsByVariable.ContainsKey(variableName))
+                    {
+                        GoalsByVariable[variableName] = [];
+                    }
+                    if(!GoalsByVariable[variableName].Contains(square)) {
+                        GoalsByVariable[variableName].Add(square);
+                    }
+                    break;
             }
         }
 
@@ -64,7 +122,7 @@ namespace BingoSync
             foreach (BingoSquare square in squares)
             {
                 goals.Add(square.Name, new BingoGoal(square.Name, []));
-                _allKnownSquares.Add(square);
+                AllKnownSquaresByName[square.Name] = square;
             }
             return goals;
         }
@@ -85,14 +143,8 @@ namespace BingoSync
 
         public static void UpdateBoolean(string name, bool value)
         {
-            if (Settings.Booleans.ContainsKey(name))
-            {
-                Settings.Booleans[name] = value;
-            }
-            else
-            {
-                Settings.Booleans.Add(name, value);
-            }
+            Settings.Booleans[name] = value;
+            VariableUpdated(name);
         }
 
         public static int GetInteger(string name)
@@ -144,18 +196,30 @@ namespace BingoSync
                 Settings.IntegersTotalAdded[name] += added;
                 Settings.IntegersTotalRemoved[name] += removed;
             }
+            VariableUpdated(name);
         }
-
-        public static void UpdateAllKnownSquares(Session session, bool isItemSyncUpdate = false)
+        
+        private static void VariableUpdated(string variableName)
         {
-            if (!session.IsPlayable()) return;
-            _allKnownSquares.ForEach(square =>
+            if(!GoalsByVariable.TryGetValue(variableName, out List<BingoSquare> squares))
+            {
+                return;
+            }
+            foreach (BingoSquare square in squares)
             {
                 bool wasSolved = square.Condition.Solved;
                 bool isSolved = IsSolved(square);
+                bool shouldUnmark = !isSolved;
                 if (wasSolved != isSolved)
-                    UpdateSquare(session, square.Name, shouldUnmark: !isSolved, isItemSyncUpdate);
-            });
+                {
+                    OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
+                    {
+                        Name = square.Name,
+                        Clear = shouldUnmark,
+                        IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
+                    });
+                }
+            }
         }
 
         private static bool IsSolved(BingoSquare square)
@@ -221,82 +285,15 @@ namespace BingoSync
         }
 
         public static void ClearFinishedGoals() {
-            _allKnownSquares.ForEach(square => {
-                ClearCondition(square.Condition);
-            });
+            foreach(KeyValuePair<string, BingoSquare> entry in AllKnownSquaresByName)
+            {
+                ClearCondition(entry.Value.Condition);
+            }
         }
 
         public static void ClearCondition(Condition condition) {
             condition.Solved = false;
             condition.Conditions.ForEach(ClearCondition);
-        }
-
-        public static void GoalUpdateFromServer(Session session, string goal, int index)
-        {
-            if (!Controller.GlobalSettings.UnmarkGoals)
-                return;
-            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(ColorExtensions.FromName(session.RoomColor.GetName()));
-            if (marked)
-                return;
-            var square = _allKnownSquares.Find(x => x.Name == goal);
-            if (!square.CanUnmark)
-                return;
-            if (!square.Condition.Solved)
-                return;
-            UpdateSquare(session, goal, shouldUnmark: false);
-        }
-
-        public static void UpdateSquare(Session session, string goal, bool shouldUnmark, bool isItemSyncUpdate = false)
-        {
-            if (!session.IsPlayable()) return;
-            int index = -1;
-            foreach(Square square in session.Board)
-            {
-                if(square.Name == goal)
-                {
-                    index = square.GoalNr;
-                    break;
-                }
-            }
-            if (index == -1)
-                return;
-            bool marked = session.Board.GetSlot(index).MarkedBy.Contains(session.RoomColor);
-            bool isBlank = session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
-            bool isUnmarking = shouldUnmark && marked;
-            bool isMarkable = !session.RoomIsLockout || isBlank;
-            bool isMarking = !shouldUnmark && !marked && isMarkable;
-            if (isUnmarking || isMarking)
-            {
-                Task.Run(() => MarkingThread(session, goal, shouldUnmark, index, isItemSyncUpdate));
-            }
-        }
-
-        private static void MarkingThread(Session session, string goal, bool shouldUnmark, int index, bool isItemSyncUpdate)
-        {
-            ItemSyncMarkDelay setting = Controller.GlobalSettings.ItemSyncMarkSetting;
-            if (setting == ItemSyncMarkDelay.NoMark && isItemSyncUpdate)
-            {
-                Log($"Ignoring mark of goal '{goal}'");
-                return;
-            }
-            if (setting == ItemSyncMarkDelay.Delay && isItemSyncUpdate)
-            {
-                Log($"Waiting {ItemSyncInterop.MarkDelay} to mark goal '{goal}'");
-                Thread.Sleep(ItemSyncInterop.MarkDelay);
-                bool marked = session.Board.GetSlot(index).MarkedBy.Contains(session.RoomColor);
-                bool isBlank = session.Board.GetSlot(index).MarkedBy.Contains(Colors.Blank);
-                bool isUnmarking = shouldUnmark && marked;
-                bool isMarkable = !session.RoomIsLockout || isBlank;
-                bool isMarking = !shouldUnmark && !marked && isMarkable;
-                if (!(isUnmarking || isMarking))
-                {
-                    return;
-                }
-            }
-            session.SelectSquare(index + 1, () =>
-            {
-                UpdateSquare(session, goal, shouldUnmark);
-            }, shouldUnmark);
         }
     }
 
@@ -305,6 +302,7 @@ namespace BingoSync
         public string Name = string.Empty;
         public Condition Condition = new();
         public bool CanUnmark = false;
+        public string Ruleset = "Default";
     }
 
     class Condition

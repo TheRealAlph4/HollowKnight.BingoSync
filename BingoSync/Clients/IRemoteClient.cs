@@ -26,7 +26,7 @@ namespace BingoSync.Clients
         public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true);
         public void RevealCard();
         public void SendChatMessage(string text);
-        public void SelectSquare(int square, Colors color, Action errorCallback, bool clear = false);
+        public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false);
         public void ExitRoom(Action callback);
         public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback);
     }

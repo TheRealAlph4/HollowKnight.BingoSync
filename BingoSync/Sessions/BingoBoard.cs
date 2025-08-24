@@ -28,9 +28,15 @@ namespace BingoSync.Sessions
             }
         }
 
+        public Square GetIndex(int index)
+        {
+            return _squares[index];
+        }
+
+        // bingosync.com uses "slot" as a 1-based index, hence the separation internally
         public Square GetSlot(int slot)
         {
-            return _squares[slot];
+            return GetIndex(slot - 1);
         }
 
         public IEnumerator<Square> GetEnumerator()
