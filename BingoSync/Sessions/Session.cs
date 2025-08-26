@@ -5,6 +5,7 @@ using BingoSync.GameUI;
 using BingoSync.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BingoSync.GoalCompletionTracker;
@@ -68,6 +69,11 @@ namespace BingoSync.Sessions
         public string RoomNickname { get; set; } = string.Empty;
         public string RoomPassword { get; set; } = string.Empty;
         public Colors RoomColor { get; set; } = Colors.Orange;
+        public string RoomPlayerUUID { get
+            {
+                return _client.PlayerUUID;
+            } 
+        }
         public BingoBoard Board { get; set; } = new();
 
         #region Events
@@ -154,7 +160,9 @@ namespace BingoSync.Sessions
             _client.SetBoard(Board);
             OnGoalUpdateReceived += DoAudioNotification;
             OnRoomSettingsReceived += ConsumeRoomSettings;
-            OnCardRevealedBroadcastReceived += HandleOnReveal;
+            OnCardRevealedBroadcastReceived += RevealOnOthersReveal;
+            OnCardRevealedBroadcastReceived += MarkCompletedGoalsOnReveal;
+            OnNewCardReceived += MarkCompletedGoalsOnNewCard;
             _client.NeedBoardUpdate += ClientTriggeredBoardUpdate;
             GoalCompletionTracker.OnGoalCompletionChanged += OnInternalGoalUpdate;
             ItemSyncInterop.AddSession(this);
@@ -168,6 +176,44 @@ namespace BingoSync.Sessions
         private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
             RoomIsLockout = settings.IsLockout;
+        }
+
+        private void MarkCompletedGoalsOnNewCard(object sender, NewCardEventInfo newCardEvent)
+        {
+            MarkAllCompleted();
+        }
+
+        private void MarkCompletedGoalsOnReveal(object sender, CardRevealedEventInfo revealedEvent)
+        {
+            if (revealedEvent.Player.UUID != _client.PlayerUUID)
+            {
+                return;
+            }
+            MarkAllCompleted();
+        }
+
+        private void MarkAllCompleted()
+        {
+            if (GameManager.instance.IsMenuScene())
+            {
+                return;
+            }
+            if (!Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived)
+            {
+                return;
+            }
+            if (!IsPlayable())
+            {
+                return;
+            }
+            for (int index = 0; index < Board.Count(); ++index)
+            {
+                Square square = Board.GetIndex(index);
+                if (GoalCompletionTracker.IsGoalMarkedByName(square.Name))
+                {
+                    SelectIndex(index, () => { });
+                }
+            }
         }
 
         public bool IsPlayable()
@@ -237,7 +283,7 @@ namespace BingoSync.Sessions
 
         internal void OnInternalGoalUpdate(object sender, InternalGoalUpdate goalUpdate)
         {
-            if(!IsMarking)
+            if(!IsPlayable() || !IsMarking)
             {
                 return;
             }
@@ -283,8 +329,9 @@ namespace BingoSync.Sessions
             bool isMarked = square.MarkedBy.Contains(RoomColor);
             bool isBlank = square.MarkedBy.Contains(Colors.Blank);
             bool canMark = isBlank || (!isMarked && !RoomIsLockout);
+            bool canUnmark = isMarked && Controller.GlobalSettings.UnmarkGoals;
             bool shouldMark = canMark && !clear;
-            bool shouldUnmark = isMarked && clear;
+            bool shouldUnmark = canUnmark && clear;
             return shouldMark || shouldUnmark;
         }
 
@@ -305,7 +352,7 @@ namespace BingoSync.Sessions
 
         public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
         {
-            if(IsMarking)
+            if (IsMarking && SquareNeedsUpdate(Board.GetIndex(slot - 1), clear))
             {
                 _client.SelectSlot(slot, color, errorCallback, clear);
             }
@@ -352,7 +399,7 @@ namespace BingoSync.Sessions
             }
         }
 
-        private void HandleOnReveal(object sender, CardRevealedEventInfo revealedInfo)
+        private void RevealOnOthersReveal(object sender, CardRevealedEventInfo revealedInfo)
         {
             if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
             {

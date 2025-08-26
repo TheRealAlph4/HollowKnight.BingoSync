@@ -7,6 +7,8 @@ namespace BingoSync.ModMenu
     {
         private static HorizontalOption revealCardOnStartSelector;
         private static HorizontalOption revealCardOnOthersRevealSelector;
+        private static HorizontalOption markCompletedOnNewCardSelector;
+        private static HorizontalOption markCompletedOnLoadSavefileSelector;
         private static HorizontalOption unmarkGoalsSelector;
         private static HorizontalOption itemSyncSelector;
         private static CustomSlider itemSyncDelay;
@@ -25,10 +27,26 @@ namespace BingoSync.ModMenu
 
             revealCardOnOthersRevealSelector = new HorizontalOption(
                 name: "Reveal With Others",
-                description: "Reveal the card, when notified that another other player did",
+                description: "Reveal the card, when notified that another player did",
                 values: ["No", "Yes"],
                 applySetting: (index) => Controller.GlobalSettings.RevealCardWhenOthersReveal = (index == 1),
                 loadSetting: () => Controller.GlobalSettings.RevealCardWhenOthersReveal ? 1 : 0
+            );
+
+            markCompletedOnNewCardSelector = new HorizontalOption(
+                name: "Mark Goals On New Card",
+                description: "Mark all completed goals when a new card is received/revealed",
+                values: ["No", "Yes"],
+                applySetting: (index) => Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived = (index == 1),
+                loadSetting: () => Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived ? 1 : 0
+            );
+
+            markCompletedOnLoadSavefileSelector = new HorizontalOption(
+                name: "Mark Goals On Load",
+                description: "Mark all completed goals when loading a savefile",
+                values: ["No", "Yes"],
+                applySetting: (index) => Controller.GlobalSettings.MarkCompletedGoalsOnLoadSavefile = (index == 1),
+                loadSetting: () => Controller.GlobalSettings.MarkCompletedGoalsOnLoadSavefile ? 1 : 0
             );
 
             unmarkGoalsSelector = new HorizontalOption(
@@ -60,6 +78,8 @@ namespace BingoSync.ModMenu
             [
                 revealCardOnStartSelector,
                 revealCardOnOthersRevealSelector,
+                markCompletedOnNewCardSelector,
+                markCompletedOnLoadSavefileSelector,
                 unmarkGoalsSelector,
                 itemSyncSelector,
                 itemSyncDelay,

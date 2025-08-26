@@ -1,9 +1,10 @@
-﻿using Modding;
-using BingoSync.ModMenu;
-using BingoSync.Settings;
-using BingoSync.CustomGoals;
+﻿using BingoSync.CustomGoals;
 using BingoSync.GameUI;
 using BingoSync.Interfaces;
+using BingoSync.ModMenu;
+using BingoSync.Settings;
+using Modding;
+using Newtonsoft.Json;
 
 namespace BingoSync
 {
@@ -11,8 +12,10 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.4.3.0";
+        public static string version = "1.4.4.0";
         public override string GetVersion() => version;
+
+        private static readonly string DefaultSaveSettings = JsonConvert.SerializeObject(new SaveSettings());
 
         public override void Initialize()
         {
@@ -32,12 +35,21 @@ namespace BingoSync
 
         public void OnLoadLocal(SaveSettings s)
         {
-            GoalCompletionTracker.Settings = s;
+            GoalCompletionTracker.Variables = s;
+            if(JsonConvert.SerializeObject(s) == DefaultSaveSettings)
+            {
+                return;
+            }
+            if (Controller.GlobalSettings.MarkCompletedGoalsOnLoadSavefile)
+            {
+                GoalCompletionTracker.ClearFinishedGoals();
+                GoalCompletionTracker.BroadcastAllGoalStates();
+            }
         }
 
         public SaveSettings OnSaveLocal()
         {
-            return GoalCompletionTracker.Settings;
+            return GoalCompletionTracker.Variables;
         }
 
         public void OnLoadGlobal(ModSettings s)

@@ -3,6 +3,7 @@ using BingoSync.CustomGoals;
 using BingoSync.Sessions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace BingoSync.Clients
         private readonly HttpClientHandler handler = null;
         private readonly HttpClient client = null;
         private ClientWebSocket webSocketClient = null;
+        private string socketKey = string.Empty;
 
         private ClientState forcedState = ClientState.None;
         private WebSocketState lastSocketState = WebSocketState.None;
@@ -46,6 +48,8 @@ namespace BingoSync.Clients
         public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
 
         private BingoBoard Board;
+
+        public string PlayerUUID { get; private set; } = string.Empty;
 
         public void DumpDebugInfo()
         {
@@ -124,30 +128,31 @@ namespace BingoSync.Clients
             }, maxRetries, nameof(LoadCookie));
         }
 
-        private void UpdateBoardAndBroadcast(List<NetworkObjectBoardSquare> newBoard)
+        private void UpdateBoardSquares(List<NetworkObjectBoardSquare> newBoard)
         {
-            if (newBoard != null)
+            List<Square> squares = [];
+            foreach (NetworkObjectBoardSquare networkSquare in newBoard)
             {
-                List<Square> squares = [];
-                foreach (NetworkObjectBoardSquare networkSquare in newBoard)
+                HashSet<Colors> colors = [];
+                foreach (string color in networkSquare.Colors.Split(' '))
                 {
-                    HashSet<Colors> colors = [];
-                    foreach (string color in networkSquare.Colors.Split(' '))
-                    {
-                        colors.Add(ColorExtensions.FromName(color));
-                    }
-                    squares.Add(new Square() {
-                        Name = networkSquare.Name,
-                        MarkedBy = colors,
-                        Highlighted = false,
-                        GoalIndex = int.Parse(networkSquare.Slot.Substring(4)) - 1,
-                    });
+                    colors.Add(ColorExtensions.FromName(color));
                 }
-                Board.SetSquares(squares);
+                squares.Add(new Square() {
+                    Name = networkSquare.Name,
+                    MarkedBy = colors,
+                    Highlighted = false,
+                    GoalIndex = int.Parse(networkSquare.Slot.Substring(4)) - 1,
+                });
             }
+            Board.SetSquares(squares);
+        }
+
+        private void TriggerBoardUpdate(bool resetConditions)
+        {
             NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo()
             {
-                NeedsConditionReset = true,
+                NeedsConditionReset = resetConditions,
             });
         }
 
@@ -181,8 +186,10 @@ namespace BingoSync.Clients
                     readTask.ContinueWith(joinRoomResponse =>
                     {
                         var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result);
+                        socketKey = socketJoin.SocketKey;
+                        RequestPlayerUUID(() => { });
                         ConnectToBroadcastSocket(socketJoin);
-                        UpdateBoard(true); // TODO: check if card should be hidden
+                        RequestAndSetBoard(true, () => { }); 
                         UpdateSettings();
                         SetColor(color.GetName());
                     });
@@ -271,7 +278,7 @@ namespace BingoSync.Clients
                     var response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     Board.IsRevealed = true;
-                    NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
+                    TriggerBoardUpdate(resetConditions: false);
                 });
             }, maxRetries, nameof(RevealCard));
         }
@@ -334,14 +341,15 @@ namespace BingoSync.Clients
                     {
                         throw result.Exception;
                     }
-                    UpdateBoardAndBroadcast(null);
+                    TriggerBoardUpdate(resetConditions: true);
                     webSocketClient = new ClientWebSocket();
                     forcedState = ClientState.None;
+                    PlayerUUID = string.Empty;
                     callback();
                 });
             }, maxRetries, nameof(ExitRoom), () =>
             {
-                UpdateBoardAndBroadcast(null);
+                TriggerBoardUpdate(resetConditions: true);
                 webSocketClient = new ClientWebSocket();
                 forcedState = ClientState.None;
             });
@@ -361,8 +369,6 @@ namespace BingoSync.Clients
                         Log($"error connecting to websocket: {connectResponse.Exception}");
                         throw connectResponse.Exception;
                     }
-
-                    // Log($"connected to the socket, sending socketJoin object");
                     var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
                     var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
                     var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
@@ -370,6 +376,26 @@ namespace BingoSync.Clients
                     {
                         ListenForBoardUpdates(socketJoin);
                     });
+                });
+            }, maxRetries, nameof(ConnectToBroadcastSocket));
+        }
+
+        private void RequestPlayerUUID(Action callback)
+        {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var requestTask = client.GetAsync($"https://bingosync.com/api/socket/{socketKey}");
+                return requestTask.ContinueWith(response =>
+                {
+                    HttpResponseMessage result = response.Result;
+                    result.EnsureSuccessStatusCode();
+                    result.Content.ReadAsStringAsync().ContinueWith(networkSocketCheck =>
+                    {
+                        NetworkObjectSocketCheck socketInfo = JsonConvert.DeserializeObject<NetworkObjectSocketCheck>(networkSocketCheck.Result);
+                        PlayerUUID = socketInfo.PlayerUUID;
+                        callback?.Invoke();
+                    });
+
                 });
             }, maxRetries, nameof(ConnectToBroadcastSocket));
         }
@@ -422,10 +448,12 @@ namespace BingoSync.Clients
         private void HandleNewCardBroadcast(string json)
         {
             NetworkObjectNewCardBroadcast newCardBroadcast = JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(json);
-            UpdateBoardAndBroadcast(null);
-            UpdateBoard(newCardBroadcast.HideCard);
-            UpdateSettings();
-            NewCardReceived?.Invoke(this, NetworkNewCardBroadcastToLocal(newCardBroadcast));
+            RequestAndSetBoard(newCardBroadcast.HideCard, delegate
+            {
+                UpdateSettings();
+                TriggerBoardUpdate(resetConditions: false);
+                NewCardReceived?.Invoke(this, NetworkNewCardBroadcastToLocal(newCardBroadcast));
+            });
         }
 
         private void HandleGoalBroadcast(string json)
@@ -444,7 +472,7 @@ namespace BingoSync.Clients
                     break;
                 }
             }
-            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
+            TriggerBoardUpdate(resetConditions: false);
         }
 
         private void HandleColorBroadcast(string json)
@@ -456,8 +484,29 @@ namespace BingoSync.Clients
         private void HandleRevealedBroadcast(string json)
         {
             NetworkObjectRevealedBroadcast revealedBroadcast = JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(json);
-            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo());
-            CardRevealedBroadcastReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
+            void handler()
+            {
+                TriggerBoardUpdate(resetConditions: false);
+                if(revealedBroadcast.Player.UUID == PlayerUUID)
+                {
+                    Board.IsRevealed = true;
+                }
+                CardRevealedBroadcastReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
+            }
+            RunAfterUUIDKnown(handler);
+        }
+
+        private void RunAfterUUIDKnown(Action action)
+        {
+            if (string.IsNullOrEmpty(PlayerUUID))
+            {
+                RequestPlayerUUID(action);
+            }
+            else
+            {
+                action?.Invoke();
+            }
+
         }
 
         private void HandleConnectionBroadcast(string json)
@@ -466,7 +515,7 @@ namespace BingoSync.Clients
             PlayerConnectedBroadcastReceived?.Invoke(this, NetworkConnectionBroadcastToLocal(connectionBroadcast));
         }
 
-        private void UpdateBoard(bool hideCard)
+        private void RequestAndSetBoard(bool hideCard, Action callback)
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
@@ -481,10 +530,11 @@ namespace BingoSync.Clients
                     {
                         var newBoard = JsonConvert.DeserializeObject<List<NetworkObjectBoardSquare>>(boardResponse.Result);
                         Board.IsRevealed = !hideCard;
-                        UpdateBoardAndBroadcast(newBoard);
+                        UpdateBoardSquares(newBoard);
+                        callback?.Invoke();
                     });
                 });
-            }, maxRetries, nameof(UpdateBoard));
+            }, maxRetries, nameof(RequestAndSetBoard));
         }
 
         private void UpdateSettings()
@@ -836,6 +886,15 @@ namespace BingoSync.Clients
     #endregion
 
     #region Common network objects
+
+    [DataContract]
+    class NetworkObjectSocketCheck
+    {
+        [JsonProperty("room")]
+        public string RoomCode = string.Empty;
+        [JsonProperty("player")]
+        public string PlayerUUID = string.Empty;
+    }
 
     [DataContract]
     class NetworkObjectBoardSquare

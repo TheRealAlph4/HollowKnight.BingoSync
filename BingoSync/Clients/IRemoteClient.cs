@@ -18,6 +18,8 @@ namespace BingoSync.Clients
 
         public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
 
+        public string PlayerUUID { get; }
+
         public void SetBoard(BingoBoard board);
         public void DumpDebugInfo();
         public void Update();

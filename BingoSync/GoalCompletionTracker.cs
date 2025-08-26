@@ -17,7 +17,7 @@ namespace BingoSync
         private static readonly Dictionary<string, List<BingoSquare>> GoalsByRuleset = [];
 
         private static Action<string> Log;
-        public static SaveSettings Settings { get; set; }
+        public static SaveSettings Variables { get; set; }
 
         public class InternalGoalUpdate
         {
@@ -129,12 +129,12 @@ namespace BingoSync
 
         public static bool GetBoolean(string name)
         {
-            if (Settings == null)
+            if (Variables == null)
             {
                 return false;
             }
 
-            if (Settings.Booleans.TryGetValue(name, out bool current))
+            if (Variables.Booleans.TryGetValue(name, out bool current))
             {
                 return current;
             }
@@ -143,18 +143,18 @@ namespace BingoSync
 
         public static void UpdateBoolean(string name, bool value)
         {
-            Settings.Booleans[name] = value;
-            VariableUpdated(name);
+            Variables.Booleans[name] = value;
+            AfterVariableUpdated(name);
         }
 
         public static int GetInteger(string name)
         {
-            if (Settings == null)
+            if (Variables == null)
             {
                 return 0;
             }
 
-            if (Settings.Integers.TryGetValue(name, out int current))
+            if (Variables.Integers.TryGetValue(name, out int current))
             {
                 return current;
             }
@@ -163,12 +163,12 @@ namespace BingoSync
 
         public static void UpdateInteger(string name, int current)
         {
-            if (Settings == null)
+            if (Variables == null)
             {
                 return;
             }
 
-            if (!Settings.Integers.TryGetValue(name, out int previous))
+            if (!Variables.Integers.TryGetValue(name, out int previous))
             {
                 previous = 0;
             }
@@ -177,29 +177,29 @@ namespace BingoSync
 
         public static void UpdateInteger(string name, int previous, int current)
         {
-            if (Settings == null)
+            if (Variables == null)
             {
                 return;
             }
 
             var added = Math.Max(0, current - previous);
             var removed = Math.Max(0, previous - current);
-            if (!Settings.Integers.ContainsKey(name))
+            if (!Variables.Integers.ContainsKey(name))
             {
-                Settings.Integers.Add(name, current);
-                Settings.IntegersTotalAdded.Add(name, added);
-                Settings.IntegersTotalRemoved.Add(name, removed);
+                Variables.Integers.Add(name, current);
+                Variables.IntegersTotalAdded.Add(name, added);
+                Variables.IntegersTotalRemoved.Add(name, removed);
             }
             else
             {
-                Settings.Integers[name] = current;
-                Settings.IntegersTotalAdded[name] += added;
-                Settings.IntegersTotalRemoved[name] += removed;
+                Variables.Integers[name] = current;
+                Variables.IntegersTotalAdded[name] += added;
+                Variables.IntegersTotalRemoved[name] += removed;
             }
-            VariableUpdated(name);
+            AfterVariableUpdated(name);
         }
         
-        private static void VariableUpdated(string variableName)
+        private static void AfterVariableUpdated(string variableName)
         {
             if(!GoalsByVariable.TryGetValue(variableName, out List<BingoSquare> squares))
             {
@@ -222,6 +222,19 @@ namespace BingoSync
             }
         }
 
+        internal static void BroadcastAllGoalStates()
+        {
+            foreach (BingoSquare square in AllKnownSquaresByName.Values)
+            {
+                OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
+                {
+                    Name = square.Name,
+                    Clear = !IsSolved(square),
+                    IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
+                });
+            }
+        }
+
         private static bool IsSolved(BingoSquare square)
         {
             if (square.Condition.Solved && (!Controller.GlobalSettings.UnmarkGoals || !square.CanUnmark))
@@ -235,7 +248,7 @@ namespace BingoSync
             condition.Solved = false;
             if (condition.Type == ConditionType.Bool)
             {
-                Settings.Booleans.TryGetValue(condition.VariableName, out var value);
+                Variables.Booleans.TryGetValue(condition.VariableName, out var value);
                 if (value == condition.ExpectedValue)
                 {
                     condition.Solved = true;
@@ -247,9 +260,9 @@ namespace BingoSync
                 int current = -1;
                 int added = -1;
                 int removed = -1;
-                if (!Settings.Integers.TryGetValue(condition.VariableName, out current)
-                    || !Settings.IntegersTotalAdded.TryGetValue(condition.VariableName, out added)
-                    || !Settings.IntegersTotalRemoved.TryGetValue(condition.VariableName, out removed))
+                if (!Variables.Integers.TryGetValue(condition.VariableName, out current)
+                    || !Variables.IntegersTotalAdded.TryGetValue(condition.VariableName, out added)
+                    || !Variables.IntegersTotalRemoved.TryGetValue(condition.VariableName, out removed))
                 {
                     return;
                 }
