@@ -374,14 +374,5 @@ namespace BingoSync
         {
             MainMenu.RefreshMenu();
         }
-
-        internal static void MoveGameModesFromSettings()
-        {
-            foreach (CustomGameMode gameMode in GlobalSettings.CustomGameModes)
-            {
-                GameModesManager.CustomGameModes.Add(gameMode);
-            }
-            GlobalSettings.CustomGameModes.Clear();
-        }
     }
 }

@@ -30,8 +30,6 @@ namespace BingoSync.Settings
         public string DefaultColor = "red";
         public bool DebugMode = false;
 
-        public List<CustomGameMode> CustomGameModes = [];
-
         public int BoardAlphaIndex = 0;
         public List<float> BoardAlphas = [0.135f, 0.5f, 1f];
         public float BoardAlpha {
