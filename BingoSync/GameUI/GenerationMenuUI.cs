@@ -56,6 +56,14 @@ namespace BingoSync.GameUI
 
         public static void CreateGenerationMenu()
         {
+            bool lockoutButtonIsLockout = lockoutToggleButton?.IsOn ?? false;
+
+            profileNameInput?.Destroy();
+            acceptProfileNameButton?.Destroy();
+            generationSeedInput?.Destroy();
+            generateBoardButton?.Destroy();
+            lockoutToggleButton?.Destroy();
+
             generationMenu?.Children.Clear();
 
             generationMenu ??= new(layoutRoot)
@@ -112,6 +120,11 @@ namespace BingoSync.GameUI
                 MinHeight = MenuUI.lockoutButtonWidth,
             };
             lockoutToggleButton.SetButton(lockoutButton);
+
+            if (lockoutButtonIsLockout)
+            {
+                lockoutToggleButton.Toggle(lockoutButton);
+            }
 
             SetupRenameProfileRow();
             SetupGenerateRow();
