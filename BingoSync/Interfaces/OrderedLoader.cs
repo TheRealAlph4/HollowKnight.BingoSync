@@ -58,17 +58,48 @@ namespace BingoSync.Interfaces
         {
             ItemSyncInterop.Initialize(Log);
 
-            OnReadyForGoalsGameModes?.Invoke(null, EventArgs.Empty);
-            OnStandaloneGoalsGameModesLoaded?.Invoke(null, EventArgs.Empty);
-            OnReadyForUIPages?.Invoke(null, EventArgs.Empty);
-            OnDefaultSessionReady?.Invoke(null, EventArgs.Empty);
+            ExecuteLogExceptions("OnReadyForGoalsGameModes", delegate
+            {
+                OnReadyForGoalsGameModes?.Invoke(null, EventArgs.Empty);
+            });
+            ExecuteLogExceptions("OnStandaloneGoalsGameModesLoaded", delegate
+            {
+                OnStandaloneGoalsGameModesLoaded?.Invoke(null, EventArgs.Empty);
+            });
+            ExecuteLogExceptions("OnReadyForUIPages", delegate
+            {
+                OnReadyForUIPages?.Invoke(null, EventArgs.Empty);
+            });
+            ExecuteLogExceptions("OnDefaultSessionReady", delegate
+            {
+                OnDefaultSessionReady?.Invoke(null, EventArgs.Empty);
+            });
 
-            GoalCompletionTracker.SetupDictionaries();
+            ExecuteLogExceptions("GoalCompletionTracker.SetupDictionaries", delegate
+            {
+                GoalCompletionTracker.SetupDictionaries();
+            });
 
-            OnCompletelyLoaded?.Invoke(null, EventArgs.Empty);
+            ExecuteLogExceptions("OnCompletelyLoaded", delegate
+            {
+                OnCompletelyLoaded?.Invoke(null, EventArgs.Empty);
+            });
 
             GameModesManager.RefreshCustomGameModes();
             MenuUI.SetupGameModeButtons();
+        }
+
+        private static void ExecuteLogExceptions(string name, Action func)
+        {
+            try
+            {
+                func?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Log($"Exception while running {name}: {ex.Message}");
+                Log(ex.StackTrace);
+            }
         }
     }
 }
