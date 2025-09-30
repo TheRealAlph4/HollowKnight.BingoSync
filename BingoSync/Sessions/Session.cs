@@ -5,7 +5,6 @@ using BingoSync.GameUI;
 using BingoSync.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BingoSync.GoalCompletionTracker;
@@ -74,7 +73,8 @@ namespace BingoSync.Sessions
                 return _client.PlayerUUID;
             } 
         }
-        public BingoBoard Board { get; set; } = new();
+        public BingoBoard Board { get; } = new();
+        public bool NonStandardBoardGeneration { get; set; } = false;
 
         #region Events
 
@@ -206,20 +206,21 @@ namespace BingoSync.Sessions
             {
                 return;
             }
-            for (int index = 0; index < Board.Count(); ++index)
+            int index = 0;
+            foreach (Square square in Board.AllSquares)
             {
-                Square square = Board.GetIndex(index);
                 if (GoalCompletionTracker.IsGoalMarkedByName(square.Name))
                 {
                     SelectIndex(index, () => { });
                 }
+                ++index;
             }
         }
 
         public bool IsPlayable()
         {
             Update();
-            if (!Board.IsAvailable() || !Board.IsRevealed)
+            if (!Board.IsAvailable || !Board.IsRevealed)
                 return false;
             if (!ClientIsConnected())
                 return false;
@@ -288,7 +289,7 @@ namespace BingoSync.Sessions
                 return;
             }
             int slot = 1;
-            foreach (Square square in Board)
+            foreach (Square square in Board.AllSquares)
             {
                 if (square.Name == goalUpdate.Name)
                 {
@@ -370,7 +371,7 @@ namespace BingoSync.Sessions
 
         private void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
         {
-            if (goalUpdate.Unmarking || !Board.IsAvailable() || !Board.IsRevealed)
+            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed)
             {
                 return;
             }
@@ -414,6 +415,16 @@ namespace BingoSync.Sessions
             {
                 GoalCompletionTracker.ClearFinishedGoals();
             }
+        }
+
+        public void SetDisplaySquaresSelector(Func<List<Square>, List<Square>> selector)
+        {
+            Board.SetDisplaySquaresSelector(selector);
+        }
+
+        public void SetDefaultDisplaySquaresSelector()
+        {
+            Board.SetDefaultDisplaySquaresSelector();
         }
     }
 }

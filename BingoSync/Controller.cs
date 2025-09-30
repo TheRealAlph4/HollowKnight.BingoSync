@@ -184,7 +184,7 @@ namespace BingoSync
 
         public static void ToggleBoardKeybindClicked()
         {
-            if (!ActiveSession.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable)
             {
                 return;
             }
@@ -226,7 +226,7 @@ namespace BingoSync
             {
                 return;
             }
-            if (!ActiveSession.Board.IsAvailable() || !ActiveSession.Board.IsRevealed || ActiveSession.Board.IsConfirmed)
+            if (!ActiveSession.Board.IsAvailable || !ActiveSession.Board.IsRevealed || ActiveSession.Board.IsConfirmed)
             {
                 return;
             }
@@ -242,7 +242,7 @@ namespace BingoSync
 
         public static void CycleBoardOpacity()
         {
-            if (!ActiveSession.Board.IsAvailable())
+            if (!ActiveSession.Board.IsAvailable)
             {
                 return;
             }
@@ -367,7 +367,9 @@ namespace BingoSync
 
         public static void RefreshGenerationButtonEnabled()
         {
-            SetGenerationButtonEnabled((ActiveSession.ClientIsConnected() || ActiveSession.ClientIsConnecting()) && IsOnMainMenu);
+            bool clientConnected = (ActiveSession.ClientIsConnected() || ActiveSession.ClientIsConnecting());
+            bool standardGeneration = !ActiveSession.NonStandardBoardGeneration;
+            SetGenerationButtonEnabled(clientConnected && IsOnMainMenu && standardGeneration);
         }
 
         public static void RefreshMenu()

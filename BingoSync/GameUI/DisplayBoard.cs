@@ -115,7 +115,7 @@ namespace BingoSync.GameUI
 
         private bool BoardShouldBeVisible()
         {
-            bool shouldBeVisible = Controller.ActiveSession.ClientIsConnected() && Controller.BoardIsVisible && Controller.ActiveSession.Board.IsAvailable() && Controller.ActiveSession.Board.IsRevealed;
+            bool shouldBeVisible = Controller.ActiveSession.ClientIsConnected() && Controller.BoardIsVisible && Controller.ActiveSession.Board.IsAvailable && Controller.ActiveSession.Board.IsRevealed;
             if (shouldBeVisible && !opacityInitialized)
             {
                 opacityInitialized = true;

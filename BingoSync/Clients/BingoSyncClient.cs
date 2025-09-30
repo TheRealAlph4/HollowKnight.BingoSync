@@ -3,7 +3,6 @@ using BingoSync.CustomGoals;
 using BingoSync.Sessions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -412,7 +411,7 @@ namespace BingoSync.Clients
                     {
                         continue;
                     }
-                    if (!Board.IsAvailable()) return;
+                    if (!Board.IsAvailable) return;
                     string json = Encoding.UTF8.GetString(buffer, 0, response.Count);
                     NetworkObjectBroadcast broadcast = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json);
                     switch(broadcast.Type)
@@ -459,7 +458,7 @@ namespace BingoSync.Clients
         private void HandleGoalBroadcast(string json)
         {
             NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json);
-            foreach (Square square in Board)
+            foreach (Square square in Board.AllSquares)
             {
                 if ("slot" + (square.GoalIndex + 1) == goalBroadcast.Square.Slot)
                 {
@@ -657,7 +656,7 @@ namespace BingoSync.Clients
                 Timestamp = network.Timestamp,
                 Color = ColorExtensions.FromName(network.Color),
                 Goal = network.Square.Name,
-                Index = board.Select((square, index) => new { square, index })
+                Index = board.AllSquares.Select((square, index) => new { square, index })
                               .Where(pair => pair.square.Name == network.Square.Name)
                               .Select(pair => pair.index)
                               .First(),
