@@ -27,7 +27,7 @@ namespace BingoSync.Sessions
                 Controller.BoardUpdate();
             }
         }
-        public bool IsMarking { get; set; }
+        public bool IsAutoMarking { get; set; }
         public bool BoardIsVisible { get; set; } = true;
         private bool _handMode = false;
         public bool HandMode
@@ -156,7 +156,7 @@ namespace BingoSync.Sessions
             SessionName = name;
             _client = client;
             SubscribeEventRefires();
-            IsMarking = markingClient;
+            IsAutoMarking = markingClient;
             _client.SetBoard(Board);
             OnGoalUpdateReceived += DoAudioNotification;
             OnRoomSettingsReceived += ConsumeRoomSettings;
@@ -284,7 +284,7 @@ namespace BingoSync.Sessions
 
         internal void OnInternalGoalUpdate(object sender, InternalGoalUpdate goalUpdate)
         {
-            if(!IsPlayable() || !IsMarking)
+            if(!IsPlayable() || !IsAutoMarking)
             {
                 return;
             }
@@ -302,7 +302,7 @@ namespace BingoSync.Sessions
         private void UpdateGoalBySlot(int slot, InternalGoalUpdate goalUpdate)
         {
             Square square = Board.GetSlot(slot);
-            if (!SquareNeedsUpdate(square, goalUpdate.Clear))
+            if (!SquareNeedsUpdate(square, RoomColor, goalUpdate.Clear))
             {
                 return;
             }
@@ -316,7 +316,7 @@ namespace BingoSync.Sessions
                 if (setting == ItemSyncMarkDelay.Delay && goalUpdate.IsItemSyncUpdate)
                 {
                     Thread.Sleep(ItemSyncInterop.MarkDelay);
-                    if (!SquareNeedsUpdate(square, goalUpdate.Clear))
+                    if (!SquareNeedsUpdate(square, RoomColor, goalUpdate.Clear))
                     {
                         return;
                     }
@@ -325,14 +325,13 @@ namespace BingoSync.Sessions
             });
         }
 
-        private bool SquareNeedsUpdate(Square square, bool clear)
+        private bool SquareNeedsUpdate(Square square, Colors color, bool clear)
         {
-            bool isMarked = square.MarkedBy.Contains(RoomColor);
+            bool isMarked = square.MarkedBy.Contains(color);
             bool isBlank = square.MarkedBy.Contains(Colors.Blank);
             bool canMark = isBlank || (!isMarked && !RoomIsLockout);
-            bool canUnmark = isMarked && Controller.GlobalSettings.UnmarkGoals;
             bool shouldMark = canMark && !clear;
-            bool shouldUnmark = canUnmark && clear;
+            bool shouldUnmark = isMarked && clear;
             return shouldMark || shouldUnmark;
         }
 
@@ -353,7 +352,7 @@ namespace BingoSync.Sessions
 
         public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
         {
-            if (IsMarking && SquareNeedsUpdate(Board.GetIndex(slot - 1), clear))
+            if (SquareNeedsUpdate(Board.GetIndex(slot - 1), color, clear))
             {
                 _client.SelectSlot(slot, color, errorCallback, clear);
             }
