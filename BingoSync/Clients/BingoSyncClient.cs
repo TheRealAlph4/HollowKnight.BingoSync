@@ -43,6 +43,7 @@ namespace BingoSync.Clients
         public event EventHandler<PlayerColorChangeEventInfo> PlayerColorChangeReceived;
         public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
         public event EventHandler<RoomSettings> RoomSettingsReceived;
+        public event EventHandler<ClientStateUpdateInfo> ConnectionStateChanged;
 
         public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
 
@@ -344,6 +345,7 @@ namespace BingoSync.Clients
                     webSocketClient = new ClientWebSocket();
                     forcedState = ClientState.None;
                     PlayerUUID = string.Empty;
+                    ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
                     callback();
                 });
             }, maxRetries, nameof(ExitRoom), () =>
@@ -371,8 +373,9 @@ namespace BingoSync.Clients
                     var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
                     var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
                     var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-                    sendTask.ContinueWith(_ =>
+                    sendTask.ContinueWith(_ => 
                     {
+                        ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
                         ListenForBoardUpdates(socketJoin);
                     });
                 });

@@ -127,6 +127,13 @@ namespace BingoSync.Sessions
             OnRoomSettingsReceived?.Invoke(this, broadcast);
         }
 
+        public event EventHandler<ClientStateUpdateInfo> OnClientStateChanged;
+
+        private void RefireClientState(object _, ClientStateUpdateInfo broadcast)
+        {
+            OnClientStateChanged?.Invoke(this, broadcast);
+        }
+
         private void UnsubscribeEventRefires()
         {
             _client.CardRevealedBroadcastReceived -= RefireCardRevealedBroadcast;
@@ -136,10 +143,12 @@ namespace BingoSync.Sessions
             _client.PlayerColorChangeReceived -= RefirePlayerColorChange;
             _client.PlayerConnectedBroadcastReceived -= RefirePlayerConnectedBroadcast;
             _client.RoomSettingsReceived -= RefireRoomSettings;
+            _client.ConnectionStateChanged -= RefireClientState;
         }
 
         private void SubscribeEventRefires()
         {
+            UnsubscribeEventRefires();
             _client.CardRevealedBroadcastReceived += RefireCardRevealedBroadcast;
             _client.ChatMessageReceived += RefireChatMessage;
             _client.GoalUpdateReceived += RefireGoalUpdate;
@@ -147,6 +156,7 @@ namespace BingoSync.Sessions
             _client.PlayerColorChangeReceived += RefirePlayerColorChange;
             _client.PlayerConnectedBroadcastReceived += RefirePlayerConnectedBroadcast;
             _client.RoomSettingsReceived += RefireRoomSettings;
+            _client.ConnectionStateChanged += RefireClientState;
         }
 
     #endregion

@@ -15,6 +15,7 @@ namespace BingoSync.Clients
         public event EventHandler<PlayerColorChangeEventInfo> PlayerColorChangeReceived;
         public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
         public event EventHandler<RoomSettings> RoomSettingsReceived;
+        public event EventHandler<ClientStateUpdateInfo> ConnectionStateChanged;
 
         public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
 
