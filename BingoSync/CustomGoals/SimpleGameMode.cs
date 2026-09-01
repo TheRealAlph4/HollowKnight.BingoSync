@@ -1,38 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace BingoSync.CustomGoals
 {
-    public class GameMode(string name, Dictionary<string, BingoGoal> goals)
+    public class SimpleGameMode(string name, Dictionary<string, BingoGoal> goals) : IGameMode
     {
-        private string name = name;
-        private Dictionary<string, BingoGoal> goals = goals;
+        public bool CanBeRenamed => false;
+        public string DisplayName => _name;
+        
+        private readonly string _name = name;
+        private readonly Dictionary<string, BingoGoal> _goals = goals;
 
-        public Dictionary<string, BingoGoal> GetGoals()
+        public string SetName(string _)
         {
-            return goals;
+            return _name;
         }
 
-        public void SetGoals(Dictionary<string, BingoGoal> goals)
-        {
-            this.goals = goals;
-        }
-
-        virtual public string GetDisplayName()
-        {
-            return name;
-        }
-
-        protected void SetName(string newName)
-        {
-            name = newName;
-        }
-
-        virtual public List<BingoGoal> GenerateBoard(int seed)
+        public List<BingoGoal> GenerateBoard(int seed)
         {
             List<BingoGoal> board = [];
-            List<BingoGoal> availableGoals = [.. goals.Values];
+            List<BingoGoal> availableGoals = [.. _goals.Values];
             Random r = new(seed);
             while (board.Count < 25)
             {

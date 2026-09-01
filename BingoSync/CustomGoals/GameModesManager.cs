@@ -12,7 +12,7 @@ namespace BingoSync.CustomGoals
     {
         private static readonly string CustomGameModesPath = Path.Combine(Path.Combine(Application.persistentDataPath, "BingoSync"), "CustomProfiles");
         private static Action<string> Log;
-        private static readonly List<GameMode> gameModes = [];
+        private static readonly List<IGameMode> gameModes = [];
         private static readonly Dictionary<string, BingoGoal> vanillaGoals = [];
         private static readonly Dictionary<string, BingoGoal> itemRandoGoals = [];
         private static readonly Dictionary<string, List<BingoGoal>> goalGroupDefinitions = [];
@@ -26,7 +26,7 @@ namespace BingoSync.CustomGoals
             {
                 Log($"\tGoalGroup \"{groupname}\"");
             };
-            foreach (string gamemode in gameModes.Select(gamemode => gamemode.GetDisplayName()))
+            foreach (string gamemode in gameModes.Select(gamemode => gamemode.DisplayName))
             {
                 Log($"\tGameMode \"{gamemode}\"");
             };
@@ -37,20 +37,20 @@ namespace BingoSync.CustomGoals
             Log = log;
             SetupVanillaGoals();
             SetupItemRandoGoals();
-            gameModes.Add(new GameMode("Vanilla", vanillaGoals));
-            gameModes.Add(new GameMode("Item Rando", itemRandoGoals));
+            gameModes.Add(new SimpleGameMode("Vanilla", vanillaGoals));
+            gameModes.Add(new SimpleGameMode("Item Rando", itemRandoGoals));
             RegisterGoalsForCustom("Vanilla", vanillaGoals);
             RegisterGoalsForCustom("Item Rando", itemRandoGoals);
         }
 
-        public static void AddGameMode(GameMode gameMode)
+        public static void AddGameMode(IGameMode gameMode)
         {
             gameModes.Add(gameMode);
         }
 
-        public static GameMode FindGameModeByDisplayName(string name)
+        public static IGameMode FindGameModeByDisplayName(string name)
         {
-            return gameModes.Find(gameMode => gameMode.GetDisplayName() == name);
+            return gameModes.Find(gameMode => gameMode.DisplayName == name);
         }
 
         public static Dictionary<string, BingoGoal> GetGoalsByGroupName(string groupName)
@@ -210,9 +210,9 @@ namespace BingoSync.CustomGoals
         public static List<string> GameModeNames()
         {
             List<string> names = [];
-            foreach (GameMode gameMode in gameModes)
+            foreach (IGameMode gameMode in gameModes)
             {
-                names.Add(gameMode.GetDisplayName());
+                names.Add(gameMode.DisplayName);
             }
             return names;
         }
@@ -223,7 +223,7 @@ namespace BingoSync.CustomGoals
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
             Controller.ActiveSession.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with a {isCustomSeedString} seed");
-            List<BingoGoal> board = GameMode.GetErrorBoard();
+            List<BingoGoal> board = SimpleGameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
                 board = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);

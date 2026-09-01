@@ -44,10 +44,7 @@ namespace BingoSync
             }
             set
             {
-                if (ActiveSession != null)
-                {
-                    ActiveSession.BoardIsVisible = value;
-                }
+                ActiveSession?.BoardIsVisible = value;
             }
         }
         public static string ActiveGameMode { get; set; } = string.Empty;
@@ -115,10 +112,7 @@ namespace BingoSync
             }
             set
             {
-                if (ActiveSession != null)
-                {
-                    ActiveSession.RoomColor = ColorExtensions.FromName(value);
-                }
+                ActiveSession?.RoomColor = ColorExtensions.FromName(value);
             }
         }
 
@@ -353,23 +347,16 @@ namespace BingoSync
 
         public static bool RenameActiveGameModeTo(string newName)
         {
-            GameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
-            if(gameMode == null || gameMode.GetType() != typeof(CustomGameMode))
+            IGameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
+            if(gameMode == null || !gameMode.CanBeRenamed)
             {
-                Log($"Cannot rename non-custom gamemode {ActiveGameMode}");
+                Log($"Cannot rename gamemode {ActiveGameMode}");
                 return false;
             }
-            CustomGameMode customGameMode = (CustomGameMode)gameMode;
-            string oldName = customGameMode.InternalName;
-            customGameMode.InternalName = newName;
+            string oldName = gameMode.SetName(newName);
             GameModesManager.RenameGameModeFile(oldName, newName);
-            ActiveGameMode = customGameMode.GetDisplayName();
+            ActiveGameMode = gameMode.DisplayName;
             return true;
-        }
-
-        public static bool IsCustomGameMode(string name)
-        {
-            return GameModesManager.FindGameModeByDisplayName(name).GetType() == typeof(CustomGameMode);
         }
 
         public static void SetGenerationButtonEnabled(bool enabled)

@@ -117,7 +117,7 @@ namespace BingoSync.ModMenu
             string name = "Profile ";
             int nr = 1;
             for (; gameModeNames.Contains(name + nr); ++nr) ;
-            GameModesManager.CustomGameModes.Add(new CustomGameMode(name + nr, []));
+            GameModesManager.CustomGameModes.Add(new CustomGameMode(name + nr));
             if(GameModesManager.CustomGameModes.Count == 1)
             {
                 gameModeSelector.SetOptionTo(0);

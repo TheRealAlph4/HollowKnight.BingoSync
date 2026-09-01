@@ -7,26 +7,32 @@ namespace BingoSync.CustomGoals
 {
     [Serializable]
     [JsonObject("CustomGameMode")]
-    public class CustomGameMode : GameMode
+    public class CustomGameMode : IGameMode
     {
+        public bool CanBeRenamed => true;
+        public string DisplayName => _name + "*";
+
+        private string _name;
+        protected Dictionary<string, BingoGoal> _goals;
         [JsonProperty("GameModeName")]
         public string InternalName
         {
             get
             {
-                return base.GetDisplayName();
+                return _name;
             }
             set
             {
-                SetName(value);
+                _name = value;
             }
         }
         [JsonProperty("GoalGroups")]
         private readonly List<GoalGroup> goalSettings;
 
-        public CustomGameMode(string name, Dictionary<string, BingoGoal> goals, List<GoalGroup> loadedGoalSettings = null) 
-            : base(name, goals)
+        public CustomGameMode(string name, List<GoalGroup> loadedGoalSettings = null) 
         {
+            _name = name;
+            _goals = [];
             if (loadedGoalSettings != null)
             {
                 goalSettings = loadedGoalSettings;
@@ -40,6 +46,13 @@ namespace BingoSync.CustomGoals
         public void AddGoalGroupToSettings(GoalGroup goalGroup)
         {
             goalSettings.Add(goalGroup);
+        }
+
+        public string SetName(string newName)
+        {
+            string oldName = _name;
+            _name = newName;
+            return oldName;
         }
 
         public List<GoalGroup> GetGoalSettings()
@@ -71,18 +84,50 @@ namespace BingoSync.CustomGoals
                     }
                 }
             }
-            SetGoals(goals);
+            _goals = goals;
         }
 
-        public override List<BingoGoal> GenerateBoard(int seed)
+        public List<BingoGoal> GenerateBoard(int seed)
         {
             SetGoalsFromSettings();
-            return base.GenerateBoard(seed);
+            List<BingoGoal> board = [];
+            List<BingoGoal> availableGoals = [.. _goals.Values];
+            Random r = new(seed);
+            while (board.Count < 25)
+            {
+                if (availableGoals.Count == 0)
+                {
+                    Modding.Logger.Log("Could not generate board");
+                    return GetErrorBoard();
+                }
+                int index = r.Next(availableGoals.Count);
+                BingoGoal proposedGoal = availableGoals[index];
+                bool valid = true;
+                foreach (BingoGoal existing in board)
+                {
+                    if (existing.Excludes(proposedGoal) || proposedGoal.Excludes(existing))
+                    {
+                        valid = false;
+                    }
+                }
+                if (valid)
+                {
+                    board.Add(proposedGoal);
+                }
+                availableGoals.Remove(proposedGoal);
+            }
+            return board;
         }
 
-        public override string GetDisplayName()
+        public static List<BingoGoal> GetErrorBoard()
         {
-            return base.GetDisplayName() + "*";
+            BingoGoal empty = new("-");
+            List<BingoGoal> board = [new BingoGoal("Error generating board")];
+            for (int i = 0; i < 24; ++i)
+            {
+                board.Add(empty);
+            }
+            return board;
         }
     }
 }

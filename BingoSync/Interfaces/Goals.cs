@@ -2,7 +2,7 @@
 using System.IO;
 using BingoSync.CustomGoals;
 
-namespace BingoSync
+namespace BingoSync.Interfaces
 {
     public static class Goals
     {
@@ -67,7 +67,7 @@ namespace BingoSync
         /// Registers a gamemode to be available on the generation UI.
         /// </summary>
         /// <param name="gameMode"></param>
-        public static void AddGameMode(GameMode gameMode)
+        public static void AddGameMode(IGameMode gameMode)
         {
             GameModesManager.AddGameMode(gameMode);
         }

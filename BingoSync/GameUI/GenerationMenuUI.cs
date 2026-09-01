@@ -312,9 +312,9 @@ namespace BingoSync.GameUI
                 gameMode.BorderColor = Color.white;
             }
             sender.BorderColor = Color.red;
-            bool isCustom = Controller.IsCustomGameMode(gameModeName);
-            profileNameInput.Enabled = isCustom;
-            acceptProfileNameButton.Enabled = isCustom;
+            bool canBeRenamed = GameModesManager.FindGameModeByDisplayName(gameModeName).CanBeRenamed;
+            profileNameInput.Enabled = canBeRenamed;
+            acceptProfileNameButton.Enabled = canBeRenamed;
         }
 
         public static void SetGenerationButtonEnabled(bool enabled)
