@@ -85,7 +85,7 @@ namespace BingoSync.Interfaces
         /// <exception cref="NotImplementedException"></exception>
         public static Session CreateSession(string name, Servers server, bool isAutoMarking, bool isAutoUnmarking)
         {
-            IRemoteClient remoteClient = server switch
+            IBingoClient remoteClient = server switch
             {
                 Servers.BingoSync => new BingoSyncClient(Log),
                 _ => throw new NotImplementedException()

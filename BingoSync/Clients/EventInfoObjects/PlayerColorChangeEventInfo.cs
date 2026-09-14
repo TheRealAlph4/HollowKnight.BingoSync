@@ -2,6 +2,6 @@
 {
     public class PlayerColorChangeEventInfo : RoomEventInfo
     {
-        public Colors Color { get; set; }
+        public int Color { get; set; }
     }
 }

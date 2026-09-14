@@ -2,30 +2,18 @@
 
 namespace BingoSync.CustomGoals
 {
-    public class BingoGoal
+    public class BingoGoal(string goalName, List<string>? exclusions = null)
     {
-        public string name;
-        public List<string> exclusions;
-
-        public BingoGoal(string goalName)
-        {
-            name = goalName;
-            exclusions = [];
-        }
-
-        public BingoGoal(string name, List<string> exclusions)
-        {
-            this.name = name;
-            this.exclusions = exclusions;
-        }
+        public string Name = goalName;
+        public List<string> Exclusions = exclusions ?? [];
 
         public bool Excludes(string other)
         {
-            return exclusions.Contains(other);
+            return Exclusions.Contains(other);
         }
         public bool Excludes(BingoGoal other)
         {
-            return exclusions.Contains(other.name);
+            return Exclusions.Contains(other.Name);
         }
     }
 }

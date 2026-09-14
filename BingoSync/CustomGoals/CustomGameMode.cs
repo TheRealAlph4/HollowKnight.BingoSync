@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BingoSync.CustomGoals
 {
@@ -29,7 +30,7 @@ namespace BingoSync.CustomGoals
         [JsonProperty("GoalGroups")]
         private readonly List<GoalGroup> goalSettings;
 
-        public CustomGameMode(string name, List<GoalGroup> loadedGoalSettings = null) 
+        public CustomGameMode(string name, List<GoalGroup>? loadedGoalSettings = null) 
         {
             _name = name;
             _goals = [];
@@ -74,20 +75,20 @@ namespace BingoSync.CustomGoals
                 List<BingoGoal> activeBingoGoals = GameModesManager.GetGoalsFromNames(goalGroup.Name, activeGoals);
                 foreach(BingoGoal goal in activeBingoGoals)
                 {
-                    if(goals.ContainsKey(goal.name))
+                    if(goals.ContainsKey(goal.Name))
                     {
-                        goals[goal.name].exclusions.AddRange(goal.exclusions);
+                        goals[goal.Name].Exclusions.AddRange(goal.Exclusions);
                     }
                     else
                     {
-                        goals[goal.name] = goal;
+                        goals[goal.Name] = goal;
                     }
                 }
             }
             _goals = goals;
         }
 
-        public List<BingoGoal> GenerateBoard(int seed)
+        public List<string> GenerateBoard(int seed)
         {
             SetGoalsFromSettings();
             List<BingoGoal> board = [];
@@ -116,16 +117,15 @@ namespace BingoSync.CustomGoals
                 }
                 availableGoals.Remove(proposedGoal);
             }
-            return board;
+            return [.. board.Select(goal => goal.Name)];
         }
 
-        public static List<BingoGoal> GetErrorBoard()
+        public static List<string> GetErrorBoard()
         {
-            BingoGoal empty = new("-");
-            List<BingoGoal> board = [new BingoGoal("Error generating board")];
+            List<string> board = ["Error generating board"];
             for (int i = 0; i < 24; ++i)
             {
-                board.Add(empty);
+                board.Add("-");
             }
             return board;
         }

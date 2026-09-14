@@ -60,7 +60,7 @@ namespace BingoSync.CustomGoals
             {
                 foreach(BingoGoal goal in goalGroupDefinitions[groupName])
                 {
-                    goals[goal.name] = goal;
+                    goals[goal.Name] = goal;
                 }
             }
             return goals;
@@ -119,21 +119,24 @@ namespace BingoSync.CustomGoals
             string[] paths = Directory.GetFiles(CustomGameModesPath, "*.json");
             foreach (string path in paths)
             {
-                CustomGameMode gameMode = LoadCustomGameModeFromFile(path);
-                if (gameMode != null)
+                try
                 {
-                    CustomGameModes.Add(gameMode);
+                    CustomGameModes.Add(LoadCustomGameModeFromFile(path));
+                }
+                catch (Exception e)
+                {
+                    Log(e.Message);
                 }
             }
         }
 
         private static CustomGameMode LoadCustomGameModeFromFile(string filepath)
         {
-            if (filepath == null || !File.Exists(filepath))
+            if (!File.Exists(filepath))
             {
-                return null;
+                throw new FileNotFoundException($"Could not find profile at '{filepath}'");
             }
-            CustomGameMode gameMode = JsonConvert.DeserializeObject<CustomGameMode>(File.ReadAllText(filepath));
+            CustomGameMode gameMode = JsonConvert.DeserializeObject<CustomGameMode>(File.ReadAllText(filepath)) ?? throw new InvalidDataException($"Failed to deserialize profile at '{filepath}'");
             File.Move(filepath, MakeFilepathForGameModeName(gameMode.InternalName));
             return gameMode;
         }
@@ -177,7 +180,7 @@ namespace BingoSync.CustomGoals
             List<BingoGoal> goals = [];
             if (GoalGroupExists(groupName))
             {
-                goals = goalGroupDefinitions[groupName].FindAll(goal => goalNames.Contains(goal.name));
+                goals = goalGroupDefinitions[groupName].FindAll(goal => goalNames.Contains(goal.Name));
             }
             return goals;
         }
@@ -199,7 +202,7 @@ namespace BingoSync.CustomGoals
                 Log($"Couldn't create default settings for unknown group \"{groupName}\"");
                 return new GoalGroup("Unknown Group", []);
             }
-            return new GoalGroup(groupName, [.. goalGroupDefinitions[groupName].Select(goal => goal.name)]);
+            return new GoalGroup(groupName, [.. goalGroupDefinitions[groupName].Select(goal => goal.Name)]);
         }
 
         public static bool GoalGroupExists(string groupName)
@@ -223,12 +226,12 @@ namespace BingoSync.CustomGoals
             string lockoutString = Controller.MenuIsLockout ? "lockout" : "non-lockout";
             string isCustomSeedString = isCustomSeed ? "set" : "random";
             Controller.ActiveSession.SendChatMessage($"Generating {Anify(Controller.ActiveGameMode)} board in {lockoutString} mode with a {isCustomSeedString} seed");
-            List<BingoGoal> board = SimpleGameMode.GetErrorBoard();
+            List<string> board = SimpleGameMode.GetErrorBoard();
             if (Controller.ActiveGameMode != string.Empty)
             {
                 board = FindGameModeByDisplayName(Controller.ActiveGameMode).GenerateBoard(seed);
             }
-            Controller.ActiveSession.NewCard(board, Controller.MenuIsLockout, true, seed);
+            Controller.ActiveSession.NewBoard(board, Controller.MenuIsLockout, true, seed);
         }
 
         private static void SetupVanillaGoals()
@@ -238,51 +241,51 @@ namespace BingoSync.CustomGoals
             {
                 vanillaGoals.Add(goal, new(goal));
             }
-            vanillaGoals["Break the 420 geo rock in Kingdom's Edge"].exclusions = ["Quick Slash"];
-            vanillaGoals["Broken Vessel"].exclusions = ["Monarch Wings"];
-            vanillaGoals["Buy 6 map pins from Iselda (All but two)"].exclusions = ["Buy 8 map pins from Iselda (All)"];
-            vanillaGoals["Buy 8 map pins from Iselda (All)"].exclusions = ["Buy 6 map pins from Iselda (All but two)"];
-            vanillaGoals["Collect 1 Arcane Egg"].exclusions = ["Shade Cloak", "Void Tendrils Journal Entry"];
-            vanillaGoals["Collect 500 essence"].exclusions = ["Dream Wielder"];
-            vanillaGoals["Colosseum 1"].exclusions = ["Defeat Colosseum Zote"];
-            vanillaGoals["Defeat Colosseum Zote"].exclusions = ["Colosseum 1", "Rescue Zote in Deepnest"];
-            vanillaGoals["Desolate Dive"].exclusions = ["Soul Master"];
-            vanillaGoals["Dream Nail"].exclusions = ["Xero"];
-            vanillaGoals["Dream Wielder"].exclusions = ["Collect 500 essence"];
-            vanillaGoals["Dung Defender"].exclusions = ["Talk to Lemm with Crest Equipped"];
-            vanillaGoals["Flukemarm"].exclusions = ["Flukenest"];
-            vanillaGoals["Flukenest"].exclusions = ["Flukemarm"];
-            vanillaGoals["Have 2 Pale Ore"].exclusions = ["Nail 3"];
-            vanillaGoals["Herrah"].exclusions = ["Talk to Hornet at CoT Statue + Herrah"];
-            vanillaGoals["Hive Knight"].exclusions = ["Hiveblood", "Mask Shard  in the Hive", "Tram Pass + Visit all 5 Tram Stations"];
-            vanillaGoals["Hiveblood"].exclusions = ["Hive Knight", "Mask Shard  in the Hive", "Tram Pass + Visit all 5 Tram Stations"];
-            vanillaGoals["Isma's Tear"].exclusions = ["Talk to Emilitia (shortcut out of sewers)"];
-            vanillaGoals["Kill 4 Mimics"].exclusions = ["Save the 5 grubs in Deepnest", "Save the 7 grubs in Crystal Peak"];
-            vanillaGoals["Longnail + MoP"].exclusions = ["Mantis Lords"];
-            vanillaGoals["Mantis Lords"].exclusions = ["Longnail + MoP"];
-            vanillaGoals["Mask Shard  in the Hive"].exclusions = ["Hive Knight", "Hiveblood", "Tram Pass + Visit all 5 Tram Stations"];
-            vanillaGoals["Monarch Wings"].exclusions = ["Broken Vessel"];
-            vanillaGoals["Nail 3"].exclusions = ["Have 2 Pale Ore"];
-            vanillaGoals["Obtain fountain vessel fragment"].exclusions = ["Spend 3000 geo", "Spend 4000 geo"];
-            vanillaGoals["Quick Slash"].exclusions = ["Break the 420 geo rock in Kingdom's Edge"];
-            vanillaGoals["Rescue Zote in Deepnest"].exclusions = ["Defeat Colosseum Zote"];
-            vanillaGoals["Save the 5 grubs in Deepnest"].exclusions = ["Kill 4 Mimics"];
-            vanillaGoals["Save the 7 grubs in Crystal Peak"].exclusions = ["Kill 4 Mimics"];
-            vanillaGoals["Shade Cloak"].exclusions = ["Collect 1 Arcane Egg", "Void Tendrils Journal Entry"];
-            vanillaGoals["Soul Master"].exclusions = ["Desolate Dive"];
-            vanillaGoals["Spend 3000 geo"].exclusions = ["Obtain fountain vessel fragment", "Spend 4000 geo"];
-            vanillaGoals["Spend 4000 geo"].exclusions = ["Obtain fountain vessel fragment", "Spend 3000 geo", "Spend 5000 geo"];
-            vanillaGoals["Spend 5000 geo"].exclusions = ["Obtain fountain vessel fragment", "Spend 4000 geo"];
-            vanillaGoals["Talk to Emilitia (shortcut out of sewers)"].exclusions = ["Isma's Tear"];
-            vanillaGoals["Talk to Hornet at CoT Statue + Herrah"].exclusions = ["Herrah"];
-            vanillaGoals["Talk to Lemm with Crest Equipped"].exclusions = ["Dung Defender"];
-            vanillaGoals["Talk to Mask Maker"].exclusions = ["Talk to Midwife"];
-            vanillaGoals["Talk to Midwife"].exclusions = ["Talk to Mask Maker"];
-            vanillaGoals["Traitor Lord"].exclusions = ["Watch Cloth Die"];
-            vanillaGoals["Tram Pass + Visit all 5 Tram Stations"].exclusions = ["Hive Knight", "Hiveblood", "Mask Shard  in the Hive"];
-            vanillaGoals["Void Tendrils Journal Entry"].exclusions = ["Collect 1 Arcane Egg", "Shade Cloak"];
-            vanillaGoals["Watch Cloth Die"].exclusions = ["Traitor Lord"];
-            vanillaGoals["Xero"].exclusions = ["Dream Nail"];
+            vanillaGoals["Break the 420 geo rock in Kingdom's Edge"].Exclusions = ["Quick Slash"];
+            vanillaGoals["Broken Vessel"].Exclusions = ["Monarch Wings"];
+            vanillaGoals["Buy 6 map pins from Iselda (All but two)"].Exclusions = ["Buy 8 map pins from Iselda (All)"];
+            vanillaGoals["Buy 8 map pins from Iselda (All)"].Exclusions = ["Buy 6 map pins from Iselda (All but two)"];
+            vanillaGoals["Collect 1 Arcane Egg"].Exclusions = ["Shade Cloak", "Void Tendrils Journal Entry"];
+            vanillaGoals["Collect 500 essence"].Exclusions = ["Dream Wielder"];
+            vanillaGoals["Colosseum 1"].Exclusions = ["Defeat Colosseum Zote"];
+            vanillaGoals["Defeat Colosseum Zote"].Exclusions = ["Colosseum 1", "Rescue Zote in Deepnest"];
+            vanillaGoals["Desolate Dive"].Exclusions = ["Soul Master"];
+            vanillaGoals["Dream Nail"].Exclusions = ["Xero"];
+            vanillaGoals["Dream Wielder"].Exclusions = ["Collect 500 essence"];
+            vanillaGoals["Dung Defender"].Exclusions = ["Talk to Lemm with Crest Equipped"];
+            vanillaGoals["Flukemarm"].Exclusions = ["Flukenest"];
+            vanillaGoals["Flukenest"].Exclusions = ["Flukemarm"];
+            vanillaGoals["Have 2 Pale Ore"].Exclusions = ["Nail 3"];
+            vanillaGoals["Herrah"].Exclusions = ["Talk to Hornet at CoT Statue + Herrah"];
+            vanillaGoals["Hive Knight"].Exclusions = ["Hiveblood", "Mask Shard  in the Hive", "Tram Pass + Visit all 5 Tram Stations"];
+            vanillaGoals["Hiveblood"].Exclusions = ["Hive Knight", "Mask Shard  in the Hive", "Tram Pass + Visit all 5 Tram Stations"];
+            vanillaGoals["Isma's Tear"].Exclusions = ["Talk to Emilitia (shortcut out of sewers)"];
+            vanillaGoals["Kill 4 Mimics"].Exclusions = ["Save the 5 grubs in Deepnest", "Save the 7 grubs in Crystal Peak"];
+            vanillaGoals["Longnail + MoP"].Exclusions = ["Mantis Lords"];
+            vanillaGoals["Mantis Lords"].Exclusions = ["Longnail + MoP"];
+            vanillaGoals["Mask Shard  in the Hive"].Exclusions = ["Hive Knight", "Hiveblood", "Tram Pass + Visit all 5 Tram Stations"];
+            vanillaGoals["Monarch Wings"].Exclusions = ["Broken Vessel"];
+            vanillaGoals["Nail 3"].Exclusions = ["Have 2 Pale Ore"];
+            vanillaGoals["Obtain fountain vessel fragment"].Exclusions = ["Spend 3000 geo", "Spend 4000 geo"];
+            vanillaGoals["Quick Slash"].Exclusions = ["Break the 420 geo rock in Kingdom's Edge"];
+            vanillaGoals["Rescue Zote in Deepnest"].Exclusions = ["Defeat Colosseum Zote"];
+            vanillaGoals["Save the 5 grubs in Deepnest"].Exclusions = ["Kill 4 Mimics"];
+            vanillaGoals["Save the 7 grubs in Crystal Peak"].Exclusions = ["Kill 4 Mimics"];
+            vanillaGoals["Shade Cloak"].Exclusions = ["Collect 1 Arcane Egg", "Void Tendrils Journal Entry"];
+            vanillaGoals["Soul Master"].Exclusions = ["Desolate Dive"];
+            vanillaGoals["Spend 3000 geo"].Exclusions = ["Obtain fountain vessel fragment", "Spend 4000 geo"];
+            vanillaGoals["Spend 4000 geo"].Exclusions = ["Obtain fountain vessel fragment", "Spend 3000 geo", "Spend 5000 geo"];
+            vanillaGoals["Spend 5000 geo"].Exclusions = ["Obtain fountain vessel fragment", "Spend 4000 geo"];
+            vanillaGoals["Talk to Emilitia (shortcut out of sewers)"].Exclusions = ["Isma's Tear"];
+            vanillaGoals["Talk to Hornet at CoT Statue + Herrah"].Exclusions = ["Herrah"];
+            vanillaGoals["Talk to Lemm with Crest Equipped"].Exclusions = ["Dung Defender"];
+            vanillaGoals["Talk to Mask Maker"].Exclusions = ["Talk to Midwife"];
+            vanillaGoals["Talk to Midwife"].Exclusions = ["Talk to Mask Maker"];
+            vanillaGoals["Traitor Lord"].Exclusions = ["Watch Cloth Die"];
+            vanillaGoals["Tram Pass + Visit all 5 Tram Stations"].Exclusions = ["Hive Knight", "Hiveblood", "Mask Shard  in the Hive"];
+            vanillaGoals["Void Tendrils Journal Entry"].Exclusions = ["Collect 1 Arcane Egg", "Shade Cloak"];
+            vanillaGoals["Watch Cloth Die"].Exclusions = ["Traitor Lord"];
+            vanillaGoals["Xero"].Exclusions = ["Dream Nail"];
         }
 
         private static void SetupItemRandoGoals()
@@ -292,75 +295,75 @@ namespace BingoSync.CustomGoals
             {
                 itemRandoGoals.Add(goal, new(goal));
             }
-            itemRandoGoals["Obtain 15 grubs"].exclusions = [];
-            itemRandoGoals["Use 2 Simple Keys"].exclusions = ["Open Jiji's Hut and buy out Jiji", "Dream Nail Marissa"];
-            itemRandoGoals["Obtain 2 Pale Ore"].exclusions = ["Nail 3"];
-            itemRandoGoals["Kill two Soul Warriors"].exclusions = ["Check Shade Soul"];
-            itemRandoGoals["Spend 3000 geo"].exclusions = ["Buy the Basin fountain check", "Spend 4000 geo"];
-            itemRandoGoals["Break 3 floors using Dive"].exclusions = [];
-            itemRandoGoals["Have 3 different maps not counting Dirtmouth or Hive"].exclusions = ["Interact with 3 Cornifer locations"];
-            itemRandoGoals["Kill three different Great Husk Sentries"].exclusions = ["Kill Gorgeous Husk"];
-            itemRandoGoals["Spend 4000 geo"].exclusions = ["Buy the Basin fountain check", "Spend 3000 geo", "Spend 5000 geo"];
-            itemRandoGoals["Spend 5000 geo"].exclusions = ["Spend 4000 geo"];
-            itemRandoGoals["Have 1500 geo in the bank"].exclusions = ["Slash Millibelle in Pleasure House"];
-            itemRandoGoals["Get Brumm's flame"].exclusions = ["Obtain Carefree Melody"];
-            itemRandoGoals["Defeat Broken Vessel"].exclusions = ["Defeat Lost Kin"];
-            itemRandoGoals["Obtain Carefree Melody"].exclusions = ["Defeat Nightmare King Grimm", "Get Brumm's flame"];
-            itemRandoGoals["Defeat Crystal Guardian 1"].exclusions = ["Defeat Crystal Guardian 2"];
-            itemRandoGoals["Defeat Crystal Guardian 2"].exclusions = ["Defeat Crystal Guardian 1"];
-            itemRandoGoals["Talk to Cloth"].exclusions = ["Visit all 4 shops (Sly, Iselda, Salubra and Leg Eater)"];
-            itemRandoGoals["Complete either ending of the Cloth questline"].exclusions = ["Defeat Traitor Lord", "Dream Nail White Lady"];
-            itemRandoGoals["Defeat Collector"].exclusions = [];
-            itemRandoGoals["Colosseum 1"].exclusions = ["Defeat Colosseum Zote"];
-            itemRandoGoals["Defeat Colosseum Zote"].exclusions = ["Colosseum 1"];
-            itemRandoGoals["Interact with 3 Cornifer locations"].exclusions = ["Have 3 different maps not counting Dirtmouth or Hive"];
-            itemRandoGoals["Defeat Dung Defender"].exclusions = ["Defeat White Defender"];
-            itemRandoGoals["Rescue Zote in Deepnest"].exclusions = [];
-            itemRandoGoals["Ride the stag to Distant Village"].exclusions = ["Talk to Midwife", "Visit Distant Village or Hive"];
-            itemRandoGoals["Get 2 Dreamer's checks (Requires Dream nail)"].exclusions = ["Defeat Uumuu", "Defeat Watcher Knights", "Visit Distant Village or Hive"];
-            itemRandoGoals["Kill a Durandoo"].exclusions = ["Kill a Gulka with its own projectile"];
-            itemRandoGoals["Buy the Basin fountain check"].exclusions = ["Spend 3000 geo", "Spend 4000 geo"];
-            itemRandoGoals["Kill Gorgeous Husk"].exclusions = ["Kill three different Great Husk Sentries"];
-            itemRandoGoals["Enter Godhome"].exclusions = ["Eternal Ordeal: 20 Zotes", "Defeat any one Radiant Boss"];
-            itemRandoGoals["Kill a Gulka with its own projectile"].exclusions = ["Kill a Durandoo"];
-            itemRandoGoals["Ride the stag to Hidden Station"].exclusions = ["Sit down in Hidden Station"];
-            itemRandoGoals["Defeat Hive Knight"].exclusions = ["Check the Hive Mask Shard"];
-            itemRandoGoals["Check the Hive Mask Shard"].exclusions = ["Defeat Hive Knight"];
-            itemRandoGoals["Defeat Hornet 2"].exclusions = ["Visit Queen's Gardens or Cast Off Shell"];
-            itemRandoGoals["Check Joni's Blessing"].exclusions = ["Obtain Lumafly Lantern"];
-            itemRandoGoals["Kill a Kingsmould"].exclusions = ["Complete Path of Pain"];
-            itemRandoGoals["Obtain Lumafly Lantern"].exclusions = ["Check Joni's Blessing"];
-            itemRandoGoals["Defeat Lost Kin"].exclusions = ["Defeat Broken Vessel"];
-            itemRandoGoals["Obtain the Love Key"].exclusions = [];
-            itemRandoGoals["Check Love Key"].exclusions = ["Obtain Isma's Tear"];
-            itemRandoGoals["Dream Nail Marissa"].exclusions = ["Take a bath in 4 different Hot Springs", "Use 2 Simple Keys"];
-            itemRandoGoals["Talk to Midwife"].exclusions = ["Ride the stag to Distant Village", "Visit Distant Village or Hive"];
-            itemRandoGoals["Slash Millibelle in Pleasure House"].exclusions = ["Have 1500 geo in the bank"];
-            itemRandoGoals["Nail 3"].exclusions = ["Obtain 2 Pale Ore"];
-            itemRandoGoals["Defeat Nightmare King Grimm"].exclusions = ["Obtain Carefree Melody"];
-            itemRandoGoals["Defeat Nosk"].exclusions = ["Get two Pale Ore checks (Grubs / Essence excluded)"];
-            itemRandoGoals["Eternal Ordeal: 20 Zotes"].exclusions = ["Enter Godhome", "Defeat any one Radiant Boss"];
-            itemRandoGoals["Get two Pale Ore checks (Grubs / Essence excluded)"].exclusions = ["Defeat Nosk"];
-            itemRandoGoals["Buy 6 map pins from Iselda (All but two)"].exclusions = ["Buy 8 map pins from Iselda (All)"];
-            itemRandoGoals["Buy 8 map pins from Iselda (All)"].exclusions = ["Buy 6 map pins from Iselda (All but two)", "Obtain Tram Pass"];
-            itemRandoGoals["Complete Path of Pain"].exclusions = ["Kill a Kingsmould"];
-            itemRandoGoals["Defeat any one Radiant Boss"].exclusions = ["Enter Godhome", "Eternal Ordeal: 20 Zotes"];
-            itemRandoGoals["Parry Revek 3 times without dying (Spirit's Glade Guard)"].exclusions = ["Visit Shrine of Believers"];
-            itemRandoGoals["Visit all 4 shops (Sly, Iselda, Salubra and Leg Eater)"].exclusions = ["Talk to Cloth"];
-            itemRandoGoals["Visit Shrine of Believers"].exclusions = ["Parry Revek 3 times without dying (Spirit's Glade Guard)"];
-            itemRandoGoals["Defeat Soul Master"].exclusions = ["Defeat Soul Tyrant"];
-            itemRandoGoals["Defeat Soul Tyrant"].exclusions = ["Defeat Soul Master"];
-            itemRandoGoals["Take a bath in 4 different Hot Springs"].exclusions = ["Dream Nail Marissa"];
-            itemRandoGoals["Check Shade Soul"].exclusions = ["Kill two Soul Warriors"];
-            itemRandoGoals["Obtain Isma's Tear"].exclusions = ["Check Shape of Unn", "Check Love Key"];
-            itemRandoGoals["Defeat Traitor Lord"].exclusions = ["Dream Nail White Lady", "Complete either ending of the Cloth questline"];
-            itemRandoGoals["Obtain Tram Pass"].exclusions = ["Buy 8 map pins from Iselda (All)"];
-            itemRandoGoals["Check Shape of Unn"].exclusions = ["Obtain Isma's Tear"];
-            itemRandoGoals["Visit Distant Village or Hive"].exclusions = ["Obtain Tram Pass", "Ride the stag to Distant Village", "Talk to Midwife"];
-            itemRandoGoals["Visit Queen's Gardens or Cast Off Shell"].exclusions = ["Defeat Hornet 2"];
-            itemRandoGoals["Defeat White Defender"].exclusions = ["Defeat Dung Defender", "Interact with Mr. Mushroom once (Does not require Spore Shroom)"];
-            itemRandoGoals["Dream Nail White Lady"].exclusions = ["Defeat Traitor Lord", "Complete either ending of the Cloth questline"];
-            itemRandoGoals["Sit down in Hidden Station"].exclusions = ["Ride the stag to Hidden Station"];
+            itemRandoGoals["Obtain 15 grubs"].Exclusions = [];
+            itemRandoGoals["Use 2 Simple Keys"].Exclusions = ["Open Jiji's Hut and buy out Jiji", "Dream Nail Marissa"];
+            itemRandoGoals["Obtain 2 Pale Ore"].Exclusions = ["Nail 3"];
+            itemRandoGoals["Kill two Soul Warriors"].Exclusions = ["Check Shade Soul"];
+            itemRandoGoals["Spend 3000 geo"].Exclusions = ["Buy the Basin fountain check", "Spend 4000 geo"];
+            itemRandoGoals["Break 3 floors using Dive"].Exclusions = [];
+            itemRandoGoals["Have 3 different maps not counting Dirtmouth or Hive"].Exclusions = ["Interact with 3 Cornifer locations"];
+            itemRandoGoals["Kill three different Great Husk Sentries"].Exclusions = ["Kill Gorgeous Husk"];
+            itemRandoGoals["Spend 4000 geo"].Exclusions = ["Buy the Basin fountain check", "Spend 3000 geo", "Spend 5000 geo"];
+            itemRandoGoals["Spend 5000 geo"].Exclusions = ["Spend 4000 geo"];
+            itemRandoGoals["Have 1500 geo in the bank"].Exclusions = ["Slash Millibelle in Pleasure House"];
+            itemRandoGoals["Get Brumm's flame"].Exclusions = ["Obtain Carefree Melody"];
+            itemRandoGoals["Defeat Broken Vessel"].Exclusions = ["Defeat Lost Kin"];
+            itemRandoGoals["Obtain Carefree Melody"].Exclusions = ["Defeat Nightmare King Grimm", "Get Brumm's flame"];
+            itemRandoGoals["Defeat Crystal Guardian 1"].Exclusions = ["Defeat Crystal Guardian 2"];
+            itemRandoGoals["Defeat Crystal Guardian 2"].Exclusions = ["Defeat Crystal Guardian 1"];
+            itemRandoGoals["Talk to Cloth"].Exclusions = ["Visit all 4 shops (Sly, Iselda, Salubra and Leg Eater)"];
+            itemRandoGoals["Complete either ending of the Cloth questline"].Exclusions = ["Defeat Traitor Lord", "Dream Nail White Lady"];
+            itemRandoGoals["Defeat Collector"].Exclusions = [];
+            itemRandoGoals["Colosseum 1"].Exclusions = ["Defeat Colosseum Zote"];
+            itemRandoGoals["Defeat Colosseum Zote"].Exclusions = ["Colosseum 1"];
+            itemRandoGoals["Interact with 3 Cornifer locations"].Exclusions = ["Have 3 different maps not counting Dirtmouth or Hive"];
+            itemRandoGoals["Defeat Dung Defender"].Exclusions = ["Defeat White Defender"];
+            itemRandoGoals["Rescue Zote in Deepnest"].Exclusions = [];
+            itemRandoGoals["Ride the stag to Distant Village"].Exclusions = ["Talk to Midwife", "Visit Distant Village or Hive"];
+            itemRandoGoals["Get 2 Dreamer's checks (Requires Dream nail)"].Exclusions = ["Defeat Uumuu", "Defeat Watcher Knights", "Visit Distant Village or Hive"];
+            itemRandoGoals["Kill a Durandoo"].Exclusions = ["Kill a Gulka with its own projectile"];
+            itemRandoGoals["Buy the Basin fountain check"].Exclusions = ["Spend 3000 geo", "Spend 4000 geo"];
+            itemRandoGoals["Kill Gorgeous Husk"].Exclusions = ["Kill three different Great Husk Sentries"];
+            itemRandoGoals["Enter Godhome"].Exclusions = ["Eternal Ordeal: 20 Zotes", "Defeat any one Radiant Boss"];
+            itemRandoGoals["Kill a Gulka with its own projectile"].Exclusions = ["Kill a Durandoo"];
+            itemRandoGoals["Ride the stag to Hidden Station"].Exclusions = ["Sit down in Hidden Station"];
+            itemRandoGoals["Defeat Hive Knight"].Exclusions = ["Check the Hive Mask Shard"];
+            itemRandoGoals["Check the Hive Mask Shard"].Exclusions = ["Defeat Hive Knight"];
+            itemRandoGoals["Defeat Hornet 2"].Exclusions = ["Visit Queen's Gardens or Cast Off Shell"];
+            itemRandoGoals["Check Joni's Blessing"].Exclusions = ["Obtain Lumafly Lantern"];
+            itemRandoGoals["Kill a Kingsmould"].Exclusions = ["Complete Path of Pain"];
+            itemRandoGoals["Obtain Lumafly Lantern"].Exclusions = ["Check Joni's Blessing"];
+            itemRandoGoals["Defeat Lost Kin"].Exclusions = ["Defeat Broken Vessel"];
+            itemRandoGoals["Obtain the Love Key"].Exclusions = [];
+            itemRandoGoals["Check Love Key"].Exclusions = ["Obtain Isma's Tear"];
+            itemRandoGoals["Dream Nail Marissa"].Exclusions = ["Take a bath in 4 different Hot Springs", "Use 2 Simple Keys"];
+            itemRandoGoals["Talk to Midwife"].Exclusions = ["Ride the stag to Distant Village", "Visit Distant Village or Hive"];
+            itemRandoGoals["Slash Millibelle in Pleasure House"].Exclusions = ["Have 1500 geo in the bank"];
+            itemRandoGoals["Nail 3"].Exclusions = ["Obtain 2 Pale Ore"];
+            itemRandoGoals["Defeat Nightmare King Grimm"].Exclusions = ["Obtain Carefree Melody"];
+            itemRandoGoals["Defeat Nosk"].Exclusions = ["Get two Pale Ore checks (Grubs / Essence excluded)"];
+            itemRandoGoals["Eternal Ordeal: 20 Zotes"].Exclusions = ["Enter Godhome", "Defeat any one Radiant Boss"];
+            itemRandoGoals["Get two Pale Ore checks (Grubs / Essence excluded)"].Exclusions = ["Defeat Nosk"];
+            itemRandoGoals["Buy 6 map pins from Iselda (All but two)"].Exclusions = ["Buy 8 map pins from Iselda (All)"];
+            itemRandoGoals["Buy 8 map pins from Iselda (All)"].Exclusions = ["Buy 6 map pins from Iselda (All but two)", "Obtain Tram Pass"];
+            itemRandoGoals["Complete Path of Pain"].Exclusions = ["Kill a Kingsmould"];
+            itemRandoGoals["Defeat any one Radiant Boss"].Exclusions = ["Enter Godhome", "Eternal Ordeal: 20 Zotes"];
+            itemRandoGoals["Parry Revek 3 times without dying (Spirit's Glade Guard)"].Exclusions = ["Visit Shrine of Believers"];
+            itemRandoGoals["Visit all 4 shops (Sly, Iselda, Salubra and Leg Eater)"].Exclusions = ["Talk to Cloth"];
+            itemRandoGoals["Visit Shrine of Believers"].Exclusions = ["Parry Revek 3 times without dying (Spirit's Glade Guard)"];
+            itemRandoGoals["Defeat Soul Master"].Exclusions = ["Defeat Soul Tyrant"];
+            itemRandoGoals["Defeat Soul Tyrant"].Exclusions = ["Defeat Soul Master"];
+            itemRandoGoals["Take a bath in 4 different Hot Springs"].Exclusions = ["Dream Nail Marissa"];
+            itemRandoGoals["Check Shade Soul"].Exclusions = ["Kill two Soul Warriors"];
+            itemRandoGoals["Obtain Isma's Tear"].Exclusions = ["Check Shape of Unn", "Check Love Key"];
+            itemRandoGoals["Defeat Traitor Lord"].Exclusions = ["Dream Nail White Lady", "Complete either ending of the Cloth questline"];
+            itemRandoGoals["Obtain Tram Pass"].Exclusions = ["Buy 8 map pins from Iselda (All)"];
+            itemRandoGoals["Check Shape of Unn"].Exclusions = ["Obtain Isma's Tear"];
+            itemRandoGoals["Visit Distant Village or Hive"].Exclusions = ["Obtain Tram Pass", "Ride the stag to Distant Village", "Talk to Midwife"];
+            itemRandoGoals["Visit Queen's Gardens or Cast Off Shell"].Exclusions = ["Defeat Hornet 2"];
+            itemRandoGoals["Defeat White Defender"].Exclusions = ["Defeat Dung Defender", "Interact with Mr. Mushroom once (Does not require Spore Shroom)"];
+            itemRandoGoals["Dream Nail White Lady"].Exclusions = ["Defeat Traitor Lord", "Complete either ending of the Cloth questline"];
+            itemRandoGoals["Sit down in Hidden Station"].Exclusions = ["Ride the stag to Hidden Station"];
         }
 
         private static string Anify(string word)

@@ -101,7 +101,7 @@ namespace BingoSync.ModMenu
 
         private static string GetSaveColorDescriptionText()
         {
-            return $"Save current selected color as default. Current default: {Controller.GlobalSettings.DefaultColor}";
+            return $"Save current selected color as default. Current default: {Controller.ActiveSession.ColorManager.NameOf(Controller.GlobalSettings.DefaultColor)}";
         }
     }
 }

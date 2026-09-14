@@ -22,7 +22,7 @@ namespace BingoSync
         public class InternalGoalUpdate
         {
             public string Name { get; set; }
-            public bool Clear { get; set; }
+            public bool Unmark { get; set; }
             public bool IsItemSyncUpdate { get; set; }
         }
 
@@ -215,7 +215,7 @@ namespace BingoSync
                     OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
                     {
                         Name = square.Name,
-                        Clear = shouldUnmark,
+                        Unmark = shouldUnmark,
                         IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
                     });
                 }
@@ -229,7 +229,7 @@ namespace BingoSync
                 OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
                 {
                     Name = square.Name,
-                    Clear = !IsSolved(square),
+                    Unmark = !IsSolved(square),
                     IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
                 });
             }

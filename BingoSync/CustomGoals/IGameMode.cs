@@ -7,6 +7,6 @@ namespace BingoSync.CustomGoals
         bool CanBeRenamed { get; }
         string DisplayName { get; }
         string SetName(string newName);
-        List<BingoGoal> GenerateBoard(int seed);
+        List<string> GenerateBoard(int seed);
     }
 }

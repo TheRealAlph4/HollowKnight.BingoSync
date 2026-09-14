@@ -1,20 +1,20 @@
 ﻿using BingoSync.Clients;
+using BingoSync.Clients.ColorManagement;
 using BingoSync.Clients.EventInfoObjects;
-using BingoSync.CustomGoals;
+using BingoSync.Clients.StateChangeInfoObjects;
 using BingoSync.GameUI;
 using BingoSync.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using static BingoSync.GoalCompletionTracker;
 using static BingoSync.Settings.ModSettings;
 
 namespace BingoSync.Sessions
 {
     public class Session
     {
-        private readonly IRemoteClient _client;
+        private readonly IBingoClient _client;
         private string _sessionName = "Default";
         public string SessionName {
             get
@@ -64,142 +64,189 @@ namespace BingoSync.Sessions
                 _customAudioClipId = value;
             }
         }
-        public bool RoomIsLockout { get; set; } = false;
-        public bool RoomHidCardInitially { get; set; } = false;
+
+        public RoomSettings RoomSettings { get; set; } = new();
+        public bool RoomIsLockout => RoomSettings.IsLockout;
+        public bool RoomHidBoardInitially => RoomSettings.HideBoard;
         public string RoomLink { get; set; } = string.Empty;
         public string RoomNickname { get; set; } = string.Empty;
         public string RoomPassword { get; set; } = string.Empty;
-        public Colors RoomColor { get; set; } = Colors.Orange;
+        public int RoomColor { get; set; } = 0;
         public string RoomPlayerUUID { get
             {
                 return _client.PlayerUUID;
             } 
         }
-        public BingoBoard Board { get; } = new();
+        private SquareManager _squareManager;
+
+        public SquareManager SquareManager
+        {
+            get
+            {
+                return _squareManager;
+            }
+            private set
+            {
+                _squareManager.OnSquareCanBeMarked -= OnSquareCanBeMarked;
+                _squareManager = value;
+                _squareManager.OnSquareCanBeMarked -= OnSquareCanBeMarked;
+                _squareManager.OnSquareCanBeMarked += OnSquareCanBeMarked;
+            }
+        }
         public bool NonStandardBoardGeneration { get; set; } = false;
+        public IColorManager ColorManager => _client.ColorManager;
 
         #region Events
 
-        public event EventHandler<CardRevealedEventInfo> OnCardRevealedBroadcastReceived;
+        public event EventHandler<BoardRevealedEventInfo>? OnBoardRevealedEventReceived;
+        public event EventHandler<ChatMessageEventInfo>? OnChatMessageEventReceived;
+        public event EventHandler<GoalUpdateEventInfo>? OnGoalUpdateEventReceived;
+        public event EventHandler<NewBoardEventInfo>? OnNewBoardEventReceived;
+        public event EventHandler<PlayerColorChangeEventInfo>? OnPlayerColorChangeEventReceived;
+        public event EventHandler<PlayerConnectionEventInfo>? OnPlayerConnectedEventReceived;
 
-        private void RefireCardRevealedBroadcast(object _, CardRevealedEventInfo broadcast)
+        public event EventHandler<RoomSettings>? OnRoomSettingsChanged;
+        public event EventHandler<ClientStateChangedInfo>? OnClientStateChanged;
+        public event EventHandler<BoardChangedInfo>? OnBoardChanged;
+        public event EventHandler<SquareChangedInfo>? OnSquareChanged;
+        public event EventHandler? OnBoardRevealed;
+
+        private void RefireBoardRevealedBroadcast(object _, BoardRevealedEventInfo broadcast)
         {
-            OnCardRevealedBroadcastReceived?.Invoke(this, broadcast);
+            OnBoardRevealedEventReceived?.Invoke(this, broadcast);
         }
-
-        public event EventHandler<ChatMessageEventInfo> OnChatMessageReceived;
 
         private void RefireChatMessage(object _, ChatMessageEventInfo broadcast)
         {
-            OnChatMessageReceived?.Invoke(this, broadcast);
+            OnChatMessageEventReceived?.Invoke(this, broadcast);
         }
-
-        public event EventHandler<GoalUpdateEventInfo> OnGoalUpdateReceived;
 
         private void RefireGoalUpdate(object _, GoalUpdateEventInfo broadcast)
         {
-            OnGoalUpdateReceived?.Invoke(this, broadcast);
+            OnGoalUpdateEventReceived?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<NewCardEventInfo> OnNewCardReceived;
-
-        private void RefireNewCard(object _, NewCardEventInfo broadcast)
+        private void RefireNewBoard(object _, NewBoardEventInfo broadcast)
         {
-            OnNewCardReceived?.Invoke(this, broadcast);
+            OnNewBoardEventReceived?.Invoke(this, broadcast);
         }
-
-        public event EventHandler<PlayerColorChangeEventInfo> OnPlayerColorChangeReceived;
 
         private void RefirePlayerColorChange(object _, PlayerColorChangeEventInfo broadcast)
         {
-            OnPlayerColorChangeReceived?.Invoke(this, broadcast);
+            OnPlayerColorChangeEventReceived?.Invoke(this, broadcast);
         }
-
-        public event EventHandler<PlayerConnectionEventInfo> OnPlayerConnectedBroadcastReceived;
 
         private void RefirePlayerConnectedBroadcast(object _, PlayerConnectionEventInfo broadcast)
         {
-            OnPlayerConnectedBroadcastReceived?.Invoke(this, broadcast);
+            OnPlayerConnectedEventReceived?.Invoke(this, broadcast);
         }
-
-        public event EventHandler<RoomSettings> OnRoomSettingsReceived;
 
         private void RefireRoomSettings(object _, RoomSettings broadcast)
         {
-            OnRoomSettingsReceived?.Invoke(this, broadcast);
+            OnRoomSettingsChanged?.Invoke(this, broadcast);
         }
 
-        public event EventHandler<ClientStateUpdateInfo> OnClientStateChanged;
-
-        private void RefireClientState(object _, ClientStateUpdateInfo broadcast)
+        private void RefireClientState(object _, ClientStateChangedInfo broadcast)
         {
             OnClientStateChanged?.Invoke(this, broadcast);
         }
 
+        private void RefireBoardChanged(object _, BoardChangedInfo broadcast)
+        {
+            OnBoardChanged?.Invoke(this, broadcast);
+        }
+
+        private void RefireSquareChanged(object _, SquareChangedInfo broadcast)
+        {
+            OnSquareChanged?.Invoke(this, broadcast);
+        }
+
+        private void RefireBoardRevealed(object _, EventArgs __)
+        {
+            OnBoardRevealed?.Invoke(this, EventArgs.Empty);
+        }
+
         private void UnsubscribeEventRefires()
         {
-            _client.CardRevealedBroadcastReceived -= RefireCardRevealedBroadcast;
-            _client.ChatMessageReceived -= RefireChatMessage;
-            _client.GoalUpdateReceived -= RefireGoalUpdate;
-            _client.NewCardReceived -= RefireNewCard;
-            _client.PlayerColorChangeReceived -= RefirePlayerColorChange;
-            _client.PlayerConnectedBroadcastReceived -= RefirePlayerConnectedBroadcast;
-            _client.RoomSettingsReceived -= RefireRoomSettings;
-            _client.ConnectionStateChanged -= RefireClientState;
+            _client.BoardRevealedEventReceived -= RefireBoardRevealedBroadcast;
+            _client.ChatMessageEventReceived -= RefireChatMessage;
+            _client.GoalUpdateEventReceived -= RefireGoalUpdate;
+            _client.NewBoardEventReceived -= RefireNewBoard;
+            _client.PlayerColorChangeEventReceived -= RefirePlayerColorChange;
+            _client.PlayerConnectionEventReceived -= RefirePlayerConnectedBroadcast;
+            
+            _client.OnConnectionStateChanged -= RefireClientState;
+            _client.OnRoomSettingsChanged -= RefireRoomSettings;
+            _client.OnBoardChanged -= RefireBoardChanged;
+            _client.OnSquareChanged -= RefireSquareChanged;
+            _client.OnBoardRevealed -= RefireBoardRevealed;
         }
 
         private void SubscribeEventRefires()
         {
             UnsubscribeEventRefires();
-            _client.CardRevealedBroadcastReceived += RefireCardRevealedBroadcast;
-            _client.ChatMessageReceived += RefireChatMessage;
-            _client.GoalUpdateReceived += RefireGoalUpdate;
-            _client.NewCardReceived += RefireNewCard;
-            _client.PlayerColorChangeReceived += RefirePlayerColorChange;
-            _client.PlayerConnectedBroadcastReceived += RefirePlayerConnectedBroadcast;
-            _client.RoomSettingsReceived += RefireRoomSettings;
-            _client.ConnectionStateChanged += RefireClientState;
+            _client.BoardRevealedEventReceived += RefireBoardRevealedBroadcast;
+            _client.ChatMessageEventReceived += RefireChatMessage;
+            _client.GoalUpdateEventReceived += RefireGoalUpdate;
+            _client.NewBoardEventReceived += RefireNewBoard;
+            _client.PlayerColorChangeEventReceived += RefirePlayerColorChange;
+            _client.PlayerConnectionEventReceived += RefirePlayerConnectedBroadcast;
+
+            _client.OnConnectionStateChanged += RefireClientState;
+            _client.OnRoomSettingsChanged += RefireRoomSettings;
+            _client.OnBoardChanged += RefireBoardChanged;
+            _client.OnSquareChanged += RefireSquareChanged;
+            _client.OnBoardRevealed += RefireBoardRevealed;
         }
 
-    #endregion
+        #endregion
 
-        public Session(string name, IRemoteClient client, bool isAutoMarking, bool isAutoUnmarking)
+        public Session(string name, IBingoClient client, bool isAutoMarking, bool isAutoUnmarking)
         {
             SessionName = name;
             _client = client;
+            _squareManager = new([], false);
             SubscribeEventRefires();
+
             IsAutoMarking = isAutoMarking;
             IsAutoUnmarking = isAutoUnmarking;
-            _client.SetBoard(Board);
-            OnGoalUpdateReceived += DoAudioNotification;
-            OnRoomSettingsReceived += ConsumeRoomSettings;
-            OnCardRevealedBroadcastReceived += RevealOnOthersReveal;
-            OnCardRevealedBroadcastReceived += MarkCompletedGoalsOnReveal;
-            OnNewCardReceived += MarkCompletedGoalsOnNewCard;
-            _client.NeedBoardUpdate += ClientTriggeredBoardUpdate;
-            GoalCompletionTracker.OnGoalCompletionChanged += OnInternalGoalUpdate;
+
+            OnRoomSettingsChanged += ConsumeRoomSettings;
+            OnBoardChanged += CreateSquareManagerOnBoardChanged;
+            OnSquareChanged += ForwardSquareChanged;
+            OnBoardRevealed += RevealInSquareManager;
+
+            OnBoardRevealed += MarkCompletedGoalsOnReveal;
+            OnBoardChanged += MarkCompletedGoalsOnNewBoard;
+
+            OnBoardRevealedEventReceived += RevealOnOthersReveal;
+            OnGoalUpdateEventReceived += DoAudioNotification;
+
             ItemSyncInterop.AddSession(this);
         }
 
-        public void LocalUpdate()
+        private void RevealInSquareManager(object sender, EventArgs e)
         {
-            Controller.BoardUpdate();
+            SquareManager.IsRevealed = true;
         }
 
         private void ConsumeRoomSettings(object sender, RoomSettings settings)
         {
-            RoomIsLockout = settings.IsLockout;
-            RoomHidCardInitially = settings.HideCard;
+            RoomSettings = settings;
         }
 
-        private void MarkCompletedGoalsOnNewCard(object sender, NewCardEventInfo newCardEvent)
+        private void MarkCompletedGoalsOnNewBoard(object _, BoardChangedInfo __)
         {
+            if (!Controller.GlobalSettings.MarkCompletedGoalsOnNewBoardReceived)
+            {
+                return;
+            }
             MarkAllCompleted();
         }
 
-        private void MarkCompletedGoalsOnReveal(object sender, CardRevealedEventInfo revealedEvent)
+        private void MarkCompletedGoalsOnReveal(object _, EventArgs __)
         {
-            if (revealedEvent.Player.UUID != _client.PlayerUUID)
+            if (!Controller.GlobalSettings.MarkCompletedGoalsOnNewBoardReceived)
             {
                 return;
             }
@@ -212,29 +259,77 @@ namespace BingoSync.Sessions
             {
                 return;
             }
-            if (!Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived)
-            {
-                return;
-            }
             if (!IsPlayable())
             {
                 return;
             }
             int index = 0;
-            foreach (Square square in Board.AllSquares)
+            foreach (BoardSquare square in SquareManager.AllSquares)
             {
                 if (GoalCompletionTracker.IsGoalMarkedByName(square.Name))
                 {
-                    SelectIndex(index, () => { });
+                    SelectIndex(index);
                 }
                 ++index;
             }
         }
 
+        private void ForwardSquareChanged(object _, SquareChangedInfo info)
+        {
+            SquareManager.SquareUpdateFromServer(info);
+        }
+
+        private void OnSquareCanBeMarked(object _, SquareCanBeMarkedInfo info)
+        {
+            if (!info.Unmark && !IsAutoMarking) return;
+            if (info.Unmark && !IsAutoUnmarking) return;
+
+            Task.Run(() =>
+            {
+                ItemSyncMarkDelay setting = Controller.GlobalSettings.ItemSyncMarkSetting;
+                if (setting == ItemSyncMarkDelay.NoMark && info.IsItemSyncUpdate)
+                {
+                    return;
+                }
+                if (setting == ItemSyncMarkDelay.Delay && info.IsItemSyncUpdate)
+                {
+                    Thread.Sleep(ItemSyncInterop.MarkDelay);
+                }
+                SelectIndex(info.Index, info.Unmark);
+            });
+        }
+
+        private void CreateSquareManagerOnBoardChanged(object _, BoardChangedInfo info)
+        {
+            SquareManager = new SquareManager(info.Board);
+            SquareManager.IsRevealed = !info.HideBoard;
+        }
+
+        private bool CanMarkSquare(BoardSquare square, int color, bool unmark)
+        {
+            if (!SquareManager.IsRevealed) return false;
+            if (unmark)
+            {
+                if (!square.MarkedBy.Contains(color)) return false;
+            }
+            else
+            {
+                if (RoomSettings.IsLockout)
+                {
+                    if (square.MarkedBy.Count > 0) return false;
+                }
+                else
+                {
+                    if (square.MarkedBy.Contains(color)) return false;
+                }
+            }
+            return true;
+        }
+
         public bool IsPlayable()
         {
             Update();
-            if (!Board.IsAvailable || !Board.IsRevealed)
+            if (!SquareManager.IsValid || !SquareManager.IsRevealed)
                 return false;
             if (!ClientIsConnected())
                 return false;
@@ -248,10 +343,10 @@ namespace BingoSync.Sessions
 
         public bool ClientIsConnecting()
         {
-            return GetClientState() == ClientState.Loading;
+            return GetClientState() == ClientState.Connecting;
         }
 
-        public void JoinRoom(string roomID, string nickname, string password, Action<Exception> callback)
+        public void JoinRoom(string roomID, string nickname, string password, int color, Action? callback = null)
         {
             if (roomID == null || roomID == string.Empty
                 || nickname == null || nickname == string.Empty
@@ -260,19 +355,24 @@ namespace BingoSync.Sessions
                 return;
             }
 
-            _client.JoinRoom(roomID, nickname, password, ColorExtensions.FromName(Controller.RoomColor), callback);
-            RoomNickname = nickname;
-            RoomColor = ColorExtensions.FromName(Controller.RoomColor);
+            _client.JoinRoom(roomID, nickname, password, () =>
+            {
+                SetColor(color, () =>
+                {
+                    RoomNickname = nickname;
+                    RoomColor = color;
+                    callback?.Invoke();
+                });
+            });
         }
 
-        public void ExitRoom(Action callback)
+        public void ExitRoom(Action? callback = null)
         {
             _client.ExitRoom(callback);
         }
 
         public void Update()
         {
-            _client.Update();
             Controller.BoardUpdate();
         }
 
@@ -281,119 +381,48 @@ namespace BingoSync.Sessions
             return _client.GetState();
         }
 
-        public void SetColor(Colors color)
+        public void SetColor(int color, Action? callback = null)
         {
-            _client.SetColor(color);
+            _client.SetColor(color, callback);
         }
 
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
+        public void NewBoard(List<string> board, bool lockout = true, bool hideCard = true, int seed = 0, Action? callback = null)
         {
-            _client.NewCard(board, lockout, hideCard, seed);
+            _client.NewBoard(board, lockout, hideCard, seed, callback);
         }
 
-        public void RevealCard()
+        public void RevealBoard(Action? callback = null)
         {
-            _client.RevealCard();
+            _client.RevealBoard(callback);
         }
 
-        public void SendChatMessage(string text)
+        public void SendChatMessage(string text, Action? callback = null)
         {
-            _client.SendChatMessage(text);
+            _client.SendChatMessage(text, callback);
         }
 
-        internal void OnInternalGoalUpdate(object sender, InternalGoalUpdate goalUpdate)
+        public void SelectIndex(int index, bool unmark = false, Action? callback = null)
         {
-            if(!IsPlayable() || !IsAutoMarking)
+            SelectIndex(index, RoomColor, unmark, callback);
+        }
+
+        public void SelectIndex(int index, int color, bool unmark = false, Action? callback = null)
+        {
+            if (CanMarkSquare(SquareManager.GetSquareByIndex(index), color, unmark))
             {
-                return;
-            }
-            int slot = 1;
-            foreach (Square square in Board.AllSquares)
-            {
-                if (square.Name == goalUpdate.Name)
-                {
-                    if (IsAutoUnmarking || !goalUpdate.Clear)
-                    {
-                        UpdateGoalBySlot(slot, goalUpdate);
-                    }
-                }
-                ++slot;
+                _client.MarkGoal(index, color, unmark, callback);
             }
         }
 
-        private void UpdateGoalBySlot(int slot, InternalGoalUpdate goalUpdate)
+        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback)
         {
-            Square square = Board.GetSlot(slot);
-            if (!SquareNeedsUpdate(square, RoomColor, goalUpdate.Clear))
-            {
-                return;
-            }
-            Task.Run(() =>
-            {
-                ItemSyncMarkDelay setting = Controller.GlobalSettings.ItemSyncMarkSetting;
-                if (setting == ItemSyncMarkDelay.NoMark && goalUpdate.IsItemSyncUpdate)
-                {
-                    return;
-                }
-                if (setting == ItemSyncMarkDelay.Delay && goalUpdate.IsItemSyncUpdate)
-                {
-                    Thread.Sleep(ItemSyncInterop.MarkDelay);
-                    if (!SquareNeedsUpdate(square, RoomColor, goalUpdate.Clear))
-                    {
-                        return;
-                    }
-                }
-                SelectSlot(slot, () => { }, goalUpdate.Clear);
-            });
-        }
-
-        private bool SquareNeedsUpdate(Square square, Colors color, bool clear)
-        {
-            bool isMarked = square.MarkedBy.Contains(color);
-            bool isBlank = square.MarkedBy.Contains(Colors.Blank);
-            bool canMark = isBlank || (!isMarked && !RoomIsLockout);
-            bool shouldMark = canMark && !clear;
-            bool shouldUnmark = isMarked && clear;
-            return shouldMark || shouldUnmark;
-        }
-
-        public void SelectIndex(int index, Action errorCallback, bool clear = false)
-        {
-            SelectSlot(index + 1, RoomColor, errorCallback, clear);
-        }
-
-        public void SelectSlot(int slot, Action errorCallback, bool clear = false)
-        {
-            SelectSlot(slot, RoomColor, errorCallback, clear);
-        }
-
-        public void SelectIndex(int index, Colors color, Action errorCallback, bool clear = false)
-        {
-            SelectSlot(index + 1, color, errorCallback, clear);
-        }
-
-        public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
-        {
-            if (SquareNeedsUpdate(Board.GetIndex(slot - 1), color, clear))
-            {
-                _client.SelectSlot(slot, color, errorCallback, clear);
-            }
-        }
-
-        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
-        {
-           _client.ProcessRoomHistory(callback, errorCallback);
-        }
-
-        public void DumpDebugInfo()
-        {
-            _client.DumpDebugInfo();
+           _client.ProcessRoomHistory(callback);
         }
 
         private void DoAudioNotification(object sender, GoalUpdateEventInfo goalUpdate)
         {
-            Session session = sender as Session;
-            if (goalUpdate.Unmarking || !Board.IsAvailable || !Board.IsRevealed || session.HandMode)
+            Session session = (Session) sender;
+            if (goalUpdate.Unmark || !SquareManager.IsValid || !SquareManager.IsRevealed || session.HandMode)
             {
                 return;
             }
@@ -422,31 +451,22 @@ namespace BingoSync.Sessions
             }
         }
 
-        private void RevealOnOthersReveal(object sender, CardRevealedEventInfo revealedInfo)
+        private void RevealOnOthersReveal(object sender, BoardRevealedEventInfo revealedInfo)
         {
-            if (Controller.GlobalSettings.RevealCardWhenOthersReveal)
+            if (Controller.GlobalSettings.RevealBoardWhenOthersReveal)
             {
-                Controller.RevealCard();
+                Controller.RevealBoard();
             }
         }
 
-        private void ClientTriggeredBoardUpdate(object sender, ClientBoardUpdateInfo info)
+        public void SetDisplaySquaresSelector(Func<List<BoardSquare>, List<BoardSquare>> selector)
         {
-            Controller.BoardUpdate();
-            if(info.NeedsConditionReset)
-            {
-                GoalCompletionTracker.ClearFinishedGoals();
-            }
-        }
-
-        public void SetDisplaySquaresSelector(Func<List<Square>, List<Square>> selector)
-        {
-            Board.SetDisplaySquaresSelector(selector);
+            SquareManager.SetDisplaySquaresSelector(selector);
         }
 
         public void SetDefaultDisplaySquaresSelector()
         {
-            Board.SetDefaultDisplaySquaresSelector();
+            SquareManager.SetDefaultDisplaySquaresSelector();
         }
     }
 }

@@ -1,12 +1,13 @@
-﻿using MagicUI.Core;
+﻿using BingoSync.Clients.ColorManagement;
+using MagicUI.Core;
 using MagicUI.Elements;
-using UnityEngine;
-using System.Collections.Generic;
-using GridLayout = MagicUI.Elements.GridLayout;
-using Satchel;
-using static BingoSync.Settings.ModSettings;
 using MagicUI.Graphics;
+using Satchel;
+using System.Collections.Generic;
 using System.Reflection;
+using UnityEngine;
+using static BingoSync.Settings.ModSettings;
+using GridLayout = MagicUI.Elements.GridLayout;
 
 namespace BingoSync.GameUI
 {
@@ -115,7 +116,7 @@ namespace BingoSync.GameUI
 
         private bool BoardShouldBeVisible()
         {
-            bool shouldBeVisible = Controller.ActiveSession.ClientIsConnected() && Controller.BoardIsVisible && Controller.ActiveSession.Board.IsAvailable && Controller.ActiveSession.Board.IsRevealed;
+            bool shouldBeVisible = Controller.ActiveSession.ClientIsConnected() && Controller.BoardIsVisible && Controller.ActiveSession.SquareManager.IsValid && Controller.ActiveSession.SquareManager.IsRevealed;
             if (shouldBeVisible && !opacityInitialized)
             {
                 opacityInitialized = true;
@@ -215,13 +216,28 @@ namespace BingoSync.GameUI
                 Spacing = 0,
             }.WithProp(GridLayout.Row, row).WithProp(GridLayout.Column, column);
 
-            List<string> colors = ColorExtensions.GetAllColorNames();
+            IColorManager colorManager = Controller.ActiveSession.ColorManager;
+
             Dictionary<string, Image> images = [];
             Dictionary<string, Image> icons = [];
-            for (int brow = 0; brow < colors.Count; brow++)
+
+            Color blankTint = colorManager.ColorOf(-1);
+            Image blankBackgroundImage = new(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_-1_{row}_{column}")
             {
-                Color tint = ColorExtensions.FromName(colors[brow]).GetColor();
-                Image backgroundImage = new Image(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{brow}_{row}_{column}")
+                Height = 0,
+                Width = 110,
+                Tint = blankTint,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            stack.Children.Add(blankBackgroundImage);
+            images.Add("blank", blankBackgroundImage);
+            backgroundImagesByColor["blank"].Add(blankBackgroundImage);
+
+            foreach (int color in colorManager.Colors)
+            {
+                Color tint = colorManager.ColorOf(color);
+                Image backgroundImage = new(layoutRoot, backgroundSprite, $"BingoSync_BoardDisplay_color_{color}_{row}_{column}")
                 {
                     Height = 0,
                     Width = 110,
@@ -230,19 +246,19 @@ namespace BingoSync.GameUI
                     VerticalAlignment = VerticalAlignment.Center,
                 };
                 stack.Children.Add(backgroundImage);
-                images.Add(colors[brow], backgroundImage);
-                backgroundImagesByColor[colors[brow]].Add(backgroundImage);
+                images.Add(colorManager.NameOf(color), backgroundImage);
+                backgroundImagesByColor[colorManager.NameOf(color)].Add(backgroundImage);
 
-                if(colors[brow] != "blank")
+                if(colorManager.NameOf(color) != "blank")
                 {
-                    Image colorIcon = new Image(layoutRoot, colorIconSprites[colors[brow]], $"BingoSync_BoardDisplay_icon_{brow}_{row}_{column}")
+                    Image colorIcon = new(layoutRoot, colorIconSprites[colorManager.NameOf(color)], $"BingoSync_BoardDisplay_icon_{color}_{row}_{column}")
                     {
                         Height = 110,
                         Width = 110,
                         HorizontalAlignment = HorizontalAlignment.Center,
                         VerticalAlignment = VerticalAlignment.Center,
                     };
-                    icons.Add(colors[brow], colorIcon);
+                    icons.Add(colorManager.NameOf(color), colorIcon);
                 }
             }
 
@@ -251,11 +267,13 @@ namespace BingoSync.GameUI
 
         public void UpdateColorScheme()
         {
-            foreach(string color in ColorExtensions.GetAllColorNames())
+            IColorManager colorManager = Controller.ActiveSession.ColorManager;
+
+            foreach (int color in colorManager.Colors)
             {
-                foreach(Image image in backgroundImagesByColor[color])
+                foreach(Image image in backgroundImagesByColor[colorManager.NameOf(color)])
                 {
-                    image.Tint = ColorExtensions.FromName(color).GetColor();
+                    image.Tint = colorManager.ColorOf(color);
                 }
             }
         }

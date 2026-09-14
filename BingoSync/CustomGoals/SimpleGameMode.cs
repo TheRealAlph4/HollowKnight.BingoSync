@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BingoSync.CustomGoals
 {
@@ -16,7 +17,7 @@ namespace BingoSync.CustomGoals
             return _name;
         }
 
-        public List<BingoGoal> GenerateBoard(int seed)
+        public List<string> GenerateBoard(int seed)
         {
             List<BingoGoal> board = [];
             List<BingoGoal> availableGoals = [.. _goals.Values];
@@ -45,16 +46,15 @@ namespace BingoSync.CustomGoals
                 availableGoals.Remove(proposedGoal);
             }
 
-            return board;
+            return [.. board.Select(goal => goal.Name)];
         }
 
-        public static List<BingoGoal> GetErrorBoard()
+        public static List<string> GetErrorBoard()
         {
-            BingoGoal empty = new("-");
-            List<BingoGoal> board = [new BingoGoal("Error generating board")];
+            List<string> board = ["Error generating board"];
             for(int i = 0; i < 24; ++i)
             {
-                board.Add(empty);
+                board.Add("-");
             }
             return board;
         }

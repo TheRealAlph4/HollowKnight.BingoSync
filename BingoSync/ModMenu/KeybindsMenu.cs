@@ -30,9 +30,9 @@ namespace BingoSync.ModMenu
                         Label = "Hide Menu",
                         CancelAction = ExitMenu,
                     })
-                    .AddKeybind("Reveal Card", Controller.GlobalSettings.Keybinds.RevealCard, new KeybindConfig
+                    .AddKeybind("Reveal Board", Controller.GlobalSettings.Keybinds.RevealBoard, new KeybindConfig
                     {
-                        Label = "Reveal Card",
+                        Label = "Reveal Board",
                         CancelAction = ExitMenu,
                     });
                 }

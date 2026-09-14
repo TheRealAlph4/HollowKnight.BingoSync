@@ -194,9 +194,9 @@ namespace BingoSync
             Controller.MenuIsVisible = false;
             Controller.IsOnMainMenu = false;
             Controller.RefreshGenerationButtonEnabled();
-            if (Controller.GlobalSettings.RevealCardOnGameStart)
+            if (Controller.GlobalSettings.RevealBoardOnGameStart)
             {
-                Controller.RevealCard();
+                Controller.RevealBoard();
             }
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();
@@ -209,9 +209,9 @@ namespace BingoSync
             Controller.MenuIsVisible = false;
             Controller.IsOnMainMenu = false;
             Controller.RefreshGenerationButtonEnabled();
-            if (Controller.GlobalSettings.RevealCardOnGameStart)
+            if (Controller.GlobalSettings.RevealBoardOnGameStart)
             {
-                Controller.RevealCard();
+                Controller.RevealBoard();
             }
             Task.Run(() => {
                 Checks.GetRandomizedPlacements();

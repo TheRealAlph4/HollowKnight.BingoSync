@@ -1,4 +1,6 @@
-﻿using BingoSync.Clients.EventInfoObjects;
+﻿using BingoSync.Clients.ColorManagement;
+using BingoSync.Clients.EventInfoObjects;
+using BingoSync.Clients.StateChangeInfoObjects;
 using BingoSync.CustomGoals;
 using BingoSync.Sessions;
 using Newtonsoft.Json;
@@ -16,101 +18,63 @@ using System.Threading.Tasks;
 
 namespace BingoSync.Clients
 {
-    internal class BingoSyncClient : IRemoteClient
+    internal class BingoSyncClient : IBingoClient
     {
-        private static readonly string LOCKOUT_MODE = "Lockout";
-        private static readonly int maxRetries = 30;
+        private static readonly BingoSyncColorManager _colorManager = new();
+        public IColorManager ColorManager => _colorManager;
 
         private readonly Action<string> Log;
+        private const int MAX_RETRIES = 30;
 
-        private string currentRoomID = string.Empty;
-
-        private readonly CookieContainer cookieContainer = null;
-        private readonly HttpClientHandler handler = null;
-        private readonly HttpClient client = null;
-        private ClientWebSocket webSocketClient = null;
+        private readonly HttpClient httpClient;
+        private ClientWebSocket webSocketClient;
         private string socketKey = string.Empty;
 
-        private ClientState forcedState = ClientState.None;
-        private WebSocketState lastSocketState = WebSocketState.None;
+        private ClientState stateOverride = ClientState.None;
 
-        private bool shouldConnect = false;
-
-        public event EventHandler<CardRevealedEventInfo> CardRevealedBroadcastReceived;
-        public event EventHandler<ChatMessageEventInfo> ChatMessageReceived;
-        public event EventHandler<GoalUpdateEventInfo> GoalUpdateReceived;
-        public event EventHandler<NewCardEventInfo> NewCardReceived;
-        public event EventHandler<PlayerColorChangeEventInfo> PlayerColorChangeReceived;
-        public event EventHandler<PlayerConnectionEventInfo> PlayerConnectedBroadcastReceived;
-        public event EventHandler<RoomSettings> RoomSettingsReceived;
-        public event EventHandler<ClientStateUpdateInfo> ConnectionStateChanged;
-
-        public event EventHandler<ClientBoardUpdateInfo> NeedBoardUpdate;
-
-        private BingoBoard Board;
-
+        private string currentRoomID = string.Empty;
         public string PlayerUUID { get; private set; } = string.Empty;
+        private RoomSettings roomSettings = new();
 
-        public void DumpDebugInfo()
-        {
-            Log($"Client");
-            Log($"\tActualClientState = {webSocketClient?.State}");
-            Log($"\tForcedClientState = {forcedState}");
-            Log($"\tClientShouldConnect = {shouldConnect}");
-        }
+        public event EventHandler<BoardRevealedEventInfo>? BoardRevealedEventReceived;
+        public event EventHandler<ChatMessageEventInfo>? ChatMessageEventReceived;
+        public event EventHandler<GoalUpdateEventInfo>? GoalUpdateEventReceived;
+        public event EventHandler<NewBoardEventInfo>? NewBoardEventReceived;
+        public event EventHandler<PlayerColorChangeEventInfo>? PlayerColorChangeEventReceived;
+        public event EventHandler<PlayerConnectionEventInfo>? PlayerConnectionEventReceived;
+
+        public event EventHandler<ClientStateChangedInfo>? OnConnectionStateChanged;
+        public event EventHandler<RoomSettings>? OnRoomSettingsChanged;
+        public event EventHandler<BoardChangedInfo>? OnBoardChanged;
+        public event EventHandler<SquareChangedInfo>? OnSquareChanged;
+        public event EventHandler? OnBoardRevealed;
 
         public BingoSyncClient(Action<string> log)
         {
             Log = log;
-
-            cookieContainer = new CookieContainer();
-            handler = new HttpClientHandler
+            CookieContainer cookieContainer = new();
+            HttpClientHandler clientHandler = new()
             {
                 CookieContainer = cookieContainer
             };
-            client = new HttpClient(handler)
+            httpClient = new HttpClient(clientHandler)
             {
                 BaseAddress = new Uri("https://bingosync.com"),
             };
-            client.DefaultRequestHeaders.UserAgent.ParseAdd($"HollowKnight.BingoSync/{BingoSync.version}");
-            LoadCookie();
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"Silksong.BingoSync/{BingoSync.version}");
+            LoadCookie(cookieContainer);
 
             webSocketClient = new ClientWebSocket();
         }
 
-        public void SetBoard(BingoBoard board)
-        {
-            Board = board;
-        }
-
-        public void Update()
-        {
-            if (webSocketClient.State == lastSocketState)
-                return;
-            forcedState = ClientState.None;
-            lastSocketState = webSocketClient.State;
-        }
-
-        public ClientState GetState()
-        {
-            if (forcedState != ClientState.None)
-                return forcedState;
-            if (webSocketClient.State == WebSocketState.Open)
-                return ClientState.Connected;
-            else if (webSocketClient.State == WebSocketState.Connecting)
-                return ClientState.Loading;
-            return ClientState.Disconnected;
-        }
-
-        private void LoadCookie()
+        private void LoadCookie(CookieContainer cookieContainer)
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync("");
+                var task = httpClient.GetAsync("");
                 return task.ContinueWith(responseTask =>
                 {
-                    HttpResponseMessage response = null;
-                    response = responseTask.Result;
+                    HttpResponseMessage response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     if (response.Headers.TryGetValues("Set-Cookie", out IEnumerable<string> values))
                     {
@@ -125,241 +89,69 @@ namespace BingoSync.Clients
                         }
                     }
                 });
-            }, maxRetries, nameof(LoadCookie));
+            }, MAX_RETRIES, nameof(LoadCookie), () => { });
         }
 
-        private void UpdateBoardSquares(List<NetworkObjectBoardSquare> newBoard)
+        public ClientState GetState()
         {
-            List<Square> squares = [];
-            foreach (NetworkObjectBoardSquare networkSquare in newBoard)
-            {
-                HashSet<Colors> colors = [];
-                foreach (string color in networkSquare.Colors.Split(' '))
-                {
-                    colors.Add(ColorExtensions.FromName(color));
-                }
-                squares.Add(new Square() {
-                    Name = networkSquare.Name,
-                    MarkedBy = colors,
-                    Highlighted = false,
-                    GoalIndex = int.Parse(networkSquare.Slot.Substring(4)) - 1,
-                });
-            }
-            Board.SetSquares(squares);
+            if (stateOverride != ClientState.None)
+                return stateOverride;
+            if (webSocketClient.State == WebSocketState.Open)
+                return ClientState.Connected;
+            else if (webSocketClient.State == WebSocketState.Connecting)
+                return ClientState.Connecting;
+            return ClientState.Disconnected;
         }
 
-        private void TriggerBoardUpdate(bool resetConditions)
+        public void JoinRoom(string roomID, string nickname, string password, Action? callback = null)
         {
-            NeedBoardUpdate?.Invoke(this, new ClientBoardUpdateInfo()
-            {
-                NeedsConditionReset = resetConditions,
-            });
-        }
-
-        public void JoinRoom(string roomID, string nickname, string password, Colors color, Action<Exception> callback)
-        {
-            if (GetState() == ClientState.Loading)
+            if (GetState() == ClientState.Connecting || GetState() == ClientState.Connected)
             {
                 return;
             }
-            forcedState = ClientState.Loading;
-            shouldConnect = true;
+            stateOverride = ClientState.Connecting;
             currentRoomID = roomID;
 
-            var joinRoomInput = new NetworkObjectJoinRoomRequest
+            NetworkObjectJoinRoomRequest joinRoomInput = new()
             {
                 Room = roomID,
                 Nickname = nickname,
                 Password = password,
             };
-            var payload = JsonConvert.SerializeObject(joinRoomInput);
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
-            var task = client.PostAsync("api/join-room", content);
+            string payload = JsonConvert.SerializeObject(joinRoomInput);
+            StringContent content = new(payload, Encoding.UTF8, "application/json");
+            Task<HttpResponseMessage> task = httpClient.PostAsync("api/join-room", content);
             _ = task.ContinueWith(responseTask =>
             {
-                Exception ex = null;
                 try
                 {
-                    var response = responseTask.Result;
+                    HttpResponseMessage response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
-                    var readTask = response.Content.ReadAsStringAsync();
+                    Task<string> readTask = response.Content.ReadAsStringAsync();
                     readTask.ContinueWith(joinRoomResponse =>
                     {
-                        var socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result);
+                        NetworkObjectSocketJoinRequest socketJoin = JsonConvert.DeserializeObject<NetworkObjectSocketJoinRequest>(joinRoomResponse.Result) ?? throw new Exception("SocketJoin request is null");
                         socketKey = socketJoin.SocketKey;
-                        RequestPlayerUUID(() => { });
+                        RequestPlayerUUID();
                         ConnectToBroadcastSocket(socketJoin, () =>
                         {
-                            SetColor(color);
+                            UpdateSettings(() =>
+                            {
+                                GetNewBoard(roomSettings.HideBoard);
+                                callback?.Invoke();
+                            });
                         });
-                        RequestAndSetBoard(true, () => { }); 
-                        UpdateSettings();
                     });
                 }
-                catch (Exception _ex)
+                catch (Exception ex)
                 {
-                    ex = _ex;
                     Log($"could not join room: {ex.Message}");
-                }
-                finally
-                {
-                    forcedState = ClientState.None;
-                    callback(ex);
+                    stateOverride = ClientState.None;
                 }
             });
         }
 
-        public void SetColor(Colors color)
-        {
-            if (GetState() != ClientState.Connected) return;
-            var setColorInput = new NetworkObjectSetColorRequest
-            {
-                Room = currentRoomID,
-                Color = color.GetName(),
-            };
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var payload = JsonConvert.SerializeObject(setColorInput);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PutAsync("api/color", content);
-                return task.ContinueWith(responseTask =>
-                {
-                    var response = responseTask.Result;
-                    response.EnsureSuccessStatusCode();
-                });
-            }, maxRetries, nameof(SetColor));
-        }
-
-        public void NewCard(List<BingoGoal> board, bool lockout = true, bool hideCard = true, int seed = 0)
-        {
-            if (GetState() != ClientState.Connected) return;
-            var newCard = new NetworkObjectNewCardRequest
-            {
-                Room = currentRoomID,
-                Game = 18, // this is supposed to be custom already
-                Variant = 18, // but this is also required for custom ???
-                CustomJSON = JsonifyBoard(board),
-                Lockout = !lockout, // false is lockout here for some godforsaken reason
-                Seed = $"{seed}",
-                HideCard = hideCard,
-            };
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var payload = JsonConvert.SerializeObject(newCard);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PostAsync("api/new-card", content);
-                return task.ContinueWith(responseTask => { });
-            }, maxRetries, nameof(SendChatMessage));
-        }
-
-        private static string JsonifyBoard(List<BingoGoal> board)
-        {
-            string output = "[";
-            for (int i = 0; i < board.Count; i++)
-            {
-                output += "{\"name\": \"" + board.ElementAt(i).name + "\"}" + (i < 24 ? "," : "");
-            }
-            output += "]";
-            return output;
-        }
-
-        public void RevealCard()
-        {
-            if (GetState() != ClientState.Connected) return;
-            if (Board.IsRevealed) return;
-            var revealInput = new NetworkObjectRevealRequest
-            {
-                Room = currentRoomID,
-            };
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var payload = JsonConvert.SerializeObject(revealInput);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PutAsync("api/revealed", content);
-                return task.ContinueWith(responseTask =>
-                {
-                    var response = responseTask.Result;
-                    response.EnsureSuccessStatusCode();
-                    Board.IsRevealed = true;
-                    TriggerBoardUpdate(resetConditions: false);
-                });
-            }, maxRetries, nameof(RevealCard));
-        }
-
-        public void SendChatMessage(string text)
-        {
-            if (GetState() != ClientState.Connected) return;
-            var chatMessageInput = new NetworkObjectChatMessageRequest
-            {
-                Room = currentRoomID,
-                Text = text,
-            };
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var payload = JsonConvert.SerializeObject(chatMessageInput);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PutAsync("api/chat", content);
-                return task.ContinueWith(responseTask =>
-                {
-                    var response = responseTask.Result;
-                    response.EnsureSuccessStatusCode();
-                });
-            }, maxRetries, nameof(SendChatMessage));
-        }
-
-        public void SelectSlot(int slot, Colors color, Action errorCallback, bool clear = false)
-        {
-            if (GetState() != ClientState.Connected) return;
-            var selectInput = new NetworkObjectSelectRequest
-            {
-                Room = currentRoomID,
-                Slot = slot,
-                Color = color.GetName(),
-                RemoveColor = clear,
-            };
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var payload = JsonConvert.SerializeObject(selectInput);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                var task = client.PutAsync("api/select", content);
-                return task.ContinueWith(responseTask =>
-                {
-                    var response = responseTask.Result;
-                    response.EnsureSuccessStatusCode();
-                });
-            }, maxRetries, nameof(SelectSlot), errorCallback);
-        }
-
-        public void ExitRoom(Action callback)
-        {
-            if (GetState() != ClientState.Connected) return;
-            shouldConnect = false;
-            forcedState = ClientState.Loading;
-            currentRoomID = string.Empty;
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
-                {
-                    if (result.Exception != null)
-                    {
-                        throw result.Exception;
-                    }
-                    TriggerBoardUpdate(resetConditions: true);
-                    webSocketClient = new ClientWebSocket();
-                    forcedState = ClientState.None;
-                    PlayerUUID = string.Empty;
-                    ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
-                    callback();
-                });
-            }, maxRetries, nameof(ExitRoom), () =>
-            {
-                TriggerBoardUpdate(resetConditions: true);
-                webSocketClient = new ClientWebSocket();
-                forcedState = ClientState.None;
-            });
-        }
-
-        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin, Action callback)
+        private void ConnectToBroadcastSocket(NetworkObjectSocketJoinRequest socketJoin, Action? callback = null)
         {
             var socketUri = new Uri("wss://sockets.bingosync.com/broadcast");
             RetryHelper.RetryWithExponentialBackoff(() =>
@@ -370,40 +162,21 @@ namespace BingoSync.Clients
                 {
                     if (connectResponse.Exception != null)
                     {
-                        Log($"error connecting to websocket: {connectResponse.Exception}");
+                        Log($"Error connecting to websocket: {connectResponse.Exception}");
                         throw connectResponse.Exception;
                     }
                     var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
                     var buffer = new ArraySegment<byte>(Encoding.UTF8.GetBytes(serializedSocketJoin));
                     var sendTask = webSocketClient.SendAsync(buffer, WebSocketMessageType.Text, true, CancellationToken.None);
-                    sendTask.ContinueWith(_ => 
+                    sendTask.ContinueWith(_ =>
                     {
-                        ConnectionStateChanged?.Invoke(this, new ClientStateUpdateInfo() { NewClientState = GetState() });
+                        stateOverride = ClientState.None;
+                        callback?.Invoke();
+                        OnConnectionStateChanged?.Invoke(this, new ClientStateChangedInfo() { NewClientState = GetState() });
                         ListenForBoardUpdates(socketJoin);
-                        callback?.Invoke();
                     });
                 });
-            }, maxRetries, nameof(ConnectToBroadcastSocket));
-        }
-
-        private void RequestPlayerUUID(Action callback)
-        {
-            RetryHelper.RetryWithExponentialBackoff(() =>
-            {
-                var requestTask = client.GetAsync($"https://bingosync.com/api/socket/{socketKey}");
-                return requestTask.ContinueWith(response =>
-                {
-                    HttpResponseMessage result = response.Result;
-                    result.EnsureSuccessStatusCode();
-                    result.Content.ReadAsStringAsync().ContinueWith(networkSocketCheck =>
-                    {
-                        NetworkObjectSocketCheck socketInfo = JsonConvert.DeserializeObject<NetworkObjectSocketCheck>(networkSocketCheck.Result);
-                        PlayerUUID = socketInfo.PlayerUUID;
-                        callback?.Invoke();
-                    });
-
-                });
-            }, maxRetries, nameof(ConnectToBroadcastSocket));
+            }, MAX_RETRIES, nameof(ConnectToBroadcastSocket));
         }
 
         private async void ListenForBoardUpdates(NetworkObjectSocketJoinRequest socketJoin)
@@ -418,13 +191,12 @@ namespace BingoSync.Clients
                     {
                         continue;
                     }
-                    if (!Board.IsAvailable) return;
                     string json = Encoding.UTF8.GetString(buffer, 0, response.Count);
-                    NetworkObjectBroadcast broadcast = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json);
-                    switch(broadcast.Type)
+                    NetworkObjectBroadcast broadcast = JsonConvert.DeserializeObject<NetworkObjectBroadcast>(json) ?? throw new Exception("Broadcast object is null");
+                    switch (broadcast.Type)
                     {
                         case "chat": HandleChatBroadcast(json); break;
-                        case "new-card": HandleNewCardBroadcast(json); break;
+                        case "new-card": HandleNewBoardBroadcast(json); break;
                         case "goal": HandleGoalBroadcast(json); break;
                         case "color": HandleColorBroadcast(json); break;
                         case "revealed": HandleRevealedBroadcast(json); break;
@@ -437,138 +209,295 @@ namespace BingoSync.Clients
                     Log($"'{ex.GetType().FullName}' error with message '{ex.Message}' while handling socket broadcast.\nStacktrace: \n{ex.StackTrace}");
                 }
             }
-            if (shouldConnect)
+            if (GetState() == ClientState.Connecting || GetState() == ClientState.Connected)
             {
-                Log($"socket is closed, will try to connect again");
-                ConnectToBroadcastSocket(socketJoin, () => { });
+                Log($"Socket is closed, reconnecting...");
+                ConnectToBroadcastSocket(socketJoin);
                 return;
             }
         }
 
         private void HandleChatBroadcast(string json)
         {
-            NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json);
-            ChatMessageReceived?.Invoke(this, NetworkChatBroadcastToLocal(chatBroadcast));
+            NetworkObjectChatBroadcast chatBroadcast = JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(json) ?? throw new Exception("Chat broadcast object is null");
+            ChatMessageEventReceived?.Invoke(this, NetworkChatBroadcastToLocal(chatBroadcast));
         }
 
-        private void HandleNewCardBroadcast(string json)
+        private void HandleNewBoardBroadcast(string json)
         {
-            NetworkObjectNewCardBroadcast newCardBroadcast = JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(json);
-            RequestAndSetBoard(newCardBroadcast.HideCard, delegate
-            {
-                UpdateSettings();
-                TriggerBoardUpdate(resetConditions: false);
-                NewCardReceived?.Invoke(this, NetworkNewCardBroadcastToLocal(newCardBroadcast));
-            });
+            NetworkObjectNewBoardBroadcast newBoardBroadcast = JsonConvert.DeserializeObject<NetworkObjectNewBoardBroadcast>(json) ?? throw new Exception("NewBoard broadcast object is null");
+            UpdateSettings(delegate { GetNewBoard(newBoardBroadcast.HideBoard); });
+            NewBoardEventReceived?.Invoke(this, NetworkNewBoardBroadcastToLocal(newBoardBroadcast));
         }
 
         private void HandleGoalBroadcast(string json)
         {
-            NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json);
-            foreach (Square square in Board.AllSquares)
+            NetworkObjectGoalBroadcast goalBroadcast = JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(json) ?? throw new Exception("Goal broadcast object is null");
+            GoalUpdateEventInfo info = NetworkGoalBroadcastToLocal(goalBroadcast);
+            OnSquareChanged?.Invoke(this, new SquareChangedInfo()
             {
-                if ("slot" + (square.GoalIndex + 1) == goalBroadcast.Square.Slot)
-                {
-                    square.MarkedBy.Clear();
-                    foreach (string color in goalBroadcast.Square.Colors.Split(' '))
-                    {
-                        square.MarkedBy.Add(ColorExtensions.FromName(color));
-                    }
-                    GoalUpdateReceived?.Invoke(this, NetworkGoalBroadcastToLocal(goalBroadcast));
-                    break;
-                }
-            }
-            TriggerBoardUpdate(resetConditions: false);
+                Index = info.Index,
+                Color = info.Color,
+                Goal = info.Goal,
+                Unmark = info.Unmark,
+            });
+            GoalUpdateEventReceived?.Invoke(this, info);
         }
 
         private void HandleColorBroadcast(string json)
         {
-            NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json);
-            PlayerColorChangeReceived?.Invoke(this, NetworkColorBroadcastToLocal(colorBroadcast));
+            NetworkObjectColorBroadcast colorBroadcast = JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(json) ?? throw new Exception("Color broadcast object is null");
+            PlayerColorChangeEventReceived?.Invoke(this, NetworkColorBroadcastToLocal(colorBroadcast));
         }
 
         private void HandleRevealedBroadcast(string json)
         {
-            NetworkObjectRevealedBroadcast revealedBroadcast = JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(json);
-            void handler()
-            {
-                TriggerBoardUpdate(resetConditions: false);
-                if(revealedBroadcast.Player.UUID == PlayerUUID)
-                {
-                    Board.IsRevealed = true;
-                }
-                CardRevealedBroadcastReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
-            }
-            RunAfterUUIDKnown(handler);
-        }
-
-        private void RunAfterUUIDKnown(Action action)
-        {
-            if (string.IsNullOrEmpty(PlayerUUID))
-            {
-                RequestPlayerUUID(action);
-            }
-            else
-            {
-                action?.Invoke();
-            }
-
+            NetworkObjectRevealedBroadcast revealedBroadcast = JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(json) ?? throw new Exception("Revealed broadcast object is null");
+            BoardRevealedEventReceived?.Invoke(this, NetworkRevealedBroadcastToLocal(revealedBroadcast));
         }
 
         private void HandleConnectionBroadcast(string json)
         {
-            NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json);
-            PlayerConnectedBroadcastReceived?.Invoke(this, NetworkConnectionBroadcastToLocal(connectionBroadcast));
+            NetworkObjectConnectionBroadcast connectionBroadcast = JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(json) ?? throw new Exception("Connection broadcast object is null");
+            PlayerConnectionEventReceived?.Invoke(this, NetworkConnectionBroadcastToLocal(connectionBroadcast));
         }
 
-        private void RequestAndSetBoard(bool hideCard, Action callback)
+        private void RequestPlayerUUID(Action? callback = null)
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{currentRoomID}/board");
+                var requestTask = httpClient.GetAsync($"https://bingosync.com/api/socket/{socketKey}");
+                return requestTask.ContinueWith(response =>
+                {
+                    HttpResponseMessage result = response.Result;
+                    result.EnsureSuccessStatusCode();
+                    result.Content.ReadAsStringAsync().ContinueWith(networkSocketCheck =>
+                    {
+                        NetworkObjectSocketCheck socketInfo = JsonConvert.DeserializeObject<NetworkObjectSocketCheck>(networkSocketCheck.Result) ?? throw new Exception("SocketInfo response is null");
+                        PlayerUUID = socketInfo.PlayerUUID;
+                        callback?.Invoke();
+                    });
+
+                });
+            }, MAX_RETRIES, nameof(RequestPlayerUUID));
+        }
+
+        private void GetNewBoard(bool hideBoard, Action? callback = null)
+        {
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var task = httpClient.GetAsync($"room/{currentRoomID}/board");
                 return task.ContinueWith(responseTask =>
                 {
-                    HttpResponseMessage response = null;
-                    response = responseTask.Result;
+                    HttpResponseMessage response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     var readTask = response.Content.ReadAsStringAsync();
                     readTask.ContinueWith(boardResponse =>
                     {
-                        var newBoard = JsonConvert.DeserializeObject<List<NetworkObjectBoardSquare>>(boardResponse.Result);
-                        Board.IsRevealed = !hideCard;
-                        UpdateBoardSquares(newBoard);
+                        List<NetworkObjectBoardSquare> newBoard = JsonConvert.DeserializeObject<List<NetworkObjectBoardSquare>>(boardResponse.Result) ?? throw new Exception("Board response is null");
+                        newBoard.Sort((left, right) => int.Parse(left.Slot.Substring(4)).CompareTo(int.Parse(right.Slot.Substring(4))));
                         callback?.Invoke();
+                        OnBoardChanged?.Invoke(this, new BoardChangedInfo()
+                        {
+                            Board = [.. newBoard.Select(networkSquare => NetworkBoardSquareToLocal(networkSquare))],
+                            HideBoard = hideBoard,
+                        });
                     });
                 });
-            }, maxRetries, nameof(RequestAndSetBoard));
+            }, MAX_RETRIES, nameof(GetNewBoard));
         }
 
-        private void UpdateSettings()
+        private void UpdateSettings(Action? callback = null)
         {
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{currentRoomID}/room-settings");
+                var task = httpClient.GetAsync($"room/{currentRoomID}/room-settings");
                 return task.ContinueWith(responseTask =>
                 {
-                    HttpResponseMessage response = null;
-                    response = responseTask.Result;
+                    HttpResponseMessage response = responseTask.Result;
                     response.EnsureSuccessStatusCode();
                     var readTask = response.Content.ReadAsStringAsync();
                     readTask.ContinueWith(settingsResponse =>
                     {
-                        var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result);
-                        RoomSettingsReceived?.Invoke(this, NetworkRoomSettingsToLocal(settings));
+                        var settings = JsonConvert.DeserializeObject<NetworkObjectRoomSettingsResponse>(settingsResponse.Result) ?? throw new Exception("Settings response is null");
+                        RoomSettings localSettings = NetworkRoomSettingsToLocal(settings);
+                        roomSettings = localSettings;
+                        callback?.Invoke();
+                        OnRoomSettingsChanged?.Invoke(this, localSettings);
                     });
                 });
-            }, maxRetries, nameof(UpdateSettings));
+            }, MAX_RETRIES, nameof(UpdateSettings));
         }
 
-        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback, Action errorCallback)
+        public void SetColor(int color, Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            var setColorInput = new NetworkObjectSetColorRequest
+            {
+                Room = currentRoomID,
+                Color = ColorManager.NameOf(color),
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(setColorInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = httpClient.PutAsync("api/color", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    callback?.Invoke();
+                });
+            }, MAX_RETRIES, nameof(SetColor));
+        }
+
+        public void NewBoard(List<string> board, bool lockout = true, bool hideBoard = true, int seed = 0, Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            var newBoard = new NetworkObjectNewBoardRequest
+            {
+                Room = currentRoomID,
+                Game = 18, // this is supposed to be custom already
+                Variant = 18, // but this is also required for custom ???
+                CustomJSON = JsonifyBoard(board),
+                Lockout = !lockout, // false is lockout here for some godforsaken reason
+                Seed = $"{seed}",
+                HideBoard = hideBoard,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(newBoard);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = httpClient.PostAsync("api/new-card", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    callback?.Invoke();
+                });
+            }, MAX_RETRIES, nameof(NewBoard));
+        }
+
+        private static string JsonifyBoard(List<string> board)
+        {
+            string output = "[";
+            for (int i = 0; i < board.Count; i++)
+            {
+                output += "{\"name\": \"" + board.ElementAt(i) + "\"}" + (i < 24 ? "," : "");
+            }
+            output += "]";
+            return output;
+        }
+
+        public void RevealBoard(Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            var revealInput = new NetworkObjectRevealRequest
+            {
+                Room = currentRoomID,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(revealInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = httpClient.PutAsync("api/revealed", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    callback?.Invoke();
+                    OnBoardRevealed?.Invoke(this, EventArgs.Empty);
+                });
+            }, MAX_RETRIES, nameof(RevealBoard));
+        }
+
+        public void SendChatMessage(string text, Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            var chatMessageInput = new NetworkObjectChatMessageRequest
+            {
+                Room = currentRoomID,
+                Text = text,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(chatMessageInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = httpClient.PutAsync("api/chat", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    callback?.Invoke();
+                });
+            }, MAX_RETRIES, nameof(SendChatMessage));
+        }
+
+        public void MarkGoal(int index, int color, bool unmark = false, Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            var selectInput = new NetworkObjectSelectRequest
+            {
+                Room = currentRoomID,
+                Slot = index + 1,
+                Color = ColorManager.NameOf(color),
+                RemoveColor = unmark,
+            };
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                var payload = JsonConvert.SerializeObject(selectInput);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                var task = httpClient.PutAsync("api/select", content);
+                return task.ContinueWith(responseTask =>
+                {
+                    var response = responseTask.Result;
+                    response.EnsureSuccessStatusCode();
+                    callback?.Invoke();
+                });
+            }, MAX_RETRIES, nameof(MarkGoal));
+        }
+
+        public void ExitRoom(Action? callback = null)
+        {
+            if (GetState() != ClientState.Connected) return;
+            stateOverride = ClientState.Disconnecting;
+            OnConnectionStateChanged?.Invoke(this, new ClientStateChangedInfo() { NewClientState = GetState() });
+            currentRoomID = string.Empty;
+            RetryHelper.RetryWithExponentialBackoff(() =>
+            {
+                return webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure, "exiting room", CancellationToken.None).ContinueWith(result =>
+                {
+                    if (result.Exception != null)
+                    {
+                        throw result.Exception;
+                    }
+                    AfterExitRoom();
+                    callback?.Invoke();
+                });
+            }, MAX_RETRIES, nameof(ExitRoom), () =>
+            {
+                AfterExitRoom();
+            });
+        }
+
+        private void AfterExitRoom()
+        {
+            webSocketClient = new ClientWebSocket();
+            stateOverride = ClientState.None;
+            PlayerUUID = string.Empty;
+            OnConnectionStateChanged?.Invoke(this, new ClientStateChangedInfo() { NewClientState = GetState() });
+            OnBoardChanged?.Invoke(this, new BoardChangedInfo()
+            {
+                Board = []
+            });
+        }
+
+        public void ProcessRoomHistory(Action<List<RoomEventInfo>> callback)
         {
             if (GetState() != ClientState.Connected) return;
             RetryHelper.RetryWithExponentialBackoff(() =>
             {
-                var task = client.GetAsync($"room/{currentRoomID}/feed");
+                var task = httpClient.GetAsync($"room/{currentRoomID}/feed");
                 return task.ContinueWith(responseTask =>
                 {
                     HttpResponseMessage response = responseTask.Result;
@@ -580,24 +509,24 @@ namespace BingoSync.Clients
                         callback(events);
                     });
                 });
-            }, maxRetries, nameof(ProcessRoomHistory), errorCallback);
+            }, MAX_RETRIES, nameof(ProcessRoomHistory));
         }
 
-        private List<RoomEventInfo> ParseRoomHistory(string json)
+        private static List<RoomEventInfo> ParseRoomHistory(string json)
         {
-            UnparsedRoomFeed unparsedFeed = JsonConvert.DeserializeObject<UnparsedRoomFeed>(json);
+            UnparsedRoomFeed unparsedFeed = JsonConvert.DeserializeObject<UnparsedRoomFeed>(json) ?? throw new Exception("Room feed is null");
             List<RoomEventInfo> events = [];
-            foreach(JObject unparsedEvent in unparsedFeed.Events)
+            foreach (JObject unparsedEvent in unparsedFeed.Events)
             {
-                string type = unparsedEvent.Property("type").Value.ToString();
-                RoomEventInfo parsedEvent = type switch
+                string type = unparsedEvent?.Property("type")?.Value.ToString() ?? throw new Exception("Event type is null");
+                RoomEventInfo? parsedEvent = type switch
                 {
-                    "chat" => NetworkChatBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(unparsedEvent.ToString())),
-                    "new-card" => NetworkNewCardBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectNewCardBroadcast>(unparsedEvent.ToString())),
-                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString())),
-                    "color" => NetworkColorBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(unparsedEvent.ToString())),
-                    "revealed" => NetworkRevealedBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(unparsedEvent.ToString())),
-                    "connection" => NetworkConnectionBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(unparsedEvent.ToString())),
+                    "chat" => NetworkChatBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectChatBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("Chat event is null")),
+                    "new-card" => NetworkNewBoardBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectNewBoardBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("New board event is null")),
+                    "goal" => NetworkGoalBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectGoalBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("Goal event is null")),
+                    "color" => NetworkColorBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectColorBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("Color event is null")),
+                    "revealed" => NetworkRevealedBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectRevealedBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("Revealed event is null")),
+                    "connection" => NetworkConnectionBroadcastToLocal(JsonConvert.DeserializeObject<NetworkObjectConnectionBroadcast>(unparsedEvent.ToString()) ?? throw new Exception("Connection event is null")),
                     _ => null,
                 };
                 if (parsedEvent != null)
@@ -623,12 +552,10 @@ namespace BingoSync.Clients
         {
             return new RoomSettings()
             {
-                HideCard = network.Settings.HideCard,
-                IsLockout = network.Settings.LockoutMode == LOCKOUT_MODE,
+                HideBoard = network.Settings.HideBoard,
+                IsLockout = network.Settings.LockoutMode == "Lockout",
                 GameName = network.Settings.GameName,
-                GameId = network.Settings.GameId,
                 VariantName = network.Settings.VariantName,
-                VariantId = network.Settings.VariantId,
                 Seed = network.Settings.Seed,
             };
         }
@@ -639,7 +566,7 @@ namespace BingoSync.Clients
             {
                 UUID = network.UUID,
                 Name = network.Name,
-                Color = ColorExtensions.FromName(network.Color),
+                Color = _colorManager.NumberOf(network.Color),
                 IsSpectator = network.IsSpectator,
             };
         }
@@ -654,15 +581,33 @@ namespace BingoSync.Clients
             };
         }
 
-        private static NewCardEventInfo NetworkNewCardBroadcastToLocal(NetworkObjectNewCardBroadcast network)
+        private static NewBoardEventInfo NetworkNewBoardBroadcastToLocal(NetworkObjectNewBoardBroadcast network)
         {
-            return new NewCardEventInfo()
+            return new NewBoardEventInfo()
             {
                 Player = NetworkPlayerBroadcastToLocal(network.Player),
                 Timestamp = network.Timestamp,
                 Game = network.Game,
                 Seed = network.Seed,
-                HideCard = network.HideCard,
+                HideBoard = network.HideBoard,
+            };
+        }
+
+        private static BoardSquare NetworkBoardSquareToLocal(NetworkObjectBoardSquare network)
+        {
+            HashSet<int> markedBy = [];
+            foreach (string colorStr in network.Colors.Split(' '))
+            {
+                int color = _colorManager.NumberOf(colorStr);
+                if (color >= 0)
+                {
+                    markedBy.Add(color);
+                }
+            }
+            return new BoardSquare()
+            {
+                Name = network.Name,
+                MarkedBy = markedBy,
             };
         }
 
@@ -672,10 +617,10 @@ namespace BingoSync.Clients
             {
                 Player = NetworkPlayerBroadcastToLocal(network.Player),
                 Timestamp = network.Timestamp,
-                Color = ColorExtensions.FromName(network.Color),
+                Color = _colorManager.NumberOf(network.Color),
                 Goal = network.Square.Name,
                 Index = int.Parse(network.Square.Slot.Substring(4)) - 1,
-                Unmarking = network.Remove,
+                Unmark = network.Remove,
             };
         }
 
@@ -685,13 +630,13 @@ namespace BingoSync.Clients
             {
                 Player = NetworkPlayerBroadcastToLocal(network.Player),
                 Timestamp = network.Timestamp,
-                Color = ColorExtensions.FromName(network.Color),
+                Color = _colorManager.NumberOf(network.Color),
             };
         }
 
-        private static CardRevealedEventInfo NetworkRevealedBroadcastToLocal(NetworkObjectRevealedBroadcast network)
+        private static BoardRevealedEventInfo NetworkRevealedBroadcastToLocal(NetworkObjectRevealedBroadcast network)
         {
-            return new CardRevealedEventInfo()
+            return new BoardRevealedEventInfo()
             {
                 Player = NetworkPlayerBroadcastToLocal(network.Player),
                 Timestamp = network.Timestamp,
@@ -709,256 +654,257 @@ namespace BingoSync.Clients
         }
 
         #endregion
+
+        #region Request objects
+
+        [DataContract]
+        class NetworkObjectSetColorRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+            [JsonProperty("color")]
+            public string Color = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectRevealRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectSelectRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+            [JsonProperty("slot")]
+            public int Slot;
+            [JsonProperty("color")]
+            public string Color = string.Empty;
+            [JsonProperty("remove_color")]
+            public bool RemoveColor;
+        }
+
+        [DataContract]
+        class NetworkObjectJoinRoomRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+            [JsonProperty("nickname")]
+            public string Nickname = string.Empty;
+            [JsonProperty("password")]
+            public string Password = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectSocketJoinRequest
+        {
+            [JsonProperty("socket_key")]
+            public string SocketKey = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectNewBoardRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+            [JsonProperty("game_type")]
+            public int Game;
+            [JsonProperty("variant_type")]
+            public int Variant;
+            [JsonProperty("custom_json")]
+            public string CustomJSON = string.Empty;
+            [JsonProperty("lockout_mode")]
+            public bool Lockout;
+            [JsonProperty("seed")]
+            public string Seed = string.Empty;
+            [JsonProperty("hide_card")]
+            public bool HideBoard;
+        }
+
+        [DataContract]
+        class NetworkObjectChatMessageRequest
+        {
+            [JsonProperty("room")]
+            public string Room = string.Empty;
+            [JsonProperty("text")]
+            public string Text = string.Empty;
+        }
+
+        #endregion
+
+        #region Broadcast objects
+
+        [DataContract]
+        class NetworkObjectBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectChatBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("player_color")]
+            public string Color = string.Empty;
+            [JsonProperty("text")]
+            public string Text = string.Empty;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectNewBoardBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("player_color")]
+            public string PlayerColor = string.Empty;
+            [JsonProperty("game")]
+            public string Game = string.Empty;
+            [JsonProperty("seed")]
+            public string Seed = string.Empty;
+            [JsonProperty("hide_card")]
+            public bool HideBoard = false;
+            [JsonProperty("is_current")]
+            public bool IsCurrent = false;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectGoalBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("square")]
+            public NetworkObjectBoardSquare Square = new();
+            [JsonProperty("player_color")]
+            public string PlayerColor = string.Empty;
+            [JsonProperty("color")]
+            public string Color = string.Empty;
+            [JsonProperty("remove")]
+            public bool Remove = false;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectColorBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("player_color")]
+            public string PlayerColor = string.Empty;
+            [JsonProperty("color")]
+            public string Color = string.Empty;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectRevealedBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("player_color")]
+            public string PlayerColor = string.Empty;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectConnectionBroadcast
+        {
+            [JsonProperty("type")]
+            public string Type = string.Empty;
+            [JsonProperty("event_type")]
+            public string EventType = string.Empty;
+            [JsonProperty("player")]
+            public NetworkObjectPlayer Player = new();
+            [JsonProperty("player_color")]
+            public string PlayerColor = string.Empty;
+            [JsonProperty("timestamp")]
+            public string Timestamp = string.Empty;
+        }
+
+        #endregion
+
+        #region Common network objects
+
+        [DataContract]
+        class NetworkObjectSocketCheck
+        {
+            [JsonProperty("room")]
+            public string RoomCode = string.Empty;
+            [JsonProperty("player")]
+            public string PlayerUUID = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectBoardSquare
+        {
+            [JsonProperty("name")]
+            public string Name = string.Empty;
+            [JsonProperty("colors")]
+            public string Colors = string.Empty;
+            [JsonProperty("slot")]
+            public string Slot = string.Empty;
+        }
+
+        [DataContract]
+        class NetworkObjectRoomSettingsResponse
+        {
+            [JsonProperty("settings")]
+            public NetworkObjectRoomSettings Settings = new();
+        }
+
+        [DataContract]
+        class NetworkObjectRoomSettings
+        {
+            [JsonProperty("hide_card")]
+            public bool HideBoard = true;
+            [JsonProperty("lockout_mode")]
+            public string LockoutMode = string.Empty;
+            [JsonProperty("game")]
+            public string GameName = string.Empty;
+            [JsonProperty("game_id")]
+            public int GameId = 0;
+            [JsonProperty("variant")]
+            public string VariantName = string.Empty;
+            [JsonProperty("variant_id")]
+            public int VariantId = 0;
+            [JsonProperty("seed")]
+            public int Seed = 0;
+        }
+
+        [DataContract]
+        class NetworkObjectPlayer
+        {
+            [JsonProperty("uuid")]
+            public string UUID = string.Empty;
+            [JsonProperty("name")]
+            public string Name = string.Empty;
+            [JsonProperty("color")]
+            public string Color = string.Empty;
+            [JsonProperty("is_spectator")]
+            public bool IsSpectator = false;
+        }
+
+        #endregion
+
     }
-
-    #region Request objects
-
-    [DataContract]
-    class NetworkObjectSetColorRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("color")]
-        public string Color;
-    }
-
-    [DataContract]
-    class NetworkObjectRevealRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-    }
-
-    [DataContract]
-    class NetworkObjectSelectRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("slot")]
-        public int Slot;
-        [JsonProperty("color")]
-        public string Color;
-        [JsonProperty("remove_color")]
-        public bool RemoveColor;
-    }
-
-    [DataContract]
-    class NetworkObjectJoinRoomRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("nickname")]
-        public string Nickname;
-        [JsonProperty("password")]
-        public string Password;
-    }
-
-    [DataContract]
-    class NetworkObjectSocketJoinRequest
-    {
-        [JsonProperty("socket_key")]
-        public string SocketKey = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectNewCardRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("game_type")]
-        public int Game;
-        [JsonProperty("variant_type")]
-        public int Variant;
-        [JsonProperty("custom_json")]
-        public string CustomJSON;
-        [JsonProperty("lockout_mode")]
-        public bool Lockout;
-        [JsonProperty("seed")]
-        public string Seed;
-        [JsonProperty("hide_card")]
-        public bool HideCard;
-    }
-
-    [DataContract]
-    class NetworkObjectChatMessageRequest
-    {
-        [JsonProperty("room")]
-        public string Room;
-        [JsonProperty("text")]
-        public string Text;
-    }
-
-    #endregion
-
-    #region Broadcast objects
-
-    [DataContract]
-    class NetworkObjectBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectChatBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("player_color")]
-        public string Color = string.Empty;
-        [JsonProperty("text")]
-        public string Text = string.Empty;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectNewCardBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("player_color")]
-        public string PlayerColor = string.Empty;
-        [JsonProperty("game")]
-        public string Game = string.Empty;
-        [JsonProperty("seed")]
-        public string Seed = string.Empty;
-        [JsonProperty("hide_card")]
-        public bool HideCard = false;
-        [JsonProperty("is_current")]
-        public bool IsCurrent = false;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectGoalBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("square")]
-        public NetworkObjectBoardSquare Square = new();
-        [JsonProperty("player_color")]
-        public string PlayerColor = string.Empty;
-        [JsonProperty("color")]
-        public string Color = string.Empty;
-        [JsonProperty("remove")]
-        public bool Remove = false;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectColorBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("player_color")]
-        public string PlayerColor = string.Empty;
-        [JsonProperty("color")]
-        public string Color = string.Empty;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectRevealedBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("player_color")]
-        public string PlayerColor = string.Empty;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectConnectionBroadcast
-    {
-        [JsonProperty("type")]
-        public string Type = string.Empty;
-        [JsonProperty("event_type")]
-        public string EventType = string.Empty;
-        [JsonProperty("player")]
-        public NetworkObjectPlayer Player = new();
-        [JsonProperty("player_color")]
-        public string PlayerColor = string.Empty;
-        [JsonProperty("timestamp")]
-        public string Timestamp = string.Empty;
-    }
-
-    #endregion
-
-    #region Common network objects
-
-    [DataContract]
-    class NetworkObjectSocketCheck
-    {
-        [JsonProperty("room")]
-        public string RoomCode = string.Empty;
-        [JsonProperty("player")]
-        public string PlayerUUID = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectBoardSquare
-    {
-        [JsonProperty("name")]
-        public string Name = string.Empty;
-        [JsonProperty("colors")]
-        public string Colors = string.Empty;
-        [JsonProperty("slot")]
-        public string Slot = string.Empty;
-    }
-
-    [DataContract]
-    class NetworkObjectRoomSettingsResponse
-    {
-        [JsonProperty("settings")]
-        public NetworkObjectRoomSettings Settings = new();
-    }
-
-    [DataContract]
-    class NetworkObjectRoomSettings
-    {
-        [JsonProperty("hide_card")]
-        public bool HideCard = true;
-        [JsonProperty("lockout_mode")]
-        public string LockoutMode = string.Empty;
-        [JsonProperty("game")]
-        public string GameName = string.Empty;
-        [JsonProperty("game_id")]
-        public int GameId = 0;
-        [JsonProperty("variant")]
-        public string VariantName = string.Empty;
-        [JsonProperty("variant_id")]
-        public int VariantId = 0;
-        [JsonProperty("seed")]
-        public int Seed = 0;
-    }
-
-    [DataContract]
-    class NetworkObjectPlayer
-    {
-        [JsonProperty("uuid")]
-        public string UUID = string.Empty;
-        [JsonProperty("name")]
-        public string Name = string.Empty;
-        [JsonProperty("color")]
-        public string Color = string.Empty;
-        [JsonProperty("is_spectator")]
-        public bool IsSpectator = false;
-    }
-
-    #endregion
 }
