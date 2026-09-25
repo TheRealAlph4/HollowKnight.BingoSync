@@ -1,38 +1,57 @@
-using BingoSync;
 using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-internal static class RetryHelper
+namespace BingoSync.Helpers
 {
-    private static readonly int delayMilliseconds = 100;
-    private static readonly int maxDelayMilliseconds = 2000;
-
-    public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, Action failCallback = null, int retries = 0)
+    internal static class RetryHelper
     {
-        if (retries >= maxRetries) {
-            Log.Error($"All retries used but could not complete request {requestName}");
-            failCallback?.Invoke();
-            return;
-        }
+        private static readonly int defaultDelayMilliseconds = 100;
+        private static readonly int maxDelayMilliseconds = 2000;
 
-        Timer timer = null;
-        Task currentTask = action.Invoke();
-        _ = currentTask.ContinueWith(task =>
+        public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, Action? failCallback = null, int retries = 0)
         {
-            if (task.Exception == null)
+            if (retries >= maxRetries)
             {
-                if (retries > 0)
-                {
-                    Log.Info($"{requestName} request was successful on try {retries}");
-                }
+                Log.Error($"All retries used but could not complete request {requestName}");
+                failCallback?.Invoke();
                 return;
             }
-            int delay = Math.Min((2 << retries) * delayMilliseconds, maxDelayMilliseconds);
-            timer = new Timer(_ => {
-                timer.Dispose();
-                RetryWithExponentialBackoff(action, maxRetries, requestName, failCallback, retries + 1);
-            }, null, delay, 0);
-        });
+
+            Timer? timer = null;
+            Task currentTask = action.Invoke();
+            _ = currentTask.ContinueWith(task =>
+            {
+                int delayMilliseconds = Math.Min((2 << retries) * defaultDelayMilliseconds, maxDelayMilliseconds);
+                if (task.Exception == null)
+                {
+                    if (retries > 0)
+                    {
+                        Log.Info($"{requestName} request was successful on try {retries}");
+                    }
+                    return;
+                }
+                else if (task.Exception.InnerException is HttpRequestException ex)
+                {
+                    Log.Warn($"Exception during {requestName} request: '{ex.Message}'");
+                    if (ex.Message.Contains("400"))
+                    {
+                        Log.Error($"{requestName} request failed: '{ex.Message}'");
+                        failCallback?.Invoke();
+                        return;
+                    }
+                    if (ex.Message.Contains("429"))
+                    {
+                        Log.Info($"Retrying {requestName} request with maximum delay due to response '{ex.Message}'");
+                        delayMilliseconds = maxDelayMilliseconds;
+                    }
+                }
+                timer = new Timer(_ => {
+                    timer?.Dispose();
+                    RetryWithExponentialBackoff(action, maxRetries, requestName, failCallback, retries + 1);
+                }, null, delayMilliseconds, 0);
+            });
+        }
     }
 }

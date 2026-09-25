@@ -1,7 +1,7 @@
 ﻿using BingoSync.Clients.ColorManagement;
 using BingoSync.Clients.EventInfoObjects;
 using BingoSync.Clients.StateChangeInfoObjects;
-using BingoSync.CustomGoals;
+using BingoSync.Helpers;
 using BingoSync.Sessions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
