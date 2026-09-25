@@ -26,7 +26,7 @@ namespace BingoSync.CustomGoals
             {
                 if (availableGoals.Count == 0)
                 {
-                    Modding.Logger.Log("Could not generate board");
+                    Log.Error("Could not generate board");
                     return GetErrorBoard();
                 }
                 int index = r.Next(availableGoals.Count);

@@ -14,7 +14,6 @@ namespace BingoSync.GameUI
 {
     static class ConnectionMenuUI
     {
-        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
         private static LayoutRoot layoutRoot;
@@ -43,9 +42,8 @@ namespace BingoSync.GameUI
             }
         }
 
-        public static void Setup(Action<string> log, LayoutRoot layoutRoot)
+        public static void Setup(LayoutRoot layoutRoot)
         {
-            Log = log;
             Loader.Preload();
             ConnectionMenuUI.layoutRoot = layoutRoot;
 

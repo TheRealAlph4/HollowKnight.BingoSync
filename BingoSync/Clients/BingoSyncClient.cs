@@ -23,7 +23,6 @@ namespace BingoSync.Clients
         private static readonly BingoSyncColorManager _colorManager = new();
         public IColorManager ColorManager => _colorManager;
 
-        private readonly Action<string> Log;
         private const int MAX_RETRIES = 30;
 
         private readonly HttpClient httpClient;
@@ -49,9 +48,8 @@ namespace BingoSync.Clients
         public event EventHandler<SquareChangedInfo>? OnSquareChanged;
         public event EventHandler? OnBoardRevealed;
 
-        public BingoSyncClient(Action<string> log)
+        public BingoSyncClient()
         {
-            Log = log;
             CookieContainer cookieContainer = new();
             HttpClientHandler clientHandler = new()
             {
@@ -145,7 +143,7 @@ namespace BingoSync.Clients
                 }
                 catch (Exception ex)
                 {
-                    Log($"could not join room: {ex.Message}");
+                    Log.Error($"could not join room: {ex.Message}");
                     stateOverride = ClientState.None;
                 }
             });
@@ -162,7 +160,7 @@ namespace BingoSync.Clients
                 {
                     if (connectResponse.Exception != null)
                     {
-                        Log($"Error connecting to websocket: {connectResponse.Exception}");
+                        Log.Error($"Error connecting to websocket: {connectResponse.Exception}");
                         throw connectResponse.Exception;
                     }
                     var serializedSocketJoin = JsonConvert.SerializeObject(socketJoin);
@@ -201,17 +199,17 @@ namespace BingoSync.Clients
                         case "color": HandleColorBroadcast(json); break;
                         case "revealed": HandleRevealedBroadcast(json); break;
                         case "connection": HandleConnectionBroadcast(json); break;
-                        default: Log($"Received unknown broadcast type \"{broadcast.Type}\""); break;
+                        default: Log.Warn($"Received unknown broadcast type \"{broadcast.Type}\""); break;
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log($"'{ex.GetType().FullName}' error with message '{ex.Message}' while handling socket broadcast.\nStacktrace: \n{ex.StackTrace}");
+                    Log.Warn($"'{ex.GetType().FullName}' error with message '{ex.Message}' while handling socket broadcast.\nStacktrace: \n{ex.StackTrace}");
                 }
             }
             if (GetState() == ClientState.Connecting || GetState() == ClientState.Connected)
             {
-                Log($"Socket is closed, reconnecting...");
+                Log.Warn($"Socket is closed, reconnecting...");
                 ConnectToBroadcastSocket(socketJoin);
                 return;
             }

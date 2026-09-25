@@ -68,7 +68,7 @@ namespace BingoSync.CustomGoals
             {
                 if (!GameModesManager.GoalGroupExists(goalGroup.Name))
                 {
-                    Modding.Logger.Log($"Group \"{goalGroup.Name}\" is not registered, skipping");
+                    Log.Warn($"Group \"{goalGroup.Name}\" is not registered, skipping");
                     continue;
                 }
                 List<string> activeGoals = goalGroup.GetActiveGoals();
@@ -98,7 +98,7 @@ namespace BingoSync.CustomGoals
             {
                 if (availableGoals.Count == 0)
                 {
-                    Modding.Logger.Log("Could not generate board");
+                    Log.Error("Could not generate board");
                     return GetErrorBoard();
                 }
                 int index = r.Next(availableGoals.Count);

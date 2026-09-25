@@ -136,15 +136,13 @@ namespace BingoSync
 
         public static event Action OnBoardUpdate;
 
-        private static Action<string> Log;
         private static readonly Stopwatch timer = new();
         private static readonly TimeSpan showBoardButtonTimeout = new(days: 0, hours: 0, minutes: 0, seconds: 0, milliseconds: 300);
         private static int showBoardClickCount = 0;
 
         static Controller()
         {
-            Log = _ => { };
-            DefaultSession = new Session("Default", new BingoSyncClient(Log), true, GlobalSettings.DefaultSessionUnmarkGoals)
+            DefaultSession = new Session("Default", new BingoSyncClient(), true, GlobalSettings.DefaultSessionUnmarkGoals)
             {
                 AudioNotificationOn = GlobalSettings.AudioNotificationOn
             };
@@ -156,11 +154,6 @@ namespace BingoSync
             OnBoardUpdate += ConfirmTopLeftOnReveal;
             OnBoardUpdate += RefreshGenerationButtonEnabled;
             SessionManager.OnSessionChanged += OnSessionChanged;
-        }
-
-        public static void Setup(Action<string> log)
-        {
-            Log = log;
         }
 
         public static void BoardUpdate()
@@ -356,7 +349,7 @@ namespace BingoSync
             IGameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
             if(gameMode == null || !gameMode.CanBeRenamed)
             {
-                Log($"Cannot rename gamemode {ActiveGameMode}");
+                Log.Warn($"Cannot rename gamemode {ActiveGameMode}");
                 return false;
             }
             string oldName = gameMode.SetName(newName);

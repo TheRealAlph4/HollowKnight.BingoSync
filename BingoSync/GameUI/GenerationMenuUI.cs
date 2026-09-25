@@ -12,7 +12,6 @@ namespace BingoSync.GameUI
 {
     static class GenerationMenuUI
     {
-        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
         private static LayoutRoot layoutRoot;
@@ -44,9 +43,8 @@ namespace BingoSync.GameUI
 
         public static bool TextBoxActive { get; private set; } = false;
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
             Loader.Preload();
             SharedUIPage page = SharedUIManager.RequestUIPage("BingoSync");
             layoutRoot = page.Root;
@@ -328,12 +326,12 @@ namespace BingoSync.GameUI
             string displayName = rawName + "*";
             if(rawName == string.Empty)
             {
-                Log($"A name must be given to rename a gamemode");
+                Log.Info($"A name must be given to rename a gamemode");
                 return;
             }
             if (gameModeButtons.FindIndex(gameMode => gameMode.Content == displayName) != -1)
             {
-                Log($"Cannot rename gamemode to {displayName}, that name already exists");
+                Log.Info($"Cannot rename gamemode to {displayName}, that name already exists");
                 return;
             }
             string oldName = Controller.ActiveGameMode;

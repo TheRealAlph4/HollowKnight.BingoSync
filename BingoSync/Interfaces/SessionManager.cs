@@ -7,7 +7,6 @@ namespace BingoSync.Interfaces
 {
     public static class SessionManager
     {
-        private static Action<string> Log;
         private static readonly HashSet<string> NeedsSessionNameKeys = [];
         internal static bool ShowSessionName
         {
@@ -15,11 +14,6 @@ namespace BingoSync.Interfaces
             {
                 return NeedsSessionNameKeys.Count > 0;
             }
-        }
-
-        internal static void Setup(Action<string> log)
-        {
-            Log = log;
         }
 
         internal static void SessionChanged(Session previous)
@@ -87,7 +81,7 @@ namespace BingoSync.Interfaces
         {
             IBingoClient remoteClient = server switch
             {
-                Servers.BingoSync => new BingoSyncClient(Log),
+                Servers.BingoSync => new BingoSyncClient(),
                 _ => throw new NotImplementedException()
             };
             return new Session(name, remoteClient, isAutoMarking, isAutoUnmarking);

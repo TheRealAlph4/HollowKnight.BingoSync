@@ -5,8 +5,6 @@ namespace BingoSync.GameUI
 {
     internal static class MenuUI
     {
-        private static Action<string> Log;
-
         public static readonly int gapWidth = 10;
         public static readonly int colorButtonWidth = 100;
         public static readonly int lockoutButtonWidth = 50;
@@ -39,12 +37,10 @@ namespace BingoSync.GameUI
             VisibilityCondition = () => false,
         };
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
-
-            ConnectionMenuUI.Setup(Log, layoutRoot);
-            GenerationMenuUI.Setup(Log);
+            ConnectionMenuUI.Setup(layoutRoot);
+            GenerationMenuUI.Setup();
 
 
             layoutRoot.VisibilityCondition = () => {

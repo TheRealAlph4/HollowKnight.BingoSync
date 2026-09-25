@@ -45,13 +45,10 @@ namespace BingoSync.GameUI
             Visibility = Visibility.Hidden,
         };
         
-        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
-
             commonRoot.VisibilityCondition = () => true;
 
             revealBoardButton.Click += Controller.RevealButtonClicked;

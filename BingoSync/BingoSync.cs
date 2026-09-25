@@ -11,12 +11,25 @@ namespace BingoSync
     {
         new public string GetName() => "BingoSync";
 
-        public static string version = "1.6.0.0";
+        public static string version = "1.6.1.0";
         public override string GetVersion() => version;
+
+        private static BingoSync? _instance = null;
+        public static BingoSync? Instance
+        {
+            get
+            {
+                return _instance;
+            }
+            set
+            {
+                _instance ??= value;
+            }
+        }
 
         public override void Initialize()
         {
-            OrderedLoader.Setup(Log);
+            Instance = this;
             OrderedLoader.LoadInternal();
         }
 

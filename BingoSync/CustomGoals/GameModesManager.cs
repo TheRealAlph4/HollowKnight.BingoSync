@@ -11,7 +11,6 @@ namespace BingoSync.CustomGoals
     internal static class GameModesManager
     {
         private static readonly string CustomGameModesPath = Path.Combine(Path.Combine(Application.persistentDataPath, "BingoSync"), "CustomProfiles");
-        private static Action<string> Log;
         private static readonly List<IGameMode> gameModes = [];
         private static readonly Dictionary<string, BingoGoal> vanillaGoals = [];
         private static readonly Dictionary<string, BingoGoal> itemRandoGoals = [];
@@ -21,20 +20,19 @@ namespace BingoSync.CustomGoals
 
         public static void DumpDebugInfo()
         {
-            Log($"GameModesManager");
+            Log.Info($"GameModesManager");
             foreach (string groupname in goalGroupDefinitions.Select(group => group.Key))
             {
-                Log($"\tGoalGroup \"{groupname}\"");
+                Log.Info($"\tGoalGroup \"{groupname}\"");
             };
             foreach (string gamemode in gameModes.Select(gamemode => gamemode.DisplayName))
             {
-                Log($"\tGameMode \"{gamemode}\"");
+                Log.Info($"\tGameMode \"{gamemode}\"");
             };
         }
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
             SetupVanillaGoals();
             SetupItemRandoGoals();
             gameModes.Add(new SimpleGameMode("Vanilla", vanillaGoals));
@@ -125,7 +123,7 @@ namespace BingoSync.CustomGoals
                 }
                 catch (Exception e)
                 {
-                    Log(e.Message);
+                    Log.Error(e.Message);
                 }
             }
         }
@@ -199,7 +197,7 @@ namespace BingoSync.CustomGoals
         {
             if (!goalGroupDefinitions.ContainsKey(groupName))
             {
-                Log($"Couldn't create default settings for unknown group \"{groupName}\"");
+                Log.Error($"Couldn't create default settings for unknown group \"{groupName}\"");
                 return new GoalGroup("Unknown Group", []);
             }
             return new GoalGroup(groupName, [.. goalGroupDefinitions[groupName].Select(goal => goal.Name)]);

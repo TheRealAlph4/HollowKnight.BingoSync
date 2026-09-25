@@ -30,26 +30,15 @@ namespace BingoSync.Interfaces
         /// </summary>
         public static event EventHandler OnCompletelyLoaded;
 
-        private static Action<string> Log;
-
-        internal static void Setup(Action<string> log)
-        {
-            Log = log;
-        }
-
         internal static void LoadInternal()
         {
             ModHooks.FinishedLoadingModsHook += OnFinishedLoadingMods;
 
-            Controller.Setup(Log);
-            Variables.Setup(Log);
             Hooks.Setup();
-            RetryHelper.Setup(Log);
-            GoalCompletionTracker.Setup(Log);
-            GameModesManager.Setup(Log);
-            MenuUI.Setup(Log);
-            BingoBoardUI.Setup(Log);
-            SessionManager.Setup(Log);
+            GoalCompletionTracker.Setup();
+            GameModesManager.Setup();
+            MenuUI.Setup();
+            BingoBoardUI.Setup();
 
             // creates a permanent GameObject which calls GlobalKeybindHelper.Update every frame
             GameObject.DontDestroyOnLoad(new GameObject("update_object", [typeof(GlobalKeybindHelper)]));
@@ -57,7 +46,7 @@ namespace BingoSync.Interfaces
 
         private static void OnFinishedLoadingMods()
         {
-            ItemSyncInterop.Initialize(Log);
+            ItemSyncInterop.Initialize();
 
             ExecuteLogExceptions("OnReadyForGoalsGameModes", delegate
             {
@@ -98,8 +87,8 @@ namespace BingoSync.Interfaces
             }
             catch (Exception ex)
             {
-                Log($"Exception while running {name}: {ex.Message}");
-                Log(ex.StackTrace);
+                Log.Error($"Exception while running {name}: {ex.Message}");
+                Log.Error(ex.StackTrace);
             }
         }
     }

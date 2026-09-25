@@ -1,3 +1,4 @@
+using BingoSync;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,16 +7,11 @@ internal static class RetryHelper
 {
     private static readonly int delayMilliseconds = 100;
     private static readonly int maxDelayMilliseconds = 2000;
-    private static Action<string> Log;
-
-    public static void Setup(Action<string> log) {
-        Log = log;
-    }
 
     public static void RetryWithExponentialBackoff(Func<Task> action, int maxRetries, string requestName, Action failCallback = null, int retries = 0)
     {
         if (retries >= maxRetries) {
-            Log($"All retries used but could not complete request {requestName}");
+            Log.Error($"All retries used but could not complete request {requestName}");
             failCallback?.Invoke();
             return;
         }
@@ -28,7 +24,7 @@ internal static class RetryHelper
             {
                 if (retries > 0)
                 {
-                    Log($"{requestName} request was successful on try {retries}");
+                    Log.Info($"{requestName} request was successful on try {retries}");
                 }
                 return;
             }

@@ -16,7 +16,6 @@ namespace BingoSync
         private static readonly Dictionary<string, List<BingoSquare>> GoalsByVariable = [];
         private static readonly Dictionary<string, List<BingoSquare>> GoalsByRuleset = [];
 
-        private static Action<string> Log;
         public static SaveSettings Variables { get; set; }
 
         public class InternalGoalUpdate
@@ -28,10 +27,8 @@ namespace BingoSync
 
         public static event EventHandler<InternalGoalUpdate> OnGoalCompletionChanged;
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
-
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             foreach (var resource in resources)
             {
