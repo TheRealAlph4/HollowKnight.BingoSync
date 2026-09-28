@@ -18,14 +18,14 @@ namespace BingoSync.Interfaces
 
         internal static void SessionChanged(Session previous)
         {
-            OnSessionChanged?.Invoke(previous, previous);
+            OnActiveSessionChanged?.Invoke(previous, previous);
         }
 
         /// <summary>
         /// Called when the active session has changed. 
         /// Passes the previous session as the parameter.
         /// </summary>
-        public static event EventHandler<Session> OnSessionChanged;
+        public static event EventHandler<Session>? OnActiveSessionChanged;
 
         /// <summary>
         /// When an external mod wants the names of sessions to be displayed (e.g. 

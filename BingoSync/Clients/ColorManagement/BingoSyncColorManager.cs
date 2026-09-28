@@ -1,15 +1,77 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BingoSync.Clients.ColorManagement
 {
     public class BingoSyncColorManager : IColorManager
     {
+        public static event EventHandler? OnGlobalColorSchemeChanged;
+        public event EventHandler? OnColorSchemeChanged;
+
+
+        private bool _useGlobalColorScheme = true;
+        public bool UseGlobalColorScheme
+        {
+            get
+            {
+                return _useGlobalColorScheme;
+            }
+            set
+            {
+                _useGlobalColorScheme = value;
+                OnColorSchemeChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        private int _customColorScheme = 0;
+        public int CustomColorScheme
+        {
+            get
+            {
+                return _customColorScheme;
+            }
+            set
+            {
+                _customColorScheme = value;
+                if (_customColorScheme < 0 || _customColorScheme > 2)
+                {
+                    Log.Warn($"Attempting to set custom color scheme {value}, resetting to 0");
+                    _customColorScheme = 0;
+                }
+                if (UseGlobalColorScheme)
+                {
+                    Log.Info("Custom color scheme was set, but UseGlobalColorScheme is enabled");
+                    return;
+                }
+                OnColorSchemeChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public BingoSyncColorManager()
+        {
+            OnGlobalColorSchemeChanged += GlobalColorSchemeChangedEventHandler;
+        }
+
+        private void GlobalColorSchemeChangedEventHandler(object sender, EventArgs e)
+        {
+            if (UseGlobalColorScheme)
+            {
+                OnColorSchemeChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public static void GlobalColorSchemeChanged()
+        {
+            OnGlobalColorSchemeChanged?.Invoke(null, EventArgs.Empty);
+        }
+
         public List<int> Colors => [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
         public Color ColorOf(int color)
         {
-            if (Controller.GlobalSettings.ColorScheme == 1)
+            int effectiveColorScheme = UseGlobalColorScheme ? Controller.GlobalSettings.ColorScheme : CustomColorScheme;
+            if (effectiveColorScheme == 1)
             {
                 return color switch
                 {
@@ -26,7 +88,7 @@ namespace BingoSync.Clients.ColorManagement
                     _ => new(0f, 0f, 0f),
                 };
             }
-            if (Controller.GlobalSettings.ColorScheme == 2)
+            if (effectiveColorScheme == 2)
             {
                 return color switch
                 {

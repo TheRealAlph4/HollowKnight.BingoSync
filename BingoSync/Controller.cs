@@ -147,13 +147,15 @@ namespace BingoSync
                 AudioNotificationOn = GlobalSettings.AudioNotificationOn
             };
             _activeSession = DefaultSession;
+            ActiveSession.ColorManager.OnColorSchemeChanged -= ActiveSessionColorSchemeChangedEventHandler;
+            ActiveSession.ColorManager.OnColorSchemeChanged += ActiveSessionColorSchemeChangedEventHandler;
             ActiveSession.OnRoomSettingsChanged -= UpdateLockoutIndicatorOnNewBoard;
             ActiveSession.OnRoomSettingsChanged += UpdateLockoutIndicatorOnNewBoard;
             OnBoardUpdate += BingoBoardUI.UpdateGrid;
             OnBoardUpdate += BingoBoardUI.UpdateName;
             OnBoardUpdate += ConfirmTopLeftOnReveal;
             OnBoardUpdate += RefreshGenerationButtonEnabled;
-            SessionManager.OnSessionChanged += OnSessionChanged;
+            SessionManager.OnActiveSessionChanged += ActiveSessionChangedEventHandler;
         }
 
         public static void BoardUpdate()
@@ -161,14 +163,24 @@ namespace BingoSync
             OnBoardUpdate?.Invoke();
         }
 
-        private static void OnSessionChanged(object _, Session previous)
+        private static void ActiveSessionChangedEventHandler(object _, Session previous)
         {
             RefreshGenerationButtonEnabled();
             previous.OnRoomSettingsChanged -= UpdateLockoutIndicatorOnNewBoard;
             ActiveSession.OnRoomSettingsChanged -= UpdateLockoutIndicatorOnNewBoard;
             ActiveSession.OnRoomSettingsChanged += UpdateLockoutIndicatorOnNewBoard;
+            previous.ColorManager.OnColorSchemeChanged -= ActiveSessionColorSchemeChangedEventHandler;
+            ActiveSession.ColorManager.OnColorSchemeChanged -= ActiveSessionColorSchemeChangedEventHandler;
+            ActiveSession.ColorManager.OnColorSchemeChanged += ActiveSessionColorSchemeChangedEventHandler;
             BingoBoardUI.UpdateLockoutIndicator(ActiveSession.RoomIsLockout);
             RefreshUIWithSession(ActiveSession);
+        }
+
+        private static void ActiveSessionColorSchemeChangedEventHandler(object _, EventArgs e)
+        {
+            ConnectionMenuUI.UpdateColorScheme();
+            BingoBoardUI.UpdateColorScheme();
+            BoardUpdate();
         }
 
         public static void RefreshUIWithSession(Session session)
