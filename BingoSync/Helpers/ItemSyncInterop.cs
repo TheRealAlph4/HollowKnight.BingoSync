@@ -11,8 +11,8 @@ namespace BingoSync.Helpers
 {
     internal static class ItemSyncInterop
     {
-        private static Hook itemReceivedHook;
-        private static MethodInfo itemReceivedMethod;
+        private static Hook? itemReceivedHook;
+        private static MethodInfo? itemReceivedMethod;
 
         private static readonly List<Session> knownSessions = [];
         public static void AddSession(Session session) { knownSessions.Add(session); }

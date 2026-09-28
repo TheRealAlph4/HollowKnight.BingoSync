@@ -215,7 +215,7 @@ namespace BingoSync.GameUI
             return new string([.. input.ToCharArray().Where(c => !char.IsWhiteSpace(c))]).Split('/').Last();
         }
 
-        public static void ReadCurrentConnectionInfo(Button _ = null)
+        public static void ReadCurrentConnectionInfo(Button? _ = null)
         {
             Controller.RoomCode = SanitizeRoomCode(roomCodeInput.Text);
             Controller.RoomNickname = nicknameInput.Text;

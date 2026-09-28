@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace BingoSync
 {
@@ -24,11 +23,14 @@ namespace BingoSync
 
         public static Session DefaultSession { get; set; }
         private static Session _activeSession;
-        public static Session ActiveSession { 
-            get {
+        public static Session ActiveSession
+        {
+            get
+            {
                 return _activeSession;
             }
-            set {
+            set
+            {
                 Session previous = _activeSession;
                 _activeSession = value;
                 if (previous == null) return;
@@ -73,11 +75,12 @@ namespace BingoSync
             }
         }
 
-        public static string RoomCode {
+        public static string RoomCode
+        {
             get
             {
-                return ActiveSession?.RoomLink;
-            } 
+                return ActiveSession?.RoomLink ?? string.Empty;
+            }
             set
             {
                 ActiveSession.RoomLink = value;
@@ -87,7 +90,7 @@ namespace BingoSync
         {
             get
             {
-                return ActiveSession?.RoomPassword;
+                return ActiveSession?.RoomPassword ?? string.Empty;
             }
             set
             {
@@ -98,7 +101,7 @@ namespace BingoSync
         {
             get
             {
-                return ActiveSession?.RoomNickname;
+                return ActiveSession?.RoomNickname ?? string.Empty;
             }
             set
             {
@@ -117,7 +120,8 @@ namespace BingoSync
             }
         }
 
-        public static bool ShowSessionName { 
+        public static bool ShowSessionName
+        {
             get
             {
                 return SessionManager.ShowSessionName;
@@ -288,14 +292,16 @@ namespace BingoSync
         {
             if (!ActiveSession.ClientIsConnected())
             {
-                ActiveSession.JoinRoom(RoomCode, RoomNickname, RoomPassword, RoomColor, () => {
+                ActiveSession.JoinRoom(RoomCode, RoomNickname, RoomPassword, RoomColor, () =>
+                {
                     ConnectionMenuUI.Update();
                     RefreshGenerationButtonEnabled();
                 });
             }
             else
             {
-                ActiveSession.ExitRoom(() => {
+                ActiveSession.ExitRoom(() =>
+                {
                     ConnectionMenuUI.Update();
                     RefreshGenerationButtonEnabled();
                 });
@@ -359,7 +365,7 @@ namespace BingoSync
         public static bool RenameActiveGameModeTo(string newName)
         {
             IGameMode gameMode = GameModesManager.FindGameModeByDisplayName(ActiveGameMode);
-            if(gameMode == null || !gameMode.CanBeRenamed)
+            if (gameMode == null || !gameMode.CanBeRenamed)
             {
                 Log.Warn($"Cannot rename gamemode {ActiveGameMode}");
                 return false;

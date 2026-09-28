@@ -20,12 +20,12 @@ namespace BingoSync
 
         public class InternalGoalUpdate
         {
-            public string Name { get; set; }
+            public string Name { get; set; } = string.Empty;
             public bool Unmark { get; set; }
             public bool IsItemSyncUpdate { get; set; }
         }
 
-        public static event EventHandler<InternalGoalUpdate> OnGoalCompletionChanged;
+        public static event EventHandler<InternalGoalUpdate>? OnGoalCompletionChanged;
 
         public static void Setup()
         {
@@ -40,7 +40,7 @@ namespace BingoSync
                 using StreamReader reader = new(s);
                 using JsonTextReader jsonReader = new(reader);
                 JsonSerializer ser = new();
-                List<BingoSquare> squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                List<BingoSquare> squares = ser.Deserialize<List<BingoSquare>>(jsonReader) ?? [];
                 foreach (BingoSquare square in squares)
                 {
                     AllKnownSquaresByName[square.Name] = square;

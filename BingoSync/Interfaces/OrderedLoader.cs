@@ -12,23 +12,23 @@ namespace BingoSync.Interfaces
         /// <summary>
         /// Fires when mods are able to register custom goals and gamemodes, exactly once after all mods have loaded.
         /// </summary>
-        public static event EventHandler OnReadyForGoalsGameModes;
+        public static event EventHandler? OnReadyForGoalsGameModes;
         /// <summary>
         /// Fires after OnReadyForGoalsGameModes has completed, so that mods that depend on goals/gamemodes from other mods can load.
         /// </summary>
-        public static event EventHandler OnStandaloneGoalsGameModesLoaded;
+        public static event EventHandler? OnStandaloneGoalsGameModesLoaded;
         /// <summary>
         /// Fires when mods are able to register UI pages, exactly once after all mods have loaded.
         /// </summary>
-        public static event EventHandler OnReadyForUIPages;
+        public static event EventHandler? OnReadyForUIPages;
         /// <summary>
         /// Fires when mods are able to access the default session, exactly once after all mods have loaded.
         /// </summary>
-        public static event EventHandler OnDefaultSessionReady;
+        public static event EventHandler? OnDefaultSessionReady;
         /// <summary>
         /// Fires when all custom goals, gamemodes and UI pages have been registered, after all other events.
         /// </summary>
-        public static event EventHandler OnCompletelyLoaded;
+        public static event EventHandler? OnCompletelyLoaded;
 
         internal static void LoadInternal()
         {

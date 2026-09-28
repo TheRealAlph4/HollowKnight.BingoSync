@@ -26,6 +26,7 @@ namespace BingoSync.CustomVariables
         {
             bool isBowing = GameManager.instance?.hero_ctrl?.cState?.lookingDownAnim ?? false;
             if (!isBowing) return;
+            if (GameManager.instance == null) return;
             var pos = GameManager.instance.hero_ctrl.transform.position;
             BowInfos.ForEach(info =>
             {
@@ -40,7 +41,7 @@ namespace BingoSync.CustomVariables
     internal class BowInfo
     {
         public Rect BowRect;
-        public string roomName;
-        public string variableSuffix;
+        public string roomName = string.Empty;
+        public string variableSuffix = string.Empty;
     }
 }

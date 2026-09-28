@@ -14,7 +14,7 @@ namespace BingoSync.GameUI
 {
     internal static class BingoBoardUI
     {
-        private static DisplayBoard board;
+        private static DisplayBoard? board;
 
         private static readonly LayoutRoot commonRoot = new(true, "Persistent layout")
         {
@@ -70,11 +70,13 @@ namespace BingoSync.GameUI
 
         public static void UpdateColorScheme()
         {
-            board.UpdateColorScheme();
+            board?.UpdateColorScheme();
         }
 
         public static void UpdateGrid()
         {
+            if (board == null) return;
+
             loadingText.Visibility = (!Controller.ActiveSession.SquareManager.IsValid && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
             revealBoardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.SquareManager.IsValid && !Controller.ActiveSession.SquareManager.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
 
@@ -115,6 +117,8 @@ namespace BingoSync.GameUI
 
         public static void UpdateName()
         {
+            if (board == null) return;
+
             board.boardName.Text = Controller.ActiveSession.SessionName;
             board.boardName.Visibility = Controller.ShowSessionName ? Visibility.Visible : Visibility.Hidden;
         }
@@ -127,7 +131,7 @@ namespace BingoSync.GameUI
 
         public static void SetBoardAlpha(float alpha)
         {
-            board.SetAlpha(alpha);
+            board?.SetAlpha(alpha);
         }
     }
 }

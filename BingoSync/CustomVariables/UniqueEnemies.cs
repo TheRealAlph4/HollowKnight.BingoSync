@@ -59,7 +59,7 @@ namespace BingoSync.CustomVariables
         public static void OomasKilledWithMinions_GlowingWomb(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
             orig(self, hitInstance);
-            if (!IsOoma(self?.gameObject?.name)) return;
+            if (!IsOoma(self.gameObject.name)) return;
             if (hitInstance.Source == null || !hitInstance.Source.name.StartsWith("Damager")) return;
             if (!self.GetIsDead()) return;
             UpdateOomasKilledWithMinionCharm(self.gameObject.name);
@@ -69,11 +69,11 @@ namespace BingoSync.CustomVariables
         public static void OomasKilledWithMinions_Weaversong_Grimmchild(On.SetHP.orig_OnEnter orig, SetHP self)
         {
             orig(self);
-            GameObject obj = self?.target.GetSafe(self);
-            if (!IsOoma(obj?.name)) return;
+            GameObject obj = self.target.GetSafe(self);
+            if (!IsOoma(obj.name)) return;
             if (self?.Fsm?.Owner?.gameObject?.name != "Enemy Damager") return;
             if (self.hp.Value > 0) return;
-            UpdateOomasKilledWithMinionCharm(obj?.name);
+            UpdateOomasKilledWithMinionCharm(obj.name);
         }
     }
 }

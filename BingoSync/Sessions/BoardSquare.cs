@@ -4,8 +4,8 @@ namespace BingoSync.Sessions
 {
     public class BoardSquare
     {
-        public string Name { get; set; }
-        public HashSet<int> MarkedBy { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public HashSet<int> MarkedBy { get; set; } = [];
         public bool Highlighted { get; set; }
         public int GoalIndex { get; set; }
     }

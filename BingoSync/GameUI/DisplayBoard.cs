@@ -16,9 +16,9 @@ namespace BingoSync.GameUI
         internal class SquareLayoutObjects
         {
             public TextObject Text;
-            public Dictionary<HighlightType, Image> Highlights;
-            public Dictionary<string, Image> BackgroundColors;
-            public Dictionary<string, Image> ColorsIcons;
+            public Dictionary<HighlightType, Image> Highlights = [];
+            public Dictionary<string, Image> BackgroundColors = [];
+            public Dictionary<string, Image> ColorsIcons = [];
         };
         private readonly LayoutRoot layoutRoot;
         private readonly StackLayout boardAndName;
