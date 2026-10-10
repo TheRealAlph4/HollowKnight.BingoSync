@@ -360,7 +360,6 @@ namespace BingoSync.Sessions
                 SetColor(color, () =>
                 {
                     RoomNickname = nickname;
-                    RoomColor = color;
                     callback?.Invoke();
                 });
             });
@@ -383,7 +382,10 @@ namespace BingoSync.Sessions
 
         public void SetColor(int color, Action? callback = null)
         {
-            _client.SetColor(color, callback);
+            _client.SetColor(color, () => {
+                RoomColor = color;
+                callback?.Invoke();
+            });
         }
 
         public void NewBoard(List<string> board, bool lockout = true, bool hideCard = true, int seed = 0, Action? callback = null)
