@@ -59,7 +59,7 @@ namespace BingoSync.Clients
             {
                 BaseAddress = new Uri("https://bingosync.com"),
             };
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"Silksong.BingoSync/{BingoSync.version}");
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd($"HollowKnight.BingoSync/{BingoSync.version}");
             LoadCookie(cookieContainer);
 
             webSocketClient = new ClientWebSocket();
