@@ -16,22 +16,19 @@ namespace BingoSync
         private static readonly Dictionary<string, List<BingoSquare>> GoalsByVariable = [];
         private static readonly Dictionary<string, List<BingoSquare>> GoalsByRuleset = [];
 
-        private static Action<string> Log;
         public static SaveSettings Variables { get; set; }
 
         public class InternalGoalUpdate
         {
-            public string Name { get; set; }
-            public bool Clear { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public bool Unmark { get; set; }
             public bool IsItemSyncUpdate { get; set; }
         }
 
-        public static event EventHandler<InternalGoalUpdate> OnGoalCompletionChanged;
+        public static event EventHandler<InternalGoalUpdate>? OnGoalCompletionChanged;
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
-
             string[] resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
             foreach (var resource in resources)
             {
@@ -43,7 +40,7 @@ namespace BingoSync
                 using StreamReader reader = new(s);
                 using JsonTextReader jsonReader = new(reader);
                 JsonSerializer ser = new();
-                List<BingoSquare> squares = ser.Deserialize<List<BingoSquare>>(jsonReader);
+                List<BingoSquare> squares = ser.Deserialize<List<BingoSquare>>(jsonReader) ?? [];
                 foreach (BingoSquare square in squares)
                 {
                     AllKnownSquaresByName[square.Name] = square;
@@ -215,7 +212,7 @@ namespace BingoSync
                     OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
                     {
                         Name = square.Name,
-                        Clear = shouldUnmark,
+                        Unmark = shouldUnmark,
                         IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
                     });
                 }
@@ -229,7 +226,7 @@ namespace BingoSync
                 OnGoalCompletionChanged?.Invoke(null, new InternalGoalUpdate()
                 {
                     Name = square.Name,
-                    Clear = !IsSolved(square),
+                    Unmark = !IsSolved(square),
                     IsItemSyncUpdate = ItemSyncInterop.IsItemSyncUpdate,
                 });
             }

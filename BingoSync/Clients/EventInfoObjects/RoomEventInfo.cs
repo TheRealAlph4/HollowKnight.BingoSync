@@ -2,7 +2,7 @@
 {
     public class RoomEventInfo
     {
-        public PlayerInfo Player { get; set; }
-        public string Timestamp { get; set; }
+        public PlayerInfo Player { get; set; } = new();
+        public string Timestamp { get; set; } = string.Empty;
     }
 }

@@ -22,12 +22,12 @@ namespace BingoSync.Settings
 
         [JsonConverter(typeof(PlayerActionSetConverter))]
         public KeyBinds Keybinds = new();
-        public bool RevealCardOnGameStart = false;
-        public bool RevealCardWhenOthersReveal = false;
+        public bool RevealBoardOnGameStart = false;
+        public bool RevealBoardWhenOthersReveal = false;
         public bool DefaultSessionUnmarkGoals = false;
         public string DefaultNickname = "";
         public string DefaultPassword = "";
-        public string DefaultColor = "red";
+        public int DefaultColor = 1;
         public bool DebugMode = false;
 
         public int BoardAlphaIndex = 0;
@@ -53,6 +53,6 @@ namespace BingoSync.Settings
         public int ItemSyncMarkDelayMilliseconds = 1000;
 
         public bool MarkCompletedGoalsOnLoadSavefile = true;
-        public bool MarkCompletedGoalsOnNewCardReceived = true;
+        public bool MarkCompletedGoalsOnNewBoardReceived = true;
     }
 }

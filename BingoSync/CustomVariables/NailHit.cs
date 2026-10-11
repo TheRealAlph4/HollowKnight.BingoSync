@@ -27,7 +27,7 @@ namespace BingoSync.CustomVariables
 
     internal class NailTarget
     {
-        public string objectName;
-        public string variableSuffix;
+        public string objectName = string.Empty;
+        public string variableSuffix = string.Empty;
     };
 }

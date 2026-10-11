@@ -5,13 +5,7 @@ namespace BingoSync
 {
     public static class Variables
     {
-        private static Action<string> Log;
         private static readonly HashSet<string> trackedVariables = [];
-
-        public static void Setup(Action<string> log)
-        {
-            Log = log;
-        }
 
         /// <summary>
         /// Starts tracking the given variable. Any access to that variable through the Variables interface will be logged.
@@ -41,7 +35,7 @@ namespace BingoSync
             int value = GoalCompletionTracker.GetInteger(variableName);
             if (trackedVariables.Contains(variableName))
             {
-                Log($"GetInteger: {variableName} = {value}");
+                Log.Info($"GetInteger: {variableName} = {value}");
             }
             return value;
         }
@@ -56,7 +50,7 @@ namespace BingoSync
         {
             if (trackedVariables.Contains(variableName))
             {
-                Log($"UpdateInteger: {variableName} = {value}");
+                Log.Info($"UpdateInteger: {variableName} = {value}");
             }
             GoalCompletionTracker.UpdateInteger(variableName, value);
         }
@@ -91,7 +85,7 @@ namespace BingoSync
             bool value = GoalCompletionTracker.GetBoolean(variableName);
             if (trackedVariables.Contains(variableName))
             {
-                Log($"GetBoolean: {variableName} = {value}");
+                Log.Info($"GetBoolean: {variableName} = {value}");
             }
             return value;
         }
@@ -105,7 +99,7 @@ namespace BingoSync
         {
             if (trackedVariables.Contains(variableName))
             {
-                Log($"UpdateBoolean: {variableName} = {value}");
+                Log.Info($"UpdateBoolean: {variableName} = {value}");
             }
             GoalCompletionTracker.UpdateBoolean(variableName, value);
         }

@@ -1,4 +1,5 @@
-﻿using BingoSync.Sessions;
+﻿using BingoSync.Clients.ColorManagement;
+using BingoSync.Sessions;
 using MagicUI.Core;
 using MagicUI.Elements;
 using MagicUI.Graphics;
@@ -13,15 +14,15 @@ namespace BingoSync.GameUI
 {
     internal static class BingoBoardUI
     {
-        private static DisplayBoard board;
+        private static DisplayBoard? board;
 
         private static readonly LayoutRoot commonRoot = new(true, "Persistent layout")
         {
             VisibilityCondition = () => false,
         };
-        private static readonly Button revealCardButton = new(commonRoot, "revealCard")
+        private static readonly Button revealBoardButton = new(commonRoot, "revealBoard")
         {
-            Content = "Reveal Card",
+            Content = "Reveal Board",
             FontSize = 15,
             Margin = 20,
             BorderColor = Color.white,
@@ -44,16 +45,13 @@ namespace BingoSync.GameUI
             Visibility = Visibility.Hidden,
         };
         
-        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
-        public static void Setup(Action<string> log)
+        public static void Setup()
         {
-            Log = log;
-
             commonRoot.VisibilityCondition = () => true;
 
-            revealCardButton.Click += Controller.RevealButtonClicked;
+            revealBoardButton.Click += Controller.RevealButtonClicked;
 
             Loader.Preload();
 
@@ -66,40 +64,48 @@ namespace BingoSync.GameUI
             board = new DisplayBoard(backgroundSprite, highlights);
 
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.ToggleBoard, Controller.ToggleBoardKeybindClicked);
-            commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealCard, Controller.RevealKeybindClicked);
+            commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.RevealBoard, Controller.RevealKeybindClicked);
             commonRoot.ListenForPlayerAction(Controller.GlobalSettings.Keybinds.CycleBoardOpacity, Controller.CycleBoardOpacity);
         }
 
         public static void UpdateColorScheme()
         {
-            board.UpdateColorScheme();
+            board?.UpdateColorScheme();
         }
 
         public static void UpdateGrid()
         {
-            loadingText.Visibility = (!Controller.ActiveSession.Board.IsAvailable && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
-            revealCardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.Board.IsAvailable && !Controller.ActiveSession.Board.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
+            if (board == null) return;
 
-            if (!Controller.ActiveSession.Board.IsAvailable)
+            loadingText.Visibility = (!Controller.ActiveSession.SquareManager.IsValid && Controller.ActiveSession.ClientIsConnecting()) ? Visibility.Visible : Visibility.Hidden;
+            revealBoardButton.Visibility = (Controller.ActiveSession.ClientIsConnected() && Controller.ActiveSession.SquareManager.IsValid && !Controller.ActiveSession.SquareManager.IsRevealed) ? Visibility.Visible : Visibility.Hidden;
+
+            if (!Controller.ActiveSession.SquareManager.IsValid)
             {
                 return;
             }
 
+            IColorManager colorManager = Controller.ActiveSession.ColorManager;
+
             int goalIndex = 0;
-            foreach (Square square in Controller.ActiveSession.Board.SquaresToDisplay)
+            foreach (BoardSquare square in Controller.ActiveSession.SquareManager.SquaresToDisplay)
             {
                 board.bingoLayout[goalIndex].Text.Text = square.Name;
                 board.bingoLayout[goalIndex].BackgroundColors.Values.ToList().ForEach(img => img.Height = 0);
                 board.bingoLayout[goalIndex].ColorsIcons.Values.ToList().ForEach(img => img.Visibility = Visibility.Hidden);
-                foreach (Colors color in square.MarkedBy)
+                foreach (int color in square.MarkedBy)
                 {
-                    board.bingoLayout[goalIndex].BackgroundColors[color.GetName()].Height = 110 / square.MarkedBy.Count;
-                    if (Controller.GlobalSettings.UseShapesForColors && color != Colors.Blank)
+                    board.bingoLayout[goalIndex].BackgroundColors[colorManager.NameOf(color)].Height = 110 / square.MarkedBy.Count;
+                    if (Controller.GlobalSettings.UseShapesForColors)
                     {
-                        board.bingoLayout[goalIndex].ColorsIcons[color.GetName()].Visibility = Visibility.Visible;
+                        board.bingoLayout[goalIndex].ColorsIcons[colorManager.NameOf(color)].Visibility = Visibility.Visible;
                     }
                 }
-                foreach(KeyValuePair<HighlightType, Image> entry in board.bingoLayout[goalIndex].Highlights)
+                if (square.MarkedBy.Count == 0)
+                {
+                    board.bingoLayout[goalIndex].BackgroundColors[colorManager.NameOf(-1)].Height = 110;
+                }
+                foreach (KeyValuePair<HighlightType, Image> entry in board.bingoLayout[goalIndex].Highlights)
                 {
                     HighlightType sprite = entry.Key;
                     Image image = entry.Value;
@@ -111,6 +117,8 @@ namespace BingoSync.GameUI
 
         public static void UpdateName()
         {
+            if (board == null) return;
+
             board.boardName.Text = Controller.ActiveSession.SessionName;
             board.boardName.Visibility = Controller.ShowSessionName ? Visibility.Visible : Visibility.Hidden;
         }
@@ -118,12 +126,12 @@ namespace BingoSync.GameUI
         public static void UpdateLockoutIndicator(bool lockout)
         {
             string indicator = lockout ? " (L)" : " (NL)";
-            revealCardButton.Content = "Reveal Card" + indicator;
+            revealBoardButton.Content = "Reveal Board" + indicator;
         }
 
         public static void SetBoardAlpha(float alpha)
         {
-            board.SetAlpha(alpha);
+            board?.SetAlpha(alpha);
         }
     }
 }

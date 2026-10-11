@@ -7,7 +7,6 @@ namespace BingoSync.Interfaces
 {
     public static class SessionManager
     {
-        private static Action<string> Log;
         private static readonly HashSet<string> NeedsSessionNameKeys = [];
         internal static bool ShowSessionName
         {
@@ -17,21 +16,16 @@ namespace BingoSync.Interfaces
             }
         }
 
-        internal static void Setup(Action<string> log)
-        {
-            Log = log;
-        }
-
         internal static void SessionChanged(Session previous)
         {
-            OnSessionChanged?.Invoke(previous, previous);
+            OnActiveSessionChanged?.Invoke(previous, previous);
         }
 
         /// <summary>
         /// Called when the active session has changed. 
         /// Passes the previous session as the parameter.
         /// </summary>
-        public static event EventHandler<Session> OnSessionChanged;
+        public static event EventHandler<Session>? OnActiveSessionChanged;
 
         /// <summary>
         /// When an external mod wants the names of sessions to be displayed (e.g. 
@@ -85,9 +79,9 @@ namespace BingoSync.Interfaces
         /// <exception cref="NotImplementedException"></exception>
         public static Session CreateSession(string name, Servers server, bool isAutoMarking, bool isAutoUnmarking)
         {
-            IRemoteClient remoteClient = server switch
+            IBingoClient remoteClient = server switch
             {
-                Servers.BingoSync => new BingoSyncClient(Log),
+                Servers.BingoSync => new BingoSyncClient(),
                 _ => throw new NotImplementedException()
             };
             return new Session(name, remoteClient, isAutoMarking, isAutoUnmarking);

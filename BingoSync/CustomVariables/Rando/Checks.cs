@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using BingoSync.Helpers;
 using ItemChanger;
 
 namespace BingoSync.CustomVariables.Rando
@@ -7,6 +8,7 @@ namespace BingoSync.CustomVariables.Rando
     {
         public static void AfterGiveItem(ReadOnlyGiveEventArgs args)
         {
+            if (args.Placement == null) return;
             var variableName = $"gotCheck_{args.Placement.Name}";
             GoalCompletionTracker.UpdateBoolean(variableName, true);
 

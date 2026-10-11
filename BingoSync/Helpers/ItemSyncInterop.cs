@@ -11,9 +11,8 @@ namespace BingoSync.Helpers
 {
     internal static class ItemSyncInterop
     {
-        private static Action<string> Log;
-        private static Hook itemReceivedHook;
-        private static MethodInfo itemReceivedMethod;
+        private static Hook? itemReceivedHook;
+        private static MethodInfo? itemReceivedMethod;
 
         private static readonly List<Session> knownSessions = [];
         public static void AddSession(Session session) { knownSessions.Add(session); }
@@ -23,10 +22,8 @@ namespace BingoSync.Helpers
 
         public static bool IsItemSyncUpdate { get; private set; } = false;
 
-        public static void Initialize(Action<string> log)
+        public static void Initialize()
         {
-            Log = log;
-
             if (ModHooks.GetMod("ItemSyncMod") is Mod)
             {
                 SetupItemSyncHook();

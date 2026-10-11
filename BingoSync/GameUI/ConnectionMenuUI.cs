@@ -8,12 +8,12 @@ using System.Linq;
 using System;
 using BingoSync.Sessions;
 using InputField = UnityEngine.UI.InputField;
+using BingoSync.Clients.ColorManagement;
 
 namespace BingoSync.GameUI
 {
     static class ConnectionMenuUI
     {
-        private static Action<string> Log;
         private static readonly TextureLoader Loader = new(Assembly.GetExecutingAssembly(), "BingoSync.Resources.Images");
 
         private static LayoutRoot layoutRoot;
@@ -42,9 +42,8 @@ namespace BingoSync.GameUI
             }
         }
 
-        public static void Setup(Action<string> log, LayoutRoot layoutRoot)
+        public static void Setup(LayoutRoot layoutRoot)
         {
-            Log = log;
             Loader.Preload();
             ConnectionMenuUI.layoutRoot = layoutRoot;
 
@@ -108,19 +107,11 @@ namespace BingoSync.GameUI
 
         private static void SetupColorButtons()
         {
-            colorButtons =
-            [
-                CreateColorButton("Orange", Colors.Orange.GetColor()),
-                CreateColorButton("Red", Colors.Red.GetColor()),
-                CreateColorButton("Blue", Colors.Blue.GetColor()),
-                CreateColorButton("Green", Colors.Green.GetColor()),
-                CreateColorButton("Purple", Colors.Purple.GetColor()),
-                CreateColorButton("Navy", Colors.Navy.GetColor()),
-                CreateColorButton("Teal", Colors.Teal.GetColor()),
-                CreateColorButton("Brown", Colors.Brown.GetColor()),
-                CreateColorButton("Pink", Colors.Pink.GetColor()),
-                CreateColorButton("Yellow", Colors.Yellow.GetColor())
-            ];
+            static string Capitalize(string str) { return str[0].ToString().ToUpper() + str.Substring(1); }
+
+            IColorManager colorManager = Controller.ActiveSession.ColorManager;
+            colorButtons = [.. colorManager.Colors.Select(
+                color => CreateColorButton(Capitalize(colorManager.NameOf(color)), colorManager.ColorOf(color)))];
 
             StackLayout colorButtonsLayout = new(layoutRoot)
             {
@@ -213,20 +204,18 @@ namespace BingoSync.GameUI
 
         private static void SelectColor(Button sender)
         {
-            Button previousSelectedColor = layoutRoot.GetElement<Button>(Controller.RoomColor);
-            previousSelectedColor.BorderColor = previousSelectedColor.ContentColor;
-            Controller.RoomColor = sender.Name;
+            Button? previousSelectedColor = layoutRoot.GetElement<Button>(Controller.ActiveSession.ColorManager.NameOf(Controller.RoomColor));
+            previousSelectedColor?.BorderColor = previousSelectedColor.ContentColor;
+            Controller.RoomColor = Controller.ActiveSession.ColorManager.NumberOf(sender.Name);
             sender.BorderColor = Color.white;
         }
 
         private static string SanitizeRoomCode(string input)
         {
-            return new string(input.ToCharArray()
-            .Where(c => !char.IsWhiteSpace(c)).ToArray())
-            .Split('/').Last();
+            return new string([.. input.ToCharArray().Where(c => !char.IsWhiteSpace(c))]).Split('/').Last();
         }
 
-        public static void ReadCurrentConnectionInfo(Button _ = null)
+        public static void ReadCurrentConnectionInfo(Button? _ = null)
         {
             Controller.RoomCode = SanitizeRoomCode(roomCodeInput.Text);
             Controller.RoomNickname = nicknameInput.Text;
@@ -241,7 +230,7 @@ namespace BingoSync.GameUI
             HandMode = session.HandMode;
             foreach(Button button in colorButtons)
             {
-                if (button.Content.ToLower() == session.RoomColor.GetName())
+                if (button.Content.ToLower() == session.ColorManager.NameOf(session.RoomColor))
                 {
                     button.BorderColor = Color.white;
                 }
@@ -252,7 +241,7 @@ namespace BingoSync.GameUI
             }
         }
 
-        public static void Update(Button _ = null)
+        public static void Update(Button? _ = null)
         {
             if (Controller.ActiveSession.ClientIsConnected())
             {
@@ -287,28 +276,24 @@ namespace BingoSync.GameUI
 
         public static void LoadDefaults()
         {
-            if (nicknameInput != null)
-                nicknameInput.Text = Controller.GlobalSettings.DefaultNickname;
-            if (passwordInput != null)
-                passwordInput.Text = Controller.GlobalSettings.DefaultPassword;
+            nicknameInput?.Text = Controller.GlobalSettings.DefaultNickname;
+            passwordInput?.Text = Controller.GlobalSettings.DefaultPassword;
             Controller.RoomColor = Controller.GlobalSettings.DefaultColor;
             if (layoutRoot == null)
                 return;
-            Button selectedColorButton = layoutRoot.GetElement<Button>(Controller.RoomColor);
-            if (selectedColorButton != null)
-            {
-                selectedColorButton.BorderColor = Color.white;
-            }
+            Button? selectedColorButton = layoutRoot.GetElement<Button>(Controller.ActiveSession.ColorManager.NameOf(Controller.RoomColor));
+            selectedColorButton?.BorderColor = Color.white;
         }
 
         public static void UpdateColorScheme()
         {
-            foreach(Button button in colorButtons)
+            IColorManager colorManager = Controller.ActiveSession.ColorManager;
+            foreach (Button button in colorButtons)
             {
-                button.ContentColor = ColorExtensions.FromName(button.Content.ToLower()).GetColor();
-                button.BorderColor = ColorExtensions.FromName(button.Content.ToLower()).GetColor();
+                button.ContentColor = colorManager.ColorOf(button.Content.ToLower());
+                button.BorderColor = colorManager.ColorOf(button.Content.ToLower());
             }
-            layoutRoot.GetElement<Button>(Controller.RoomColor).BorderColor = Color.white;
+            layoutRoot.GetElement<Button>(Controller.ActiveSession.ColorManager.NameOf(Controller.RoomColor))?.BorderColor = Color.white;
         }
 
     }

@@ -5,9 +5,9 @@ namespace BingoSync.ModMenu
 {
     internal static class GeneralMenu
     {
-        private static HorizontalOption revealCardOnStartSelector;
-        private static HorizontalOption revealCardOnOthersRevealSelector;
-        private static HorizontalOption markCompletedOnNewCardSelector;
+        private static HorizontalOption revealBoardOnStartSelector;
+        private static HorizontalOption revealBoardOnOthersRevealSelector;
+        private static HorizontalOption markCompletedOnNewBoardSelector;
         private static HorizontalOption markCompletedOnLoadSavefileSelector;
         private static HorizontalOption unmarkGoalsSelector;
         private static HorizontalOption itemSyncSelector;
@@ -17,28 +17,28 @@ namespace BingoSync.ModMenu
 
         public static MenuScreen CreateMenuScreen(MenuScreen parentMenu)
         {
-            revealCardOnStartSelector = new HorizontalOption(
-                name: "Reveal Card On Start",
-                description: "Reveal Card when starting a new savefile",
+            revealBoardOnStartSelector = new HorizontalOption(
+                name: "Reveal Board On Start",
+                description: "Reveal the board when starting a new savefile",
                 values: ["No", "Yes"],
-                applySetting: (index) => Controller.GlobalSettings.RevealCardOnGameStart = (index == 1),
-                loadSetting: () => Controller.GlobalSettings.RevealCardOnGameStart ? 1 : 0
+                applySetting: (index) => Controller.GlobalSettings.RevealBoardOnGameStart = (index == 1),
+                loadSetting: () => Controller.GlobalSettings.RevealBoardOnGameStart ? 1 : 0
             );
 
-            revealCardOnOthersRevealSelector = new HorizontalOption(
+            revealBoardOnOthersRevealSelector = new HorizontalOption(
                 name: "Reveal With Others",
-                description: "Reveal the card, when notified that another player did",
+                description: "Reveal the board, when notified that another player did",
                 values: ["No", "Yes"],
-                applySetting: (index) => Controller.GlobalSettings.RevealCardWhenOthersReveal = (index == 1),
-                loadSetting: () => Controller.GlobalSettings.RevealCardWhenOthersReveal ? 1 : 0
+                applySetting: (index) => Controller.GlobalSettings.RevealBoardWhenOthersReveal = (index == 1),
+                loadSetting: () => Controller.GlobalSettings.RevealBoardWhenOthersReveal ? 1 : 0
             );
 
-            markCompletedOnNewCardSelector = new HorizontalOption(
-                name: "Mark Goals On New Card",
-                description: "Mark all completed goals when a new card is received/revealed",
+            markCompletedOnNewBoardSelector = new HorizontalOption(
+                name: "Mark Goals On New Board",
+                description: "Mark all completed goals when a new board is received/revealed",
                 values: ["No", "Yes"],
-                applySetting: (index) => Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived = (index == 1),
-                loadSetting: () => Controller.GlobalSettings.MarkCompletedGoalsOnNewCardReceived ? 1 : 0
+                applySetting: (index) => Controller.GlobalSettings.MarkCompletedGoalsOnNewBoardReceived = (index == 1),
+                loadSetting: () => Controller.GlobalSettings.MarkCompletedGoalsOnNewBoardReceived ? 1 : 0
             );
 
             markCompletedOnLoadSavefileSelector = new HorizontalOption(
@@ -80,9 +80,9 @@ namespace BingoSync.ModMenu
 
             Element[] elements =
             [
-                revealCardOnStartSelector,
-                revealCardOnOthersRevealSelector,
-                markCompletedOnNewCardSelector,
+                revealBoardOnStartSelector,
+                revealBoardOnOthersRevealSelector,
+                markCompletedOnNewBoardSelector,
                 markCompletedOnLoadSavefileSelector,
                 unmarkGoalsSelector,
                 itemSyncSelector,
@@ -95,8 +95,8 @@ namespace BingoSync.ModMenu
 
         public static void RefreshMenu()
         {
-            revealCardOnStartSelector?.LoadSetting();
-            revealCardOnOthersRevealSelector?.LoadSetting();
+            revealBoardOnStartSelector?.LoadSetting();
+            revealBoardOnOthersRevealSelector?.LoadSetting();
             unmarkGoalsSelector?.LoadSetting();
             itemSyncSelector?.LoadSetting();
             itemSyncDelay?.LoadValue();

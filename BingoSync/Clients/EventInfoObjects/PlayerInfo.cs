@@ -4,9 +4,9 @@ namespace BingoSync.Clients.EventInfoObjects
 {
     public class PlayerInfo
     {
-        public string UUID { get; set; }
-        public string Name { get; set; }
-        public Colors Color { get; set; }
+        public string UUID { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public int Color { get; set; }
         public bool IsSpectator { get; set; }
 
         public override bool Equals(object obj)

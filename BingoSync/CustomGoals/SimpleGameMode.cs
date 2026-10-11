@@ -4,41 +4,29 @@ using System.Linq;
 
 namespace BingoSync.CustomGoals
 {
-    public class GameMode(string name, Dictionary<string, BingoGoal> goals)
+    public class SimpleGameMode(string name, Dictionary<string, BingoGoal> goals) : IGameMode
     {
-        private string name = name;
-        private Dictionary<string, BingoGoal> goals = goals;
+        public bool CanBeRenamed => false;
+        public string DisplayName => _name;
+        
+        private readonly string _name = name;
+        private readonly Dictionary<string, BingoGoal> _goals = goals;
 
-        public Dictionary<string, BingoGoal> GetGoals()
+        public string SetName(string _)
         {
-            return goals;
+            return _name;
         }
 
-        public void SetGoals(Dictionary<string, BingoGoal> goals)
-        {
-            this.goals = goals;
-        }
-
-        virtual public string GetDisplayName()
-        {
-            return name;
-        }
-
-        protected void SetName(string newName)
-        {
-            name = newName;
-        }
-
-        virtual public List<BingoGoal> GenerateBoard(int seed)
+        public List<string> GenerateBoard(int seed)
         {
             List<BingoGoal> board = [];
-            List<BingoGoal> availableGoals = [.. goals.Values];
+            List<BingoGoal> availableGoals = [.. _goals.Values];
             Random r = new(seed);
             while (board.Count < 25)
             {
                 if (availableGoals.Count == 0)
                 {
-                    Modding.Logger.Log("Could not generate board");
+                    Log.Error("Could not generate board");
                     return GetErrorBoard();
                 }
                 int index = r.Next(availableGoals.Count);
@@ -58,16 +46,15 @@ namespace BingoSync.CustomGoals
                 availableGoals.Remove(proposedGoal);
             }
 
-            return board;
+            return [.. board.Select(goal => goal.Name)];
         }
 
-        public static List<BingoGoal> GetErrorBoard()
+        public static List<string> GetErrorBoard()
         {
-            BingoGoal empty = new("-");
-            List<BingoGoal> board = [new BingoGoal("Error generating board")];
+            List<string> board = ["Error generating board"];
             for(int i = 0; i < 24; ++i)
             {
-                board.Add(empty);
+                board.Add("-");
             }
             return board;
         }

@@ -150,6 +150,7 @@ public sealed class ToggleButton : Container
 
     private void ReconstructButton()
     {
+        if (Child == null) return;
         Button newButton = new(layoutRoot, Child.Name)
         {
             Borderless = ((Button)Child).Borderless,

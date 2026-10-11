@@ -1,4 +1,5 @@
-﻿using BingoSync.GameUI;
+﻿using BingoSync.Clients.ColorManagement;
+using BingoSync.GameUI;
 using Satchel.BetterMenus;
 
 namespace BingoSync.ModMenu
@@ -20,9 +21,7 @@ namespace BingoSync.ModMenu
                 applySetting: (index) =>
                 {
                     Controller.GlobalSettings.ColorScheme = index;
-                    ConnectionMenuUI.UpdateColorScheme();
-                    BingoBoardUI.UpdateColorScheme();
-                    Controller.BoardUpdate();
+                    BingoSyncColorManager.GlobalColorSchemeChanged();
                 },
                 loadSetting: () => Controller.GlobalSettings.ColorScheme
             );
